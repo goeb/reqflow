@@ -5,7 +5,7 @@
 
 bool doPrint(enum LogLevel msgLevel)
 {
-    const char *envLevel = getenv("SMIT_DEBUG");
+    const char *envLevel = getenv("REQ_DEBUG");
     enum LogLevel policy = LL_INFO; // default value
     if (envLevel) {
         if (0 == strcmp(envLevel, "FATAL")) policy = LL_FATAL;
