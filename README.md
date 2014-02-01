@@ -2,7 +2,7 @@
 
 # Overview
 
-`req` is software for Requirement Management across documents.
+`req` is a software tool for Requirement Management across documents.
 
 
 It is not operationnal and highly unstable at the moment.
