@@ -20,3 +20,6 @@ req list
     -c <config-file>  select config file
     -x <format>       export to format
 
+# Supported Input Formats
+
+    docx (Open Xml)
