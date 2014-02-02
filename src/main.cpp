@@ -18,6 +18,9 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <regex.h>
+#include <map>
+
 
 #include "global.h"
 #include "logging.h"
@@ -32,6 +35,8 @@ void usage()
            "    stat\n"
            "\n"
            "    list\n"
+           "\n"
+           "    config\n"
            "\n"
            "    version\n"
            "    help\n"
@@ -64,12 +69,14 @@ int showVersion()
 struct ReqFileConfig {
     std::string id;
     std::string path;
-    std::string tagRegex;
-    std::string refRegex;
+    std::string tagPattern;
+    regex_t tagRegex;
+    std::string refPattern;
+    regex_t refRegex;
     std::list<std::string> dependencies;
 };
 
-std::list<ReqFileConfig> ReqConfig;
+std::map<std::string, ReqFileConfig> ReqConfig;
 
 std::string pop(std::list<std::string> & L)
 {
@@ -105,6 +112,7 @@ int loadConfiguration(const char * file)
         if (verb == "addFile") {
             ReqFileConfig fileConfig;
             fileConfig.id = pop(*line);
+            LOG_DEBUG("addFile '%s'...", fileConfig.id.c_str());
             if (fileConfig.id.empty()) {
                 LOG_ERROR("Missing identifier for file: line %d", lineNum);
             }
@@ -116,20 +124,34 @@ int loadConfiguration(const char * file)
                         LOG_ERROR("Missing -path value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.id = pop(*line);
+                    fileConfig.path = pop(*line);
                 } else if (arg == "-tag") {
                     if (line->empty()) {
                         LOG_ERROR("Missing -tag value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.tagRegex = pop(*line);
+                    fileConfig.tagPattern = pop(*line);
+                    /* Compile regular expression */
+                    int reti = regcomp(&fileConfig.tagRegex, fileConfig.tagPattern.c_str(), 0);
+                    if (reti) {
+                        LOG_ERROR("Cannot compile tag regex for %s: %s", fileConfig.id.c_str(), fileConfig.tagPattern.c_str());
+                        exit(1);
+                    }
+
 
                 } else if (arg == "-ref") {
                     if (line->empty()) {
                         LOG_ERROR("Missing -ref value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.refRegex = pop(*line);
+                    fileConfig.refPattern = pop(*line);
+                    /* Compile regular expression */
+                    int reti = regcomp(&fileConfig.refRegex, fileConfig.refPattern.c_str(), 0);
+                    if (reti) {
+                        LOG_ERROR("Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
+                        exit(1);
+                    }
+
 
                 } else if (arg == "-depends-on") {
                     if (line->empty()) {
@@ -142,7 +164,12 @@ int loadConfiguration(const char * file)
                     LOG_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
                 }
             }
-            ReqConfig.push_back(fileConfig);
+            std::map<std::string, ReqFileConfig>::iterator c = ReqConfig.find(fileConfig.id);
+            if (c != ReqConfig.end()) {
+                LOG_ERROR("Config error: duplicate id '%s'", fileConfig.id.c_str());
+                return 1;
+            }
+            ReqConfig[fileConfig.id] = fileConfig;
 
         } else {
             LOG_ERROR("Invalid token '%s': line %d", verb.c_str(), lineNum);
@@ -154,6 +181,20 @@ int loadConfiguration(const char * file)
 
 int cmdStat(int argc, const char **argv)
 {
+    int i = 0;
+    const char *configFile = 0;
+    const char *arg = 0;
+    while (i<argc) {
+        arg = argv[i]; i++;
+        if (0 == strcmp(arg, "-c")) {
+            if (i>=argc) usage();
+            configFile = argv[i]; i++;
+        }
+    }
+
+    int r = loadConfiguration(configFile);
+    if (r != 0) return 1;
+
     return 0;
 }
 
@@ -168,7 +209,6 @@ int cmdList(int argc, const char **argv)
             if (i>=argc) usage();
             configFile = argv[i]; i++;
         }
-
     }
     if (!configFile) {
         LOG_ERROR(_("No configuration file specified. Please provide a -c option."));
@@ -180,6 +220,36 @@ int cmdList(int argc, const char **argv)
     return 0;
 }
 
+int cmdConfig(int argc, const char **argv)
+{
+    int i = 0;
+    const char *configFile = 0;
+    const char *arg = 0;
+    while (i<argc) {
+        arg = argv[i]; i++;
+        if (0 == strcmp(arg, "-c")) {
+            if (i>=argc) usage();
+            configFile = argv[i]; i++;
+        }
+    }
+    if (!configFile) {
+        LOG_ERROR(_("No configuration file specified. Please provide a -c option."));
+        return 1;
+    } else {
+        int r = loadConfiguration(configFile);
+        if (r != 0) return 1;
+    }
+
+    // display a summary of the configuration
+    std::map<std::string, ReqFileConfig>::iterator c;
+    FOREACH(c, ReqConfig) {
+        printf("%s: %s\n", c->first.c_str(), c->second.path.c_str());
+    }
+
+    return 0;
+}
+
+
 
 int main(int argc, const char **argv)
 {
@@ -190,6 +260,7 @@ int main(int argc, const char **argv)
     if (0 == strcmp(command, "stat"))         return cmdStat(argc-2, argv+2);
     else if (0 == strcmp(command, "version")) return showVersion();
     else if (0 == strcmp(command, "list"))    return cmdList(argc-2, argv+2);
+    else if (0 == strcmp(command, "config"))    return cmdConfig(argc-2, argv+2);
     else usage();
 
     return 0;
