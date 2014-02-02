@@ -22,6 +22,7 @@
 #include <map>
 #include <set>
 #include <fstream>
+#include <iostream>
 #include <zip.h>
 
 #include <libxml/parser.h>
@@ -53,6 +54,7 @@ void usage()
            "\n"
            "Options:\n"
            "    -c <config> Select configuration file.\n"
+           "    -x <format> Select export format: text (default), csv"
            "\n"
            "\n");
     exit(1);
@@ -90,7 +92,8 @@ struct ReqFileConfig {
 struct Requirement {
     std::string id;
     std::string parentDocumentId;
-    std::set<std::string> coveredRequirements;
+    std::set<std::string> covers;
+    std::set<std::string> coveredBy;
 };
 
 std::map<std::string, ReqFileConfig> ReqConfig;
@@ -310,7 +313,7 @@ void loadText(ReqFileConfig &fileConfig)
             if (currentRequirement.empty()) {
                 LOG_ERROR("Reference found whereas no current requirement.");
             } else {
-                Requirements[currentRequirement].coveredRequirements.insert(ref);
+                Requirements[currentRequirement].covers.insert(ref);
             }
         }
     }
@@ -357,7 +360,7 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
                 if (currentRequirement.empty()) {
                     LOG_ERROR("Reference found whereas no current requirement.");
                 } else {
-                    Requirements[currentRequirement].coveredRequirements.insert(ref);
+                    Requirements[currentRequirement].covers.insert(ref);
                 }
             }
 
@@ -455,17 +458,99 @@ int loadRequirements()
     return 0;
 }
 
-void printRequirements()
+bool isReqDefined(std::string id)
+{
+    std::map<std::string, Requirement>::iterator req = Requirements.find(id);
+    if (req == Requirements.end()) return false;
+    else return true;
+}
+
+/** Fulfill .coveredBy tables
+  */
+void consolidateCoverage()
 {
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
-        printf("%s\n", r->second.id.c_str());
         std::set<std::string>::iterator c;
-        FOREACH(c, r->second.coveredRequirements) {
-            printf("%s covers %s\n", r->second.id.c_str(), c->c_str());
+        FOREACH(c, r->second.covers) {
+            if (isReqDefined(*c)) Requirements[*c].coveredBy.insert(r->second.id);
+        }
+    }
+
+}
+
+void printRequirements()
+{
+    printf("-- Matrix A Covers B:\n");
+
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        if (r->second.covers.empty()) {
+            printf("%s covers none\n", r->second.id.c_str());
+        } else {
+            std::set<std::string>::iterator c;
+            FOREACH(c, r->second.covers) {
+                printf("%s covers %s", r->second.id.c_str(), c->c_str());
+                if (!isReqDefined(*c)) {
+                    printf(":Undefined");
+                } else {
+                    Requirements[*c].coveredBy.insert(r->second.id);
+                }
+                printf("\n");
+            }
+        }
+    }
+    // print inverted matrix (fulfilled via the coveredBy.insert(...) above)
+    printf("-- Matrix A Covered By B:\n");
+    FOREACH(r, Requirements) {
+        if (r->second.coveredBy.empty()) {
+            printf("%s covered-by none\n", r->second.id.c_str());
+        } else {
+            std::set<std::string>::iterator c;
+            FOREACH(c, r->second.coveredBy) {
+                printf("%s covered-by %s\n", r->second.id.c_str(), c->c_str());
+            }
         }
     }
 }
+
+void printRequirementsCsv()
+{
+    std::cout << "Requirements,Covered Requirements" << std::endl;
+
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        if (r->second.covers.empty()) {
+            std::cout << r->second.id << ',' << std::endl;
+
+        } else {
+            std::set<std::string>::iterator c;
+            FOREACH(c, r->second.covers) {
+                std::cout << r->second.id << ',' << *c;
+
+                if (!isReqDefined(*c)) {
+                    printf(":Undefined");
+                }
+                std::cout << std::endl;
+            }
+        }
+    }
+    // print inverted matrix
+    std::cout << "Requirements,Covered By" << std::endl;
+    FOREACH(r, Requirements) {
+        if (r->second.coveredBy.empty()) {
+            std::cout << r->second.id << ',' << std::endl;
+
+        } else {
+            std::set<std::string>::iterator c;
+            FOREACH(c, r->second.coveredBy) {
+                std::cout << r->second.id << ',' << *c << std::endl;
+            }
+        }
+    }
+}
+
+
 
 /** Check that all referenced requirements exist
   */
@@ -474,10 +559,10 @@ void checkUndefinedRequirements()
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
         std::set<std::string>::iterator c;
-        FOREACH(c, r->second.coveredRequirements) {
-            std::map<std::string, Requirement>::iterator ref = Requirements.find(*c);
-            if (ref == Requirements.end()) {
-                printf("Undefined requirement: %s, referenced by: %s (%s)", c->c_str(), r->second.id.c_str(), r->second.parentDocumentId.c_str());
+        FOREACH(c, r->second.covers) {
+            if (!isReqDefined(*c)) {
+                LOG_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
+                          c->c_str(), r->second.id.c_str(), r->second.parentDocumentId.c_str());
             }
         }
     }
@@ -507,11 +592,15 @@ int cmdList(int argc, const char **argv)
     int i = 0;
     const char *configFile = 0;
     const char *arg = 0;
+    const char *exportFormat = "txt";
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
             if (i>=argc) usage();
             configFile = argv[i]; i++;
+        } else if (0 == strcmp(arg, "-x")) {
+            if (i>=argc) usage();
+            exportFormat = argv[i]; i++;
         }
     }
     if (!configFile) {
@@ -526,7 +615,12 @@ int cmdList(int argc, const char **argv)
     if (r != 0) return 1;
 
     checkUndefinedRequirements();
-    printRequirements();
+    consolidateCoverage();
+    if (0 == strcmp(exportFormat, "txt")) printRequirements();
+    else if (0 == strcmp(exportFormat, "csv")) printRequirementsCsv();
+    else {
+        LOG_ERROR("Invalid export format: %s", exportFormat);
+    }
 
     return 0;
 }

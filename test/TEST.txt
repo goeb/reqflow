@@ -10,6 +10,12 @@ T_01
     check this 01
     check that 01
 Ref: REQ_01
+Ref: REQ_02
+Ref: REQ_03
+
+T_01
+    xxx
+    yyy
 
 T_02
     do this 02
