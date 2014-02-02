@@ -38,6 +38,9 @@ void usage()
            "\n"
            "    config\n"
            "\n"
+           "    regex <pattern> <text>\n"
+           "          Test regex given by <pattern> applied on <text>\n"
+           "\n"
            "    version\n"
            "    help\n"
            "\n"
@@ -249,6 +252,11 @@ int cmdConfig(int argc, const char **argv)
     return 0;
 }
 
+int cmdRegex(int argc, const char **argv)
+{
+    return 0;
+}
+
 
 
 int main(int argc, const char **argv)
@@ -260,8 +268,10 @@ int main(int argc, const char **argv)
     if (0 == strcmp(command, "stat"))         return cmdStat(argc-2, argv+2);
     else if (0 == strcmp(command, "version")) return showVersion();
     else if (0 == strcmp(command, "list"))    return cmdList(argc-2, argv+2);
-    else if (0 == strcmp(command, "config"))    return cmdConfig(argc-2, argv+2);
+    else if (0 == strcmp(command, "config"))  return cmdConfig(argc-2, argv+2);
+    else if (0 == strcmp(command, "regex"))   return cmdRegex(argc-2, argv+2);
     else usage();
+
 
     return 0;
 }

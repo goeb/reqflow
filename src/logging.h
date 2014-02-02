@@ -25,21 +25,29 @@ bool doPrint(enum LogLevel msgLevel);
 #define LOG_INFO(...)  do { if (doPrint(LL_INFO)) { LOG("INFO ", __VA_ARGS__); } } while (0)
 #define LOG_DEBUG(...) do { if (doPrint(LL_DEBUG)) { LOG("DEBUG", __VA_ARGS__); } } while (0)
 
-#define LOG(_level, ...) LOG2(_level, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG(_level, ...) if (doPrint(LL_DEBUG)) LOG_FULL(_level, __FILE__, __LINE__, __VA_ARGS__); \
+    else { LOG_SHORT(_level, __VA_ARGS__); }
 
-#define LOG2(_level, _file, _line, ...) do { \
+#define LOG_FULL(_level, _file, _line, ...) do { \
     fprintf(stderr, "%s %s %s:%d ", getLocalTimestamp().c_str(), _level, _file, _line); \
     fprintf(stderr, __VA_ARGS__); \
     fprintf(stderr, "\n"); \
     } while (0)
 
+#define LOG_SHORT(_level, ...) do { \
+    fprintf(stderr, "%s ", _level); \
+    fprintf(stderr, __VA_ARGS__); \
+    fprintf(stderr, "\n"); \
+    } while (0)
+
+
 
 class FuncScope {
 public:
     FuncScope(const char *file, int line, const char *name) {
-        funcName = name;  if (doPrint(LL_DEBUG)) { LOG2("FUNC ", file, line, "Entering %s...", funcName); }
+        funcName = name;  if (doPrint(LL_DEBUG)) { LOG_FULL("FUNC ", file, line, "Entering %s...", funcName); }
     }
-    ~FuncScope() { if (doPrint(LL_DEBUG)) LOG("FUNC ", "Leaving %s...", funcName); }
+    ~FuncScope() { if (doPrint(LL_DEBUG)) { LOG("FUNC ", "Leaving %s...", funcName); } }
 private:
     const char *funcName;
 };
