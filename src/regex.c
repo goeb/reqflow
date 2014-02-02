@@ -33,6 +33,11 @@ int main(int argc, char *argv[])
     char buffer[256];
     const char *text = argv[2];
     reti = regexec(&regex, text, N, pmatch, 0);
+    int i;
+    for (i=0; i<100; i++) reti = regexec(&regex, text, N, pmatch, 0);
+
+
+
     if (!reti) {
         puts("Match: \n");
         int i;
