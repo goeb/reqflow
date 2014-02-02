@@ -86,12 +86,16 @@ struct ReqFileConfig {
     std::string refPattern;
     regex_t *refRegex;
     std::list<std::string> dependencies;
-    ReqFileConfig(): tagRegex(0), refRegex(0) {}
+    int nTotalRequirements;
+    int nCoveredRequirements;
+
+    ReqFileConfig(): tagRegex(0), refRegex(0), nTotalRequirements(0), nCoveredRequirements(0) {}
 };
 
 struct Requirement {
     std::string id;
     std::string parentDocumentId;
+    std::string parentDocumentPath;
     std::set<std::string> covers;
     std::set<std::string> coveredBy;
 };
@@ -295,13 +299,14 @@ void loadText(ReqFileConfig &fileConfig)
             std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
             if (r != Requirements.end()) {
                 LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
-                          reqId.c_str(), r->second.parentDocumentId.c_str(), fileConfig.path.c_str());
+                          reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
                 currentRequirement.clear();
 
             } else {
                 Requirement req;
                 req.id = reqId;
-                req.parentDocumentId = fileConfig.path;
+                req.parentDocumentId = fileConfig.id;
+                req.parentDocumentPath = fileConfig.path;
                 Requirements[reqId] = req;
                 currentRequirement = reqId;
             }
@@ -342,13 +347,14 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
                 std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
                 if (r != Requirements.end()) {
                     LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
-                              reqId.c_str(), r->second.parentDocumentId.c_str(), fileConfig.path.c_str());
+                              reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
                     currentRequirement.clear();
 
                 } else {
                     Requirement req;
                     req.id = reqId;
-                    req.parentDocumentId = fileConfig.path;
+                    req.parentDocumentId = fileConfig.id;
+                    req.parentDocumentPath = fileConfig.path;
                     Requirements[reqId] = req;
                     currentRequirement = reqId;
                 }
@@ -425,8 +431,46 @@ void loadDocx(ReqFileConfig &fileConfig)
     loadDocxXml(fileConfig, contents);
 }
 
+bool isReqDefined(std::string id)
+{
+    std::map<std::string, Requirement>::iterator req = Requirements.find(id);
+    if (req == Requirements.end()) return false;
+    else return true;
+}
+
+/** Fulfill .coveredBy tables
+  */
+void consolidateCoverage()
+{
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        std::set<std::string>::iterator c;
+        FOREACH(c, r->second.covers) {
+            if (isReqDefined(*c)) Requirements[*c].coveredBy.insert(r->second.id);
+        }
+    }
+
+}
+
+/** Check that all referenced requirements exist
+  */
+void checkUndefinedRequirements()
+{
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        std::set<std::string>::iterator c;
+        FOREACH(c, r->second.covers) {
+            if (!isReqDefined(*c)) {
+                LOG_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
+                          c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
+            }
+        }
+    }
+}
+
 int loadRequirements()
 {
+    int result = 0;
     std::map<std::string, ReqFileConfig>::iterator c;
     FOREACH(c, ReqConfig) {
         ReqFileConfig &fileConfig = c->second;
@@ -452,31 +496,13 @@ int loadRequirements()
         }
         default:
             LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
-            return -1;
+            result = -1;
         }
     }
-    return 0;
-}
+    checkUndefinedRequirements();
+    consolidateCoverage();
 
-bool isReqDefined(std::string id)
-{
-    std::map<std::string, Requirement>::iterator req = Requirements.find(id);
-    if (req == Requirements.end()) return false;
-    else return true;
-}
-
-/** Fulfill .coveredBy tables
-  */
-void consolidateCoverage()
-{
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        std::set<std::string>::iterator c;
-        FOREACH(c, r->second.covers) {
-            if (isReqDefined(*c)) Requirements[*c].coveredBy.insert(r->second.id);
-        }
-    }
-
+    return result;
 }
 
 void printRequirements()
@@ -550,24 +576,6 @@ void printRequirementsCsv()
     }
 }
 
-
-
-/** Check that all referenced requirements exist
-  */
-void checkUndefinedRequirements()
-{
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        std::set<std::string>::iterator c;
-        FOREACH(c, r->second.covers) {
-            if (!isReqDefined(*c)) {
-                LOG_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
-                          c->c_str(), r->second.id.c_str(), r->second.parentDocumentId.c_str());
-            }
-        }
-    }
-}
-
 int cmdStat(int argc, const char **argv)
 {
     int i = 0;
@@ -583,6 +591,34 @@ int cmdStat(int argc, const char **argv)
 
     int r = loadConfiguration(configFile);
     if (r != 0) return 1;
+
+    r = loadRequirements();
+    if (r != 0) return 1;
+
+    // compute statistics
+    std::map<std::string, ReqFileConfig>::iterator file;
+    std::map<std::string, Requirement>::iterator req;
+    FOREACH(req, Requirements) {
+        file = ReqConfig.find(req->second.parentDocumentId);
+        if (file == ReqConfig.end()) {
+            LOG_ERROR("Cannot find parent document of requirement: %s", req->second.id.c_str());
+            continue;
+        }
+        file->second.nTotalRequirements++;
+        if (!req->second.coveredBy.empty()) {
+            file->second.nCoveredRequirements++;
+        }
+    }
+
+    // print statistics
+    FOREACH(file, ReqConfig) {
+        ReqFileConfig f = file->second;
+        int ratio = -1;
+        if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
+        printf("%s (%s) Total=%d Covered=%d Ratio(c/t)=%d%%)\n", f.id.c_str(), f.path.c_str(),
+               f.nTotalRequirements, f.nCoveredRequirements, ratio);
+    }
+
 
     return 0;
 }
@@ -614,8 +650,6 @@ int cmdList(int argc, const char **argv)
     int r = loadRequirements();
     if (r != 0) return 1;
 
-    checkUndefinedRequirements();
-    consolidateCoverage();
     if (0 == strcmp(exportFormat, "txt")) printRequirements();
     else if (0 == strcmp(exportFormat, "csv")) printRequirementsCsv();
     else {
