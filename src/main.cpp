@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <regex.h>
 #include <map>
+#include <set>
+#include <fstream>
 
 
 #include "global.h"
@@ -79,7 +81,14 @@ struct ReqFileConfig {
     std::list<std::string> dependencies;
 };
 
+struct Requirement {
+    std::string id;
+    std::string parentDocumentId;
+    std::set<std::string> coveredRequirements;
+};
+
 std::map<std::string, ReqFileConfig> ReqConfig;
+std::map<std::string, Requirement> Requirements;
 
 std::string pop(std::list<std::string> & L)
 {
@@ -181,6 +190,143 @@ int loadConfiguration(const char * file)
     return 0;
 }
 
+enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_UNKNOWN };
+ReqFileType getFileType(const std::string &path)
+{
+    size_t i = path.find_last_of('.');
+    if (i == std::string::npos) return RF_UNKNOWN;
+    if (i == path.size()-1) return RF_UNKNOWN;
+    std::string extension = path.substr(i+1);
+    if (0 == strcasecmp(extension.c_str(), "txt")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "odt")) return RF_ODT;
+    else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
+    else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
+    else return RF_UNKNOWN;
+}
+
+std::string getMatchingPattern(regex_t *regex, const char *text)
+{
+    std::string matchingText;
+    // check if line contains a requirement
+    const int N = 5; // max number of groups
+    regmatch_t pmatch[N];
+    int reti = regexec(regex, text, N, pmatch, 0);
+    if (!reti) {
+        // take the last group, becauase we want to support the 2 following cases.
+        // Example 1: ./req regex "<\(REQ_[-a-zA-Z_0-9]*\)>" "ex: <REQ_123> (comment)"
+        // match[0]: <REQ_123>
+        // match[1]: REQ_123
+        // match[2]:
+        //
+        // Example 2: ./req regex "REQ_[-a-zA-Z_0-9]*" "ex: REQ_123 (comment)"
+        // match[0]: REQ_123
+        // match[1]:
+        // match[2]:
+
+        int i;
+        const int LINE_MAX = 4096;
+        char buffer[LINE_MAX];
+        for (i=0; i<N; i++) {
+            if (pmatch[i].rm_so != -1) {
+                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
+                if (length > LINE_MAX-1) {
+                    LOG_ERROR("Requirement size too big (%d)", length);
+                    break;
+                }
+                memcpy(buffer, text+pmatch[i].rm_so, length);
+                buffer[length] = 0;
+                LOG_DEBUG("match[%d]: %s", i, buffer);
+                matchingText = buffer; // overwrite each time, so that we take the last one
+
+            } else break; // no more groups
+        }
+
+    } else if (reti == REG_NOMATCH) {
+        matchingText = "";
+
+    } else {
+        char msgbuf[1024];
+        regerror(reti, regex, msgbuf, sizeof(msgbuf));
+        LOG_ERROR("Regex match failed: %s", msgbuf);
+        matchingText = "";
+    }
+
+    return matchingText;
+}
+
+
+void loadText(ReqFileConfig &fileConfig)
+{
+    const int LINE_MAX = 4096;
+    char line[LINE_MAX];
+
+    std::ifstream ifs(fileConfig.path.c_str(), std::ifstream::in);
+
+    std::string currentRequirement;
+
+
+    if (!ifs.good()) {
+        LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
+        return;
+    }
+    while (ifs.getline(line, LINE_MAX)) {
+
+        std::string requirementId = getMatchingPattern(&fileConfig.tagRegex, line);
+
+        if (!requirementId.empty()) {
+
+            std::map<std::string, Requirement>::iterator r = Requirements.find(requirementId);
+            if (r != Requirements.end()) {
+                LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
+                          requirementId.c_str(), r->second.parentDocumentId.c_str(), fileConfig.path.c_str());
+                currentRequirement.clear();
+
+            } else {
+                Requirement req;
+                req.id = requirementId;
+                req.parentDocumentId = fileConfig.path;
+                Requirements[requirementId] = req;
+                currentRequirement = requirementId;
+            }
+        }
+
+        // check if line covers a requirement
+        std::string ref = getMatchingPattern(&fileConfig.refRegex, line);
+        if (!ref.empty()) {
+            if (currentRequirement.empty()) {
+                LOG_ERROR("Reference found whereas no current requirement.");
+            } else {
+                Requirements[currentRequirement].coveredRequirements.insert(ref);
+            }
+        }
+    }
+
+}
+void loadDocx(ReqFileConfig &fileConfig)
+{
+
+}
+
+int loadRequirements()
+{
+    std::map<std::string, ReqFileConfig>::iterator c;
+    FOREACH(c, ReqConfig) {
+        ReqFileConfig &fileConfig = c->second;
+        ReqFileType fileType = getFileType(fileConfig.path);
+        switch(fileType) {
+        case RF_TEXT:
+            loadText(fileConfig);
+            break;
+        case RF_DOCX:
+            loadDocx(fileConfig);
+            break;
+        default:
+            LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
+            return -1;
+        }
+    }
+    return 0;
+}
 
 int cmdStat(int argc, const char **argv)
 {
@@ -220,6 +366,11 @@ int cmdList(int argc, const char **argv)
         int r = loadConfiguration(configFile);
         if (r != 0) return 1;
     }
+
+    int r = loadRequirements();
+    if (r != 0) return 1;
+
+
     return 0;
 }
 
@@ -269,10 +420,10 @@ int cmdRegex(int argc, const char **argv)
     /* Execute regular expression */
 
     const int N = 5;
-    regmatch_t pmatch[N];
 
     char buffer[256];
     const char *text = argv[1];
+    regmatch_t pmatch[N];
     reti = regexec(&regex, text, N, pmatch, 0);
     if (!reti) {
         printf("Match: \n");
