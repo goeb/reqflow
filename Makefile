@@ -17,6 +17,9 @@ SRCS_CPP = 	src/main.cpp \
 			src/logging.cpp \
 			src/dateTools.cpp \
 			src/parseConfig.cpp \
+			src/req.cpp \
+			src/importerTxt.cpp \
+			src/importerDocx.cpp \
 
 OBJS = $(SRCS_CPP:%.cpp=$(BUILD_DIR)/%.o)
 DEPENDS = $(SRCS_CPP:%.cpp=$(BUILD_DIR)/%.d)

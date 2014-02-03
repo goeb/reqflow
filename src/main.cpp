@@ -23,16 +23,13 @@
 #include <set>
 #include <fstream>
 #include <iostream>
-#include <zip.h>
-
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-
-
 
 #include "global.h"
 #include "logging.h"
 #include "parseConfig.h"
+#include "req.h"
+#include "importerDocx.h"
+#include "importerTxt.h"
 
 void usage()
 {
@@ -40,7 +37,10 @@ void usage()
            "\n"
            "Commands:\n"
            "\n"
-           "    stat\n"
+           "    stat [doc ...]  Print the status of requirements in all documents or the given documents.\n"
+           "                    Without additionnal option, only unresolved coverage issues are reported.\n"
+           "         -s         Print a one-line summary of each document.\n"
+           "         -v         Print the status of all requirements.\n"
            "\n"
            "    list\n"
            "\n"
@@ -78,30 +78,6 @@ int showVersion()
     exit(1);
 }
 
-struct ReqFileConfig {
-    std::string id;
-    std::string path;
-    std::string tagPattern;
-    regex_t *tagRegex;
-    std::string refPattern;
-    regex_t *refRegex;
-    std::list<std::string> dependencies;
-    int nTotalRequirements;
-    int nCoveredRequirements;
-
-    ReqFileConfig(): tagRegex(0), refRegex(0), nTotalRequirements(0), nCoveredRequirements(0) {}
-};
-
-struct Requirement {
-    std::string id;
-    std::string parentDocumentId;
-    std::string parentDocumentPath;
-    std::set<std::string> covers;
-    std::set<std::string> coveredBy;
-};
-
-std::map<std::string, ReqFileConfig> ReqConfig;
-std::map<std::string, Requirement> Requirements;
 
 std::string pop(std::list<std::string> & L)
 {
@@ -222,243 +198,7 @@ ReqFileType getFileType(const std::string &path)
     else return RF_UNKNOWN;
 }
 
-std::string getMatchingPattern(regex_t *regex, const char *text)
-{
-    if (!regex) return "";
 
-    std::string matchingText;
-    // check if line matches
-    const int N = 5; // max number of groups
-    regmatch_t pmatch[N];
-    //LOG_DEBUG("regexec(%p, %p)", regex, text);
-    int reti = regexec(regex, text, N, pmatch, 0);
-    if (!reti) {
-        // take the last group, because we want to support the 2 following cases.
-        // Example 1: ./req regex "<\(REQ_[-a-zA-Z_0-9]*\)>" "ex: <REQ_123> (comment)"
-        // match[0]: <REQ_123>
-        // match[1]: REQ_123
-        // match[2]:
-        //
-        // Example 2: ./req regex "REQ_[-a-zA-Z_0-9]*" "ex: REQ_123 (comment)"
-        // match[0]: REQ_123
-        // match[1]:
-        // match[2]:
-
-        int i;
-        const int LINE_SIZE_MAX = 4096;
-        char buffer[LINE_SIZE_MAX];
-        for (i=0; i<N; i++) {
-            if (pmatch[i].rm_so != -1) {
-                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
-                if (length > LINE_SIZE_MAX-1) {
-                    LOG_ERROR("Requirement size too big (%d)", length);
-                    break;
-                }
-                memcpy(buffer, text+pmatch[i].rm_so, length);
-                buffer[length] = 0;
-                //LOG_DEBUG("match[%d]: %s", i, buffer);
-                matchingText = buffer; // overwrite each time, so that we take the last one
-
-            } else break; // no more groups
-        }
-
-    } else if (reti == REG_NOMATCH) {
-        matchingText = "";
-
-    } else {
-        char msgbuf[1024];
-        regerror(reti, regex, msgbuf, sizeof(msgbuf));
-        LOG_ERROR("Regex match failed: %s", msgbuf);
-        matchingText = "";
-    }
-
-    return matchingText;
-}
-
-
-void loadText(ReqFileConfig &fileConfig)
-{
-    LOG_DEBUG("loadText: %s", fileConfig.path.c_str());
-    const int LINE_SIZE_MAX = 4096;
-    char line[LINE_SIZE_MAX];
-
-    std::ifstream ifs(fileConfig.path.c_str(), std::ifstream::in);
-
-    std::string currentRequirement;
-
-    if (!ifs.good()) {
-        LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
-        return;
-    }
-    while (ifs.getline(line, LINE_SIZE_MAX)) {
-
-        // check if line covers a requirement
-        std::string ref = getMatchingPattern(fileConfig.refRegex, line);
-        if (!ref.empty()) {
-            if (currentRequirement.empty()) {
-                LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
-            } else {
-                Requirements[currentRequirement].covers.insert(ref);
-            }
-        }
-
-        std::string reqId = getMatchingPattern(fileConfig.tagRegex, line);
-
-        if (!reqId.empty() && reqId != ref) {
-
-            std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
-            if (r != Requirements.end()) {
-                LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
-                          reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
-                currentRequirement.clear();
-
-            } else {
-                Requirement req;
-                req.id = reqId;
-                req.parentDocumentId = fileConfig.id;
-                req.parentDocumentPath = fileConfig.path;
-                Requirements[reqId] = req;
-                currentRequirement = reqId;
-            }
-        }
-
-    }
-}
-
-void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
-{
-    xmlNode *currentNode = NULL;
-
-    static std::string currentRequirement;
-	static std::string textInParagraphCurrent; // consolidated over recursive calls
-
-    for (currentNode = a_node; currentNode; currentNode = currentNode->next) {
-		std::string nodeName;
-        if (currentNode->type == XML_ELEMENT_NODE) {
-            if (0 == strcmp((char*)currentNode->name, "pStyle")) {
-				xmlAttr* attribute = currentNode->properties;
-				while(attribute && attribute->name && attribute->children)
-				{
-					xmlChar* style = xmlNodeListGetString(currentNode->doc, attribute->children, 1);
-					LOG_DEBUG("style: %s", (char*)style);
-					xmlFree(style); 
-					attribute = attribute->next;
-				}
-
-			} // take benefit of styles in the future
-			LOG_DEBUG("node: %s", (char*)currentNode->name);
-			nodeName = (char*)currentNode->name;
-
-        } else if (XML_TEXT_NODE == currentNode->type) {
-            xmlChar *text;
-            text = xmlNodeListGetRawString(doc, currentNode, 1);
-            LOG_DEBUG("text size: %d bytes", strlen((char*)text));
-            LOG_DEBUG("text: %s", (char*)text);
-
-			textInParagraphCurrent += (char*)text;
-
-			LOG_DEBUG("textInParagraphCurrent: %s", textInParagraphCurrent.c_str());
-
-			xmlFree(text);
-        }
-
-
-
-        loadDocxXmlNode(fileConfig, doc, currentNode->children);
-
-		if (nodeName =="p" && !textInParagraphCurrent.empty()) {
-			// process text of paragraph
-
-            // check coverage of requirement
-            std::string ref = getMatchingPattern(fileConfig.refRegex, textInParagraphCurrent.c_str());
-            if (!ref.empty()) {
-                if (currentRequirement.empty()) {
-                    LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
-                } else {
-                    Requirements[currentRequirement].covers.insert(ref);
-                }
-            }
-
-            // check plain requirement
-            std::string reqId = getMatchingPattern(fileConfig.tagRegex, textInParagraphCurrent.c_str());
-
-			// TODO if reqId and ref are the same (same value && same offset), only consider ref.
-            if (!reqId.empty() && (reqId != ref) ) {
-
-                std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
-                if (r != Requirements.end()) {
-                    LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
-                              reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
-                    currentRequirement.clear();
-
-                } else {
-                    Requirement req;
-                    req.id = reqId;
-                    req.parentDocumentId = fileConfig.id;
-                    req.parentDocumentPath = fileConfig.path;
-                    Requirements[reqId] = req;
-                    currentRequirement = reqId;
-                }
-            }
-
-			textInParagraphCurrent.clear();
-		}
-    }
-}
-
-
-void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents)
-{
-    xmlDocPtr document;
-    xmlNode *root;
-
-    document = xmlReadMemory(contents.data(), contents.size(), 0, 0, 0);
-    root = xmlDocGetRootElement(document);
-
-    loadDocxXmlNode(fileConfig, document, root);
-}
-
-
-
-void loadDocx(ReqFileConfig &fileConfig)
-{
-    LOG_DEBUG("loadDocx: %s", fileConfig.path.c_str());
-    int err;
-
-    struct zip *zipFile = zip_open(fileConfig.path.c_str(), 0, &err);
-    if (!zipFile) {
-        LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
-        return;
-    }
-
-    const char *CONTENTS = "word/document.xml";
-    int i = zip_name_locate(zipFile, CONTENTS, 0);
-    if (i < 0) {
-        LOG_ERROR("Not a valid docx document; %s", fileConfig.path.c_str());
-        zip_close(zipFile);
-        return;
-    }
-
-    std::string contents; // buffer for loading the XML contents
-    struct zip_file *fileInZip = zip_fopen_index(zipFile, i, 0);
-    if (fileInZip) {
-        const int BUF_SIZ = 4096;
-        char buffer[BUF_SIZ];
-        int r;
-        while ( (r = zip_fread(fileInZip, buffer, BUF_SIZ)) > 0) {
-            contents.append(buffer, r);
-        }
-        LOG_DEBUG("%s:%s: %d bytes", fileConfig.path.c_str(), CONTENTS, contents.size());
-
-        zip_fclose(fileInZip);
-    } else {
-        LOG_ERROR("Cannot open file %d in zip: %s", i, fileConfig.path.c_str());
-    }
-    zip_close(zipFile);
-
-    // parse the XML
-    loadDocxXml(fileConfig, contents);
-}
 
 bool isReqDefined(std::string id)
 {
@@ -506,7 +246,7 @@ int loadRequirements()
         ReqFileType fileType = getFileType(fileConfig.path);
         switch(fileType) {
         case RF_TEXT:
-            loadText(fileConfig);
+            loadText(fileConfig, Requirements);
             break;
         case RF_DOCX:
             loadDocx(fileConfig);
@@ -608,13 +348,18 @@ void printRequirementsCsv()
 int cmdStat(int argc, const char **argv)
 {
     int i = 0;
-    const char *configFile = 0;
+    const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
+    enum REQ_STAT_MODE { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL } statusMode = REQ_UNRESOLVED;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
             if (i>=argc) usage();
             configFile = argv[i]; i++;
+        } else if (0 == strcmp(arg, "-s")) {
+            statusMode = REQ_SUMMARY;
+        } else if (0 == strcmp(arg, "-v")) {
+            statusMode = REQ_ALL;
         }
     }
 
@@ -655,7 +400,7 @@ int cmdStat(int argc, const char **argv)
 int cmdList(int argc, const char **argv)
 {
     int i = 0;
-    const char *configFile = 0;
+    const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
     const char *exportFormat = "txt";
     while (i<argc) {
