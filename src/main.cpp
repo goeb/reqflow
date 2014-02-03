@@ -644,8 +644,8 @@ int cmdStat(int argc, const char **argv)
         ReqFileConfig f = file->second;
         int ratio = -1;
         if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
-        printf("%s (%s) Total=%d Covered=%d Ratio(c/t)=%d%%)\n", f.id.c_str(), f.path.c_str(),
-               f.nTotalRequirements, f.nCoveredRequirements, ratio);
+        printf("%-30s %3d%% %3d / %3d %s\n", f.id.c_str(), ratio,
+               f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
     }
 
 
