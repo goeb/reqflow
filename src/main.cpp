@@ -230,7 +230,7 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
     // check if line matches
     const int N = 5; // max number of groups
     regmatch_t pmatch[N];
-    LOG_DEBUG("regexec(%p, %p)", regex, text);
+    //LOG_DEBUG("regexec(%p, %p)", regex, text);
     int reti = regexec(regex, text, N, pmatch, 0);
     if (!reti) {
         // take the last group, because we want to support the 2 following cases.
@@ -245,18 +245,18 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
         // match[2]:
 
         int i;
-        const int LINE_MAX = 4096;
-        char buffer[LINE_MAX];
+        const int LINE_SIZE_MAX = 4096;
+        char buffer[LINE_SIZE_MAX];
         for (i=0; i<N; i++) {
             if (pmatch[i].rm_so != -1) {
                 int length = pmatch[i].rm_eo - pmatch[i].rm_so;
-                if (length > LINE_MAX-1) {
+                if (length > LINE_SIZE_MAX-1) {
                     LOG_ERROR("Requirement size too big (%d)", length);
                     break;
                 }
                 memcpy(buffer, text+pmatch[i].rm_so, length);
                 buffer[length] = 0;
-                LOG_DEBUG("match[%d]: %s", i, buffer);
+                //LOG_DEBUG("match[%d]: %s", i, buffer);
                 matchingText = buffer; // overwrite each time, so that we take the last one
 
             } else break; // no more groups
@@ -279,8 +279,8 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
 void loadText(ReqFileConfig &fileConfig)
 {
     LOG_DEBUG("loadText: %s", fileConfig.path.c_str());
-    const int LINE_MAX = 4096;
-    char line[LINE_MAX];
+    const int LINE_SIZE_MAX = 4096;
+    char line[LINE_SIZE_MAX];
 
     std::ifstream ifs(fileConfig.path.c_str(), std::ifstream::in);
 
@@ -290,11 +290,21 @@ void loadText(ReqFileConfig &fileConfig)
         LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
         return;
     }
-    while (ifs.getline(line, LINE_MAX)) {
+    while (ifs.getline(line, LINE_SIZE_MAX)) {
+
+        // check if line covers a requirement
+        std::string ref = getMatchingPattern(fileConfig.refRegex, line);
+        if (!ref.empty()) {
+            if (currentRequirement.empty()) {
+                LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
+            } else {
+                Requirements[currentRequirement].covers.insert(ref);
+            }
+        }
 
         std::string reqId = getMatchingPattern(fileConfig.tagRegex, line);
 
-        if (!reqId.empty()) {
+        if (!reqId.empty() && reqId != ref) {
 
             std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
             if (r != Requirements.end()) {
@@ -312,37 +322,68 @@ void loadText(ReqFileConfig &fileConfig)
             }
         }
 
-        // check if line covers a requirement
-        std::string ref = getMatchingPattern(fileConfig.refRegex, line);
-        if (!ref.empty()) {
-            if (currentRequirement.empty()) {
-                LOG_ERROR("Reference found whereas no current requirement.");
-            } else {
-                Requirements[currentRequirement].covers.insert(ref);
-            }
-        }
     }
 }
 
 void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
 {
-    xmlNode *cur_node = NULL;
+    xmlNode *currentNode = NULL;
 
-    std::string currentRequirement;
+    static std::string currentRequirement;
+	static std::string textInParagraphCurrent; // consolidated over recursive calls
 
-    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
-        if (cur_node->type == XML_ELEMENT_NODE) {
-            if (0 == strcmp((char*)cur_node->name, "pStyle")) { } // take benefit of styles later...
+    for (currentNode = a_node; currentNode; currentNode = currentNode->next) {
+		std::string nodeName;
+        if (currentNode->type == XML_ELEMENT_NODE) {
+            if (0 == strcmp((char*)currentNode->name, "pStyle")) {
+				xmlAttr* attribute = currentNode->properties;
+				while(attribute && attribute->name && attribute->children)
+				{
+					xmlChar* style = xmlNodeListGetString(currentNode->doc, attribute->children, 1);
+					LOG_DEBUG("style: %s", (char*)style);
+					xmlFree(style); 
+					attribute = attribute->next;
+				}
 
-        } else if (XML_TEXT_NODE == cur_node->type) {
+			} // take benefit of styles in the future
+			LOG_DEBUG("node: %s", (char*)currentNode->name);
+			nodeName = (char*)currentNode->name;
+
+        } else if (XML_TEXT_NODE == currentNode->type) {
             xmlChar *text;
-            text = xmlNodeListGetRawString(doc, cur_node, 1);
+            text = xmlNodeListGetRawString(doc, currentNode, 1);
             LOG_DEBUG("text size: %d bytes", strlen((char*)text));
+            LOG_DEBUG("text: %s", (char*)text);
+
+			textInParagraphCurrent += (char*)text;
+
+			LOG_DEBUG("textInParagraphCurrent: %s", textInParagraphCurrent.c_str());
+
+			xmlFree(text);
+        }
+
+
+
+        loadDocxXmlNode(fileConfig, doc, currentNode->children);
+
+		if (nodeName =="p" && !textInParagraphCurrent.empty()) {
+			// process text of paragraph
+
+            // check coverage of requirement
+            std::string ref = getMatchingPattern(fileConfig.refRegex, textInParagraphCurrent.c_str());
+            if (!ref.empty()) {
+                if (currentRequirement.empty()) {
+                    LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
+                } else {
+                    Requirements[currentRequirement].covers.insert(ref);
+                }
+            }
 
             // check plain requirement
-            std::string reqId = getMatchingPattern(fileConfig.tagRegex, (char*)text);
+            std::string reqId = getMatchingPattern(fileConfig.tagRegex, textInParagraphCurrent.c_str());
 
-            if (!reqId.empty()) {
+			// TODO if reqId and ref are the same (same value && same offset), only consider ref.
+            if (!reqId.empty() && (reqId != ref) ) {
 
                 std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
                 if (r != Requirements.end()) {
@@ -360,20 +401,8 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
                 }
             }
 
-            // check coverage of requirement
-            std::string ref = getMatchingPattern(fileConfig.refRegex, (char*)text);
-            if (!ref.empty()) {
-                if (currentRequirement.empty()) {
-                    LOG_ERROR("Reference found whereas no current requirement.");
-                } else {
-                    Requirements[currentRequirement].covers.insert(ref);
-                }
-            }
-
-            if (text) xmlFree(text);
-        }
-
-        loadDocxXmlNode(fileConfig, doc, cur_node->children);
+			textInParagraphCurrent.clear();
+		}
     }
 }
 
