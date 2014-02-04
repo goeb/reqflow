@@ -314,7 +314,7 @@ int loadRequirements()
     return result;
 }
 
-void printRequirements()
+void printMatrix()
 {
     printf("-- Matrix A Covers B:\n");
 
@@ -384,6 +384,61 @@ void printRequirementsCsv()
         }
     }
 }
+void printSummary(int argc, const char **argv)
+{
+
+    // TODO process only files given by argv
+
+    // compute statistics
+    std::map<std::string, ReqFileConfig>::iterator file;
+    std::map<std::string, Requirement>::iterator req;
+    FOREACH(req, Requirements) {
+        file = ReqConfig.find(req->second.parentDocumentId);
+        if (file == ReqConfig.end()) {
+            LOG_ERROR("Cannot find parent document of requirement: %s", req->second.id.c_str());
+            continue;
+        }
+        file->second.nTotalRequirements++;
+        if (!req->second.coveredBy.empty()) {
+            file->second.nCoveredRequirements++;
+        }
+    }
+
+    // print statistics
+    FOREACH(file, ReqConfig) {
+        ReqFileConfig f = file->second;
+        int ratio = -1;
+        if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
+        printf("%-30s %3d%% %3d / %3d %s\n", f.id.c_str(), ratio,
+               f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
+    }
+}
+
+void printUnresolved(int argc, const char **argv)
+{
+    std::map<std::string, Requirement>::iterator r;
+    if (!argc) {
+        FOREACH(r, Requirements) {
+            if (r->second.covers.empty()) {
+                printf("U %s\n", r->second.id.c_str());
+            }
+        }
+    } else while (argc) {
+        FOREACH(r, Requirements) {
+            if (r->second.covers.empty() && r->second.parentDocumentId == argv[0]) {
+                printf("U %s\n", r->second.id.c_str());
+            }
+        }
+    }
+}
+
+void printAllRequirements(int argc, const char **argv)
+{
+    // TODO process only files given by argv
+    LOG_ERROR("printAllRequirements");
+    //printRequirements();
+}
+
 
 int cmdStat(int argc, const char **argv)
 {
@@ -409,30 +464,20 @@ int cmdStat(int argc, const char **argv)
     r = loadRequirements();
     if (r != 0) return 1;
 
-    // compute statistics
-    std::map<std::string, ReqFileConfig>::iterator file;
-    std::map<std::string, Requirement>::iterator req;
-    FOREACH(req, Requirements) {
-        file = ReqConfig.find(req->second.parentDocumentId);
-        if (file == ReqConfig.end()) {
-            LOG_ERROR("Cannot find parent document of requirement: %s", req->second.id.c_str());
-            continue;
-        }
-        file->second.nTotalRequirements++;
-        if (!req->second.coveredBy.empty()) {
-            file->second.nCoveredRequirements++;
-        }
+    switch (statusMode) {
+    case REQ_SUMMARY:
+        printSummary(argc+i, argv+i);
+        break;
+    case REQ_UNRESOLVED:
+        printUnresolved(argc+i, argv+i);
+        break;
+    case REQ_ALL:
+        printAllRequirements(argc+i, argv+i);
+        break;
+    default:
+        LOG_ERROR("Unexpected statusMode %d", statusMode);
+        exit(1);
     }
-
-    // print statistics
-    FOREACH(file, ReqConfig) {
-        ReqFileConfig f = file->second;
-        int ratio = -1;
-        if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
-        printf("%-30s %3d%% %3d / %3d %s\n", f.id.c_str(), ratio,
-               f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
-    }
-
 
     return 0;
 }
@@ -464,7 +509,7 @@ int cmdList(int argc, const char **argv)
     int r = loadRequirements();
     if (r != 0) return 1;
 
-    if (0 == strcmp(exportFormat, "txt")) printRequirements();
+    if (0 == strcmp(exportFormat, "txt")) printMatrix();
     else if (0 == strcmp(exportFormat, "csv")) printRequirementsCsv();
     else {
         LOG_ERROR("Invalid export format: %s", exportFormat);
