@@ -19,13 +19,17 @@ struct ReqFileConfig {
     regex_t *tagRegex;
     std::string refPattern;
     regex_t *refRegex;
+	std::string startAfter;
+	regex_t *startAfterRegex;
+	std::string stopAfter;
+	regex_t *stopAfterRegex;
     std::list<std::string> dependencies;
     int nTotalRequirements;
     int nCoveredRequirements;
 	Encoding encoding;
 
-    ReqFileConfig(): tagRegex(0), refRegex(0), nTotalRequirements(0), nCoveredRequirements(0),
-		encoding(UTF8) {}
+    ReqFileConfig(): tagRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0),
+		nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8) {}
 };
 
 struct Requirement {

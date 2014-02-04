@@ -30,6 +30,7 @@
 #include "req.h"
 #include "importerDocx.h"
 #include "importerTxt.h"
+#include "importerPdf.h"
 
 void usage()
 {
@@ -45,6 +46,9 @@ void usage()
            "    list\n"
            "\n"
            "    config\n"
+           "\n"
+           "    pdf <file>\n"
+           "          Dump text extracted from pdf file (debug purpose).\n"
            "\n"
            "    regex <pattern> <text>\n"
            "          Test regex given by <pattern> applied on <text>\n"
@@ -127,6 +131,34 @@ int loadConfiguration(const char * file)
                         return -1;
                     }
                     fileConfig.path = pop(*line);
+                } else if (arg == "-start-after") {
+                    if (line->empty()) {
+                        LOG_ERROR("Missing -start-after value for %s", fileConfig.id.c_str());
+                        return -1;
+                    }
+					fileConfig.startAfter = pop(*line);
+					fileConfig.startAfterRegex = new regex_t();
+                    int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
+                    if (reti) {
+                        LOG_ERROR("Cannot compile startAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
+                        exit(1);
+                    }
+                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
+					
+                } else if (arg == "-stop-after") {
+                    if (line->empty()) {
+                        LOG_ERROR("Missing -stop-after value for %s", fileConfig.id.c_str());
+                        return -1;
+                    }
+					fileConfig.stopAfter = pop(*line);
+					fileConfig.stopAfterRegex = new regex_t();
+                    int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
+                    if (reti) {
+                        LOG_ERROR("Cannot compile stopAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
+                        exit(1);
+                    }
+                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
+					
                 } else if (arg == "-tag") {
                     if (line->empty()) {
                         LOG_ERROR("Missing -tag value for %s", fileConfig.id.c_str());
@@ -183,7 +215,7 @@ int loadConfiguration(const char * file)
     return 0;
 }
 
-enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_UNKNOWN };
+enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_PDF, RF_UNKNOWN };
 ReqFileType getFileType(const std::string &path)
 {
     size_t i = path.find_last_of('.');
@@ -195,6 +227,7 @@ ReqFileType getFileType(const std::string &path)
     else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
     else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
     else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
+    else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
     else return RF_UNKNOWN;
 }
 
@@ -249,7 +282,7 @@ int loadRequirements()
             loadText(fileConfig, Requirements);
             break;
         case RF_DOCX:
-            loadDocx(fileConfig);
+            loadDocx(fileConfig, Requirements);
             break;
         case RF_DOCX_XML: // mainly for test purpose
         {
@@ -259,10 +292,13 @@ int loadRequirements()
                 LOG_ERROR("Cannot read file (or empty): %s", fileConfig.path.c_str());
                 continue;
             }
-            loadDocxXml(fileConfig, xml);
+            loadDocxXml(fileConfig, xml, Requirements);
             free((void*)xml);
             break;
         }
+		case RF_PDF:
+			loadPdf(fileConfig, Requirements);
+			break;
         default:
             LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
             result = -1;
@@ -462,6 +498,16 @@ int cmdConfig(int argc, const char **argv)
     return 0;
 }
 
+int cmdPdf(int argc, const char **argv)
+{
+	if (!argc) usage();
+	while (argc) {
+		extractText(argv[0], UTF8); // TODO take encoding from command line
+		argc--;
+		argv++;
+	}
+	return 0;
+}
 int cmdRegex(int argc, const char **argv)
 {
     if (argc != 2) usage();
@@ -521,6 +567,7 @@ int main(int argc, const char **argv)
     else if (0 == strcmp(command, "list"))    return cmdList(argc-2, argv+2);
     else if (0 == strcmp(command, "config"))  return cmdConfig(argc-2, argv+2);
     else if (0 == strcmp(command, "regex"))   return cmdRegex(argc-2, argv+2);
+    else if (0 == strcmp(command, "pdf"))     return cmdPdf(argc-2, argv+2);
     else usage();
 
 

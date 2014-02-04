@@ -5,7 +5,7 @@
 #include "importerDocx.h"
 #include "logging.h"
 
-void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
+void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node, std::map<std::string, Requirement> &requirements)
 {
     xmlNode *currentNode = NULL;
 
@@ -44,7 +44,7 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
 
 
 
-        loadDocxXmlNode(fileConfig, doc, currentNode->children);
+        loadDocxXmlNode(fileConfig, doc, currentNode->children, requirements);
 
         if (nodeName =="p" && !textInParagraphCurrent.empty()) {
             // process text of paragraph
@@ -55,7 +55,7 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
                 if (currentRequirement.empty()) {
                     LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
                 } else {
-                    Requirements[currentRequirement].covers.insert(ref);
+                    requirements[currentRequirement].covers.insert(ref);
                 }
             }
 
@@ -65,8 +65,8 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
             // TODO if reqId and ref are the same (same value && same offset), only consider ref.
             if (!reqId.empty() && (reqId != ref) ) {
 
-                std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
-                if (r != Requirements.end()) {
+                std::map<std::string, Requirement>::iterator r = requirements.find(reqId);
+                if (r != requirements.end()) {
                     LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
                               reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
                     currentRequirement.clear();
@@ -76,7 +76,7 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
                     req.id = reqId;
                     req.parentDocumentId = fileConfig.id;
                     req.parentDocumentPath = fileConfig.path;
-                    Requirements[reqId] = req;
+                    requirements[reqId] = req;
                     currentRequirement = reqId;
                 }
             }
@@ -87,7 +87,7 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node)
 }
 
 
-void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents)
+void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents, std::map<std::string, Requirement> &requirements)
 {
     xmlDocPtr document;
     xmlNode *root;
@@ -95,12 +95,12 @@ void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents)
     document = xmlReadMemory(contents.data(), contents.size(), 0, 0, 0);
     root = xmlDocGetRootElement(document);
 
-    loadDocxXmlNode(fileConfig, document, root);
+    loadDocxXmlNode(fileConfig, document, root, requirements);
 }
 
 
 
-void loadDocx(ReqFileConfig &fileConfig)
+void loadDocx(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &requirements)
 {
     LOG_DEBUG("loadDocx: %s", fileConfig.path.c_str());
     int err;
@@ -137,5 +137,5 @@ void loadDocx(ReqFileConfig &fileConfig)
     zip_close(zipFile);
 
     // parse the XML
-    loadDocxXml(fileConfig, contents);
+    loadDocxXml(fileConfig, contents, requirements);
 }

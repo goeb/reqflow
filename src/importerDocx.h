@@ -8,8 +8,7 @@
 #include "req.h"
 
 
-void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node);
-void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents);
-void loadDocx(ReqFileConfig &fileConfig);
+void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents, std::map<std::string, Requirement> &requirements);
+void loadDocx(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &Requirements);
 
 #endif
