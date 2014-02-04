@@ -10,6 +10,8 @@
 
 #define DEFAULT_CONF "req.conf"
 
+enum Encoding { UTF8, LATIN1 };
+
 struct ReqFileConfig {
     std::string id;
     std::string path;
@@ -20,8 +22,10 @@ struct ReqFileConfig {
     std::list<std::string> dependencies;
     int nTotalRequirements;
     int nCoveredRequirements;
+	Encoding encoding;
 
-    ReqFileConfig(): tagRegex(0), refRegex(0), nTotalRequirements(0), nCoveredRequirements(0) {}
+    ReqFileConfig(): tagRegex(0), refRegex(0), nTotalRequirements(0), nCoveredRequirements(0),
+		encoding(UTF8) {}
 };
 
 struct Requirement {
