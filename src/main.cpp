@@ -542,7 +542,7 @@ int cmdRegex(int argc, const char **argv)
             } else printf("match[%d]:\n", i);
         }
     } else if (reti == REG_NOMATCH) {
-        printf("No match");
+        printf("No match\n");
 
     } else {
         char msgbuf[100];
