@@ -11,6 +11,7 @@
 #define DEFAULT_CONF "req.conf"
 
 enum Encoding { UTF8, LATIN1 };
+enum BlockStatus { NOT_STARTED, STOP_REACHED, REQ_OK };
 
 struct ReqFileConfig {
     std::string id;
@@ -43,7 +44,19 @@ struct Requirement {
 extern std::map<std::string, ReqFileConfig> ReqConfig;
 extern std::map<std::string, Requirement> Requirements;
 
+std::string getMatchingPattern(regex_t *regex, const std::string &text);
 std::string getMatchingPattern(regex_t *regex, const char *text);
+
+class ReqDocument {
+public:
+    virtual int loadRequirements() = 0;
+    BlockStatus processBlock(const std::string &text);
+protected:
+    bool started; // indicate if the parsing passed the point after which requirement may be acquired
+    std::string currentRequirement;
+    std::string currentText;
+    ReqFileConfig fileConfig;
+};
 
 
 #endif

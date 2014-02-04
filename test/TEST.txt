@@ -1,5 +1,4 @@
 
-1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 aaaaaa
 # Test plan:
 
 ## Tests cases
@@ -11,11 +10,7 @@ T_01
     check that 01
 Ref: REQ_01
 Ref: REQ_02
-Ref: REQ_03
 
-T_01
-    xxx
-    yyy
 
 T_02
     do this 02
@@ -29,9 +24,9 @@ T_05
     do that 05
     check this 05
     check that 05
-Ref: REQ_02
+Ref: REQ_03
 
-## Annex: INDEX OF REQUIREMENTS
+## Annex: summary of tests
 
 	T_01
 	T_02

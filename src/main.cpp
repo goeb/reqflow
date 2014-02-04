@@ -297,8 +297,11 @@ int loadRequirements()
             break;
         }
 		case RF_PDF:
-			loadPdf(fileConfig, Requirements);
+        {
+            ReqDocumentPdf doc(fileConfig);
+            doc.loadRequirements();
 			break;
+        }
         default:
             LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
             result = -1;
@@ -502,7 +505,7 @@ int cmdPdf(int argc, const char **argv)
 {
 	if (!argc) usage();
 	while (argc) {
-		extractText(argv[0], UTF8); // TODO take encoding from command line
+        ReqDocumentPdf::dumpText(argv[0], UTF8); // TODO take encoding from command line
 		argc--;
 		argv++;
 	}

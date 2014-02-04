@@ -3,8 +3,13 @@
 
 #include "req.h"
 
-void loadPdf(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &Requirements);
-void extractText(const char *file, Encoding encoding);
+class ReqDocumentPdf: public ReqDocument {
+public:
+    ReqDocumentPdf(ReqFileConfig &c) {fileConfig = c;}
+    int loadRequirements();
+    static void dumpText(const char *file, Encoding encoding);
+};
+
 
 
 #endif

@@ -7,6 +7,61 @@ std::map<std::string, ReqFileConfig> ReqConfig;
 std::map<std::string, Requirement> Requirements;
 
 
+BlockStatus ReqDocument::processBlock(const std::string &text)
+{
+    // check the startAfter pattern
+    if (!started && fileConfig.startAfterRegex) {
+        std::string start = getMatchingPattern(fileConfig.startAfterRegex, text);
+        if (!start.empty()) started = true;
+    }
+
+    if (!started) return NOT_STARTED;
+
+    // check the stopAfter pattern
+    std::string stop = getMatchingPattern(fileConfig.stopAfterRegex, text);
+    if (!stop.empty()) {
+        LOG_DEBUG("stop: %s", stop.c_str());
+        LOG_DEBUG("line: %s", text.c_str());
+        return STOP_REACHED;
+    }
+
+    // check if text covers a requirement
+    std::string ref = getMatchingPattern(fileConfig.refRegex, text);
+    if (!ref.empty()) {
+        if (currentRequirement.empty()) {
+            LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
+        } else {
+            Requirements[currentRequirement].covers.insert(ref);
+        }
+    }
+
+    std::string reqId = getMatchingPattern(fileConfig.tagRegex, text);
+
+    if (!reqId.empty() && reqId != ref) {
+        std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
+        if (r != Requirements.end()) {
+            LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
+                      reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
+            currentRequirement.clear();
+
+        } else {
+            Requirement req;
+            req.id = reqId;
+            req.parentDocumentId = fileConfig.id;
+            req.parentDocumentPath = fileConfig.path;
+            Requirements[reqId] = req;
+            currentRequirement = reqId;
+        }
+    }
+    return REQ_OK;
+}
+
+
+std::string getMatchingPattern(regex_t *regex, const std::string &text)
+{
+    return getMatchingPattern(regex, text.c_str());
+}
+
 std::string getMatchingPattern(regex_t *regex, const char *text)
 {
     if (!regex) return "";

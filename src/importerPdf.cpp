@@ -5,13 +5,12 @@
 #include <poppler/cpp/poppler-global.h>
 typedef std::vector<char> byte_array;
 
-			byte_array x;
 
 #include "importerPdf.h"
 #include "logging.h"
 #include "req.h"
 
-void extractText(const char *file, Encoding encoding)
+void ReqDocumentPdf::dumpText(const char *file, Encoding encoding)
 {
 	poppler::document *doc = poppler::document::load_from_file(file);
 	if (!doc) {
@@ -38,22 +37,21 @@ void extractText(const char *file, Encoding encoding)
 	}
 }
 
-void loadPdf(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &Requirements)
+int ReqDocumentPdf::loadRequirements()
 {
-	LOG_DEBUG("loadPdf: %s", fileConfig.path.c_str());
+    LOG_DEBUG("ReqDocumentPdf::loadRequirements: %s", fileConfig.path.c_str());
 
 	poppler::document *doc = poppler::document::load_from_file(fileConfig.path.c_str());
 	if (!doc) {
 		LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
-		return;
+        return -1;
 	}
 	const int pagesNbr = doc->pages();
 	LOG_DEBUG("loadPdf: page count: %d", pagesNbr);
 
-	std::string currentRequirement;
-
-	bool started = true;
+    started = true;
 	if (fileConfig.startAfterRegex) started = false;
+    currentRequirement = "";
 
 	for (int i = 0; i < pagesNbr; ++i) {
 		LOG_DEBUG("page %d", i+1);
@@ -73,6 +71,7 @@ void loadPdf(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &Requ
 		}
 		}
 
+        // process one line at a time
 		const char *startOfLine = pageLines.c_str();
 		const char *endOfLine = 0;
 		while (startOfLine) {
@@ -84,52 +83,11 @@ void loadPdf(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &Requ
 			std::string line;
 			line.assign(startOfLine, length);
 
-			// check the startAfter pattern
-			if (!started && fileConfig.startAfterRegex) {
-				std::string start = getMatchingPattern(fileConfig.startAfterRegex, line.c_str());
-				if (!start.empty()) started = true;
-			}
-
-			if (started) {
-				// check the stopAfter pattern
-				std::string stop = getMatchingPattern(fileConfig.stopAfterRegex, line.c_str());
-				if (!stop.empty()) {
-					LOG_DEBUG("stop: %s", stop.c_str());
-					LOG_DEBUG("line: %s", line.c_str());
-					delete doc;
-					return;
-				}
-
-				// check if line covers a requirement
-				std::string ref = getMatchingPattern(fileConfig.refRegex, line.c_str());
-				if (!ref.empty()) {
-					if (currentRequirement.empty()) {
-						LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
-					} else {
-						Requirements[currentRequirement].covers.insert(ref);
-					}
-				}
-
-				std::string reqId = getMatchingPattern(fileConfig.tagRegex, line.c_str());
-
-				if (!reqId.empty() && reqId != ref) {
-
-					std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
-					if (r != Requirements.end()) {
-						LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
-								reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
-						currentRequirement.clear();
-
-					} else {
-						Requirement req;
-						req.id = reqId;
-						req.parentDocumentId = fileConfig.id;
-						req.parentDocumentPath = fileConfig.path;
-						Requirements[reqId] = req;
-						currentRequirement = reqId;
-					}
-				}
-			}
+            BlockStatus status = processBlock(line);
+            if (status == STOP_REACHED) {
+                delete doc;
+                return 0;
+            }
 
 			if (!endOfLine) break;
 			if (endOfLine == startOfLine + strlen(startOfLine) - 1) break;
@@ -137,4 +95,5 @@ void loadPdf(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &Requ
 		}
 	}
 	delete doc;
+    return 0;
 }
