@@ -52,7 +52,8 @@ public:
     virtual int loadRequirements() = 0;
     BlockStatus processBlock(const std::string &text);
 protected:
-    bool started; // indicate if the parsing passed the point after which requirement may be acquired
+    void init();
+    bool acquisitionStarted; // indicate if the parsing passed the point after which requirement may be acquired
     std::string currentRequirement;
     std::string currentText;
     ReqFileConfig fileConfig;

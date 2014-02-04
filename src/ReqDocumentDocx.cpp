@@ -2,10 +2,11 @@
 #include <zip.h>
 #include <string.h>
 
-#include "importerDocx.h"
+#include "ReqDocumentDocx.h"
 #include "logging.h"
+#include "parseConfig.h"
 
-void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node, std::map<std::string, Requirement> &requirements)
+int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node)
 {
     xmlNode *currentNode = NULL;
 
@@ -42,73 +43,57 @@ void loadDocxXmlNode(ReqFileConfig &fileConfig, xmlDocPtr doc, xmlNode *a_node, 
             xmlFree(text);
         }
 
-
-
-        loadDocxXmlNode(fileConfig, doc, currentNode->children, requirements);
+        loadDocxXmlNode(doc, currentNode->children);
 
         if (nodeName =="p" && !textInParagraphCurrent.empty()) {
             // process text of paragraph
-
-            // check coverage of requirement
-            std::string ref = getMatchingPattern(fileConfig.refRegex, textInParagraphCurrent.c_str());
-            if (!ref.empty()) {
-                if (currentRequirement.empty()) {
-                    LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
-                } else {
-                    requirements[currentRequirement].covers.insert(ref);
-                }
-            }
-
-            // check plain requirement
-            std::string reqId = getMatchingPattern(fileConfig.tagRegex, textInParagraphCurrent.c_str());
-
-            // TODO if reqId and ref are the same (same value && same offset), only consider ref.
-            if (!reqId.empty() && (reqId != ref) ) {
-
-                std::map<std::string, Requirement>::iterator r = requirements.find(reqId);
-                if (r != requirements.end()) {
-                    LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
-                              reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
-                    currentRequirement.clear();
-
-                } else {
-                    Requirement req;
-                    req.id = reqId;
-                    req.parentDocumentId = fileConfig.id;
-                    req.parentDocumentPath = fileConfig.path;
-                    requirements[reqId] = req;
-                    currentRequirement = reqId;
-                }
-            }
+            BlockStatus status = processBlock(textInParagraphCurrent);
+            if (status == STOP_REACHED) return 0;
 
             textInParagraphCurrent.clear();
         }
     }
+    return 0;
 }
 
 
-void loadDocxXml(ReqFileConfig &fileConfig, const std::string &contents, std::map<std::string, Requirement> &requirements)
+int ReqDocumentDocxXml::loadRequirements()
+{
+    init();
+
+    const char *xml;
+    int r = loadFile(fileConfig.path.c_str(), &xml);
+    if (r <= 0) {
+        LOG_ERROR("Cannot read file (or empty): %s", fileConfig.path.c_str());
+        return -1;
+    }
+    loadContents(xml, r);
+    free((void*)xml);
+    return 0;
+}
+
+int ReqDocumentDocxXml::loadContents(const char *xml, size_t size)
 {
     xmlDocPtr document;
     xmlNode *root;
 
-    document = xmlReadMemory(contents.data(), contents.size(), 0, 0, 0);
+    document = xmlReadMemory(xml, size, 0, 0, 0);
     root = xmlDocGetRootElement(document);
 
-    loadDocxXmlNode(fileConfig, document, root, requirements);
+    return loadDocxXmlNode(document, root);
 }
 
-
-
-void loadDocx(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &requirements)
+int ReqDocumentDocx::loadRequirements()
 {
+    init();
+
     LOG_DEBUG("loadDocx: %s", fileConfig.path.c_str());
     int err;
 
     struct zip *zipFile = zip_open(fileConfig.path.c_str(), 0, &err);
     if (!zipFile) {
         LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
-        return;
+        return -1;
     }
 
     const char *CONTENTS = "word/document.xml";
@@ -116,7 +101,7 @@ void loadDocx(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &req
     if (i < 0) {
         LOG_ERROR("Not a valid docx document; %s", fileConfig.path.c_str());
         zip_close(zipFile);
-        return;
+        return -1;
     }
 
     std::string contents; // buffer for loading the XML contents
@@ -137,5 +122,6 @@ void loadDocx(ReqFileConfig &fileConfig, std::map<std::string, Requirement> &req
     zip_close(zipFile);
 
     // parse the XML
-    loadDocxXml(fileConfig, contents, requirements);
+    ReqDocumentDocxXml docXml(fileConfig);
+    return docXml.loadContents(contents.data(),contents.size());
 }

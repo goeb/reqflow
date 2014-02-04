@@ -18,9 +18,9 @@ SRCS_CPP = 	src/main.cpp \
 			src/dateTools.cpp \
 			src/parseConfig.cpp \
 			src/req.cpp \
-			src/importerTxt.cpp \
-			src/importerDocx.cpp \
-			src/importerPdf.cpp \
+			src/ReqDocumentTxt.cpp \
+			src/ReqDocumentDocx.cpp \
+			src/ReqDocumentPdf.cpp \
 
 OBJS = $(SRCS_CPP:%.cpp=$(BUILD_DIR)/%.o)
 DEPENDS = $(SRCS_CPP:%.cpp=$(BUILD_DIR)/%.d)

@@ -6,16 +6,31 @@
 std::map<std::string, ReqFileConfig> ReqConfig;
 std::map<std::string, Requirement> Requirements;
 
+void ReqDocument::init()
+{
+    acquisitionStarted = true;
+    if (fileConfig.startAfterRegex) acquisitionStarted = false;
+    currentRequirement = "";
+}
+
+
+
+/** Process a block of text (a line or paragraph)
+  *
+  * Contextual variables:
+  *    acquisitionStarted
+  *    currentRequirement
+  */
 
 BlockStatus ReqDocument::processBlock(const std::string &text)
 {
     // check the startAfter pattern
-    if (!started && fileConfig.startAfterRegex) {
+    if (!acquisitionStarted) {
         std::string start = getMatchingPattern(fileConfig.startAfterRegex, text);
-        if (!start.empty()) started = true;
+        if (!start.empty()) acquisitionStarted = true;
     }
 
-    if (!started) return NOT_STARTED;
+    if (!acquisitionStarted) return NOT_STARTED;
 
     // check the stopAfter pattern
     std::string stop = getMatchingPattern(fileConfig.stopAfterRegex, text);

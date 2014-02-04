@@ -28,9 +28,9 @@
 #include "logging.h"
 #include "parseConfig.h"
 #include "req.h"
-#include "importerDocx.h"
-#include "importerTxt.h"
-#include "importerPdf.h"
+#include "ReqDocumentDocx.h"
+#include "ReqDocumentTxt.h"
+#include "ReqDocumentPdf.h"
 
 void usage()
 {
@@ -189,7 +189,7 @@ int loadConfiguration(const char * file)
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
-
+#if 0
                 } else if (arg == "-depends-on") {
                     if (line->empty()) {
                         LOG_ERROR("Missing -depends-on value for %s", fileConfig.id.c_str());
@@ -197,6 +197,7 @@ int loadConfiguration(const char * file)
                     }
                     fileConfig.dependencies.insert(fileConfig.dependencies.begin(), line->begin(), line->end());
                     line->clear();
+#endif
                 } else {
                     LOG_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
                 }
@@ -279,21 +280,21 @@ int loadRequirements()
         ReqFileType fileType = getFileType(fileConfig.path);
         switch(fileType) {
         case RF_TEXT:
-            loadText(fileConfig, Requirements);
+        {
+            ReqDocumentTxt doc(fileConfig);
+            doc.loadRequirements();
             break;
-        case RF_DOCX:
-            loadDocx(fileConfig, Requirements);
+        }
+       case RF_DOCX:
+        {
+            ReqDocumentDocx doc(fileConfig);
+            doc.loadRequirements();
             break;
+        }
         case RF_DOCX_XML: // mainly for test purpose
         {
-            const char *xml;
-            int r = loadFile(fileConfig.path.c_str(), &xml);
-            if (r <= 0) {
-                LOG_ERROR("Cannot read file (or empty): %s", fileConfig.path.c_str());
-                continue;
-            }
-            loadDocxXml(fileConfig, xml, Requirements);
-            free((void*)xml);
+            ReqDocumentDocxXml doc(fileConfig);
+            doc.loadRequirements();
             break;
         }
 		case RF_PDF:

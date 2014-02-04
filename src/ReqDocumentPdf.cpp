@@ -6,7 +6,7 @@
 typedef std::vector<char> byte_array;
 
 
-#include "importerPdf.h"
+#include "ReqDocumentPdf.h"
 #include "logging.h"
 #include "req.h"
 
@@ -40,6 +40,7 @@ void ReqDocumentPdf::dumpText(const char *file, Encoding encoding)
 int ReqDocumentPdf::loadRequirements()
 {
     LOG_DEBUG("ReqDocumentPdf::loadRequirements: %s", fileConfig.path.c_str());
+    init();
 
 	poppler::document *doc = poppler::document::load_from_file(fileConfig.path.c_str());
 	if (!doc) {
@@ -48,10 +49,6 @@ int ReqDocumentPdf::loadRequirements()
 	}
 	const int pagesNbr = doc->pages();
 	LOG_DEBUG("loadPdf: page count: %d", pagesNbr);
-
-    started = true;
-	if (fileConfig.startAfterRegex) started = false;
-    currentRequirement = "";
 
 	for (int i = 0; i < pagesNbr; ++i) {
 		LOG_DEBUG("page %d", i+1);
