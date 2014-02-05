@@ -386,12 +386,18 @@ void printRequirementsCsv()
         }
     }
 }
+void printSummaryOfFile(const ReqFileConfig &f)
+{
+	int ratio = -1;
+	if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
+	printf("%-30s %3d%% %3d / %3d %s\n", f.id.c_str(), ratio,
+		   f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
+
+}
 void printSummary(int argc, const char **argv)
 {
 
-    // TODO process only files given by argv
-
-    // compute statistics
+    // compute global statistics
     std::map<std::string, ReqFileConfig>::iterator file;
     std::map<std::string, Requirement>::iterator req;
     FOREACH(req, Requirements) {
@@ -407,12 +413,18 @@ void printSummary(int argc, const char **argv)
     }
 
     // print statistics
-    FOREACH(file, ReqConfig) {
-        ReqFileConfig f = file->second;
-        int ratio = -1;
-        if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
-        printf("%-30s %3d%% %3d / %3d %s\n", f.id.c_str(), ratio,
-               f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
+    if (!argc) {
+		FOREACH(file, ReqConfig) {
+			printSummaryOfFile(file->second);
+		}
+    } else while (argc > 0) {
+		const char *docId = argv[0];
+		std::map<std::string, ReqFileConfig>::iterator file = ReqConfig.find(docId);
+		if (file == ReqConfig.end()) {
+			LOG_ERROR("Invalid document id: %s", docId);
+		} else printSummaryOfFile(file->second);
+		argc--;
+		argv++;
     }
 }
 
