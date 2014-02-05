@@ -43,7 +43,8 @@ void usage()
            "         -s         Print a one-line summary of each document.\n"
            "         -v         Print the status of all requirements.\n"
            "\n"
-           "    list\n"
+           "    cov [doc ...]       Print the coverage matrix of the requirements (A covered by B).\n"
+           "        [-r]            Print the reverse coverage matrix (A covers B).\n"
            "\n"
            "    config\n"
            "\n"
@@ -57,7 +58,7 @@ void usage()
            "    help\n"
            "\n"
            "Options:\n"
-           "    -c <config> Select configuration file.\n"
+           "    -c <config> Select configuration file. Defaults to 'req.conf'.\n"
            "    -x <format> Select export format: text (default), csv"
            "\n"
            "\n");
@@ -316,38 +317,75 @@ int loadRequirements()
     return result;
 }
 
-void printMatrix()
+#define ALIGN "%-35s"
+void printCoverageHeader(bool reverse)
 {
-    printf("-- Matrix A Covers B:\n");
+    if (reverse) printf(ALIGN " " ALIGN, "Requirements", "Covering");
+    else printf(ALIGN " " ALIGN, "Requirements", "Covered By");
 
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        if (r->second.covers.empty()) {
-            printf("%s covers none\n", r->second.id.c_str());
+    printf("\n");
+    printf("----------------------------------------------------------------------\n");
+}
+
+void printCoverage(const Requirement &r, bool reverse)
+{
+    if (reverse) { // A covering B
+        if (r.covers.empty()) {
+            printf(ALIGN "\n", r.id.c_str());
         } else {
             std::set<std::string>::iterator c;
-            FOREACH(c, r->second.covers) {
-                printf("%s covers %s", r->second.id.c_str(), c->c_str());
+            FOREACH(c, r.covers) {
+                printf(ALIGN " " ALIGN, r.id.c_str(), c->c_str());
                 if (!isReqDefined(*c)) {
                     printf(":Undefined");
-                } else {
-                    Requirements[*c].coveredBy.insert(r->second.id);
                 }
                 printf("\n");
             }
         }
-    }
-    // print inverted matrix (fulfilled via the coveredBy.insert(...) above)
-    printf("-- Matrix A Covered By B:\n");
-    FOREACH(r, Requirements) {
-        if (r->second.coveredBy.empty()) {
-            printf("%s covered-by none\n", r->second.id.c_str());
+
+    } else { // A covered by B
+        if (r.coveredBy.empty()) {
+            printf(ALIGN "\n", r.id.c_str());
         } else {
             std::set<std::string>::iterator c;
-            FOREACH(c, r->second.coveredBy) {
-                printf("%s covered-by %s\n", r->second.id.c_str(), c->c_str());
+            FOREACH(c, r.coveredBy) {
+                printf(ALIGN " " ALIGN "\n", r.id.c_str(), c->c_str());
             }
         }
+    }
+}
+
+void printCoverageOfFile(const char *docId, bool reverse)
+{
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        if (!docId || r->second.parentDocumentId == docId) {
+            printCoverage(r->second, reverse);
+        }
+    }
+}
+
+
+/** if not 'reverse', then print matrix A covered by B
+  * Else, print matrix A covers B.
+  */
+void printMatrix(int argc, const char **argv, bool reverse)
+{
+    printCoverageHeader(reverse);
+
+    std::map<std::string, ReqFileConfig>::iterator file;
+    if (!argc) {
+        FOREACH(file, ReqConfig) {
+            printCoverageOfFile(file->second.id.c_str(), reverse);
+        }
+    } else while (argc > 0) {
+        const char *docId = argv[0];
+        file = ReqConfig.find(docId);
+        if (file == ReqConfig.end()) {
+            LOG_ERROR("Invalid document id: %s", docId);
+        } else printCoverageOfFile(file->second.id.c_str(), reverse);
+        argc--;
+        argv++;
     }
 }
 
@@ -390,11 +428,17 @@ void printRequirementsCsv()
 static int reqTotal = 0;
 static int reqCovered = 0;
 
+
+void printSummaryHeader()
+{
+    printf("%-30s    %% covered / total\n", "Document");
+}
+
 void printPercent(int total, int covered, const char *docId, const char *path)
 {
 	int ratio = -1;
 	if (total > 0) ratio = 100*covered/total;
-	printf("%-30s %3d%% %3d / %3d %s\n", docId, ratio, covered, total, path);
+    printf("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
 }
 
 void printSummaryOfFile(const ReqFileConfig &f)
@@ -425,6 +469,8 @@ void printSummary(int argc, const char **argv)
 	bool doPrintTotal = true;
 	if (argc == 1) doPrintTotal = false;
 
+    printSummaryHeader();
+
     if (!argc) {
 		FOREACH(file, ReqConfig) {
 			printSummaryOfFile(file->second);
@@ -441,8 +487,6 @@ void printSummary(int argc, const char **argv)
 
 	if (doPrintTotal) printPercent(reqTotal, reqCovered, "Total", "");
 }
-
-
 
 void printRequirementsOfFile(StatusMode status, const char *documentId)
 {
@@ -512,34 +556,39 @@ int cmdStat(int argc, const char **argv)
     return 0;
 }
 
-int cmdList(int argc, const char **argv)
+int cmdCov(int argc, const char **argv)
 {
     int i = 0;
     const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
     const char *exportFormat = "txt";
+    bool reverse = false;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
             if (i>=argc) usage();
             configFile = argv[i]; i++;
+
         } else if (0 == strcmp(arg, "-x")) {
             if (i>=argc) usage();
             exportFormat = argv[i]; i++;
+
+        } else if (0 == strcmp(arg, "-r")) {
+            reverse = true;
+
+        } else {
+            i--; // push back arg into the list
+            break; // leave remaining args for below
         }
     }
-    if (!configFile) {
-        LOG_ERROR(_("No configuration file specified. Please provide a -c option."));
-        return 1;
-    } else {
-        int r = loadConfiguration(configFile);
-        if (r != 0) return 1;
-    }
 
-    int r = loadRequirements();
+    int r = loadConfiguration(configFile);
     if (r != 0) return 1;
 
-    if (0 == strcmp(exportFormat, "txt")) printMatrix();
+    r = loadRequirements();
+    if (r != 0) return 1;
+
+    if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse);
     else if (0 == strcmp(exportFormat, "csv")) printRequirementsCsv();
     else {
         LOG_ERROR("Invalid export format: %s", exportFormat);
@@ -548,10 +597,12 @@ int cmdList(int argc, const char **argv)
     return 0;
 }
 
+/** Print configuration documents
+  */
 int cmdConfig(int argc, const char **argv)
 {
     int i = 0;
-    const char *configFile = 0;
+    const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
     while (i<argc) {
         arg = argv[i]; i++;
@@ -560,13 +611,10 @@ int cmdConfig(int argc, const char **argv)
             configFile = argv[i]; i++;
         }
     }
-    if (!configFile) {
-        LOG_ERROR(_("No configuration file specified. Please provide a -c option."));
-        return 1;
-    } else {
-        int r = loadConfiguration(configFile);
-        if (r != 0) return 1;
-    }
+    printf("Config file: %s\n", configFile);
+
+    int r = loadConfiguration(configFile);
+    if (r != 0) return 1;
 
     // display a summary of the configuration
     std::map<std::string, ReqFileConfig>::iterator c;
@@ -643,7 +691,7 @@ int main(int argc, const char **argv)
 
     if (0 == strcmp(command, "stat"))         return cmdStat(argc-2, argv+2);
     else if (0 == strcmp(command, "version")) return showVersion();
-    else if (0 == strcmp(command, "list"))    return cmdList(argc-2, argv+2);
+    else if (0 == strcmp(command, "cov"))     return cmdCov(argc-2, argv+2);
     else if (0 == strcmp(command, "config"))  return cmdConfig(argc-2, argv+2);
     else if (0 == strcmp(command, "regex"))   return cmdRegex(argc-2, argv+2);
     else if (0 == strcmp(command, "pdf"))     return cmdPdf(argc-2, argv+2);
