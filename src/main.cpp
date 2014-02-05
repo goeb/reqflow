@@ -64,6 +64,8 @@ void usage()
     exit(1);
 }
 
+enum StatusMode { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL };
+
 int showVersion()
 {
     printf("Small Issue Tracker v%s\n"
@@ -414,29 +416,40 @@ void printSummary(int argc, const char **argv)
     }
 }
 
-void printUnresolved(int argc, const char **argv)
+
+
+void printRequirementsOfFile(StatusMode status, const char *documentId)
 {
     std::map<std::string, Requirement>::iterator r;
-    if (!argc) {
-        FOREACH(r, Requirements) {
-            if (r->second.covers.empty()) {
-                printf("U %s\n", r->second.id.c_str());
-            }
-        }
-    } else while (argc) {
-        FOREACH(r, Requirements) {
-            if (r->second.covers.empty() && r->second.parentDocumentId == argv[0]) {
-                printf("U %s\n", r->second.id.c_str());
-            }
-        }
-    }
-}
+	FOREACH(r, Requirements) {
+		if (!documentId || r->second.parentDocumentId == documentId) {
+			bool doPrint = false;
+			if (REQ_ALL == status || r->second.coveredBy.empty()) doPrint = true;
 
-void printAllRequirements(int argc, const char **argv)
+			if (doPrint) {
+				if (r->second.coveredBy.empty()) printf("U");
+				else printf(" ");
+
+				printf(" %s", r->second.id.c_str());
+				if (REQ_ALL == status) printf(" %s", r->second.parentDocumentId.c_str());
+				printf("\n");
+			}
+		}
+	}
+}
+void printRequirements(StatusMode status, uint argc, const char **argv)
 {
-    // TODO process only files given by argv
-    LOG_ERROR("printAllRequirements");
-    //printRequirements();
+    if (!argc) {
+		// print requirements of all files
+		std::map<std::string, ReqFileConfig>::iterator file;
+		FOREACH(file, ReqConfig) {
+			printRequirementsOfFile(status, file->first.c_str());
+		}
+    } else while (argc > 0) {
+		printRequirementsOfFile(status, argv[0]);
+		argc--;
+		argv++;
+    }
 }
 
 
@@ -445,7 +458,7 @@ int cmdStat(int argc, const char **argv)
     int i = 0;
     const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
-    enum REQ_STAT_MODE { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL } statusMode = REQ_UNRESOLVED;
+	StatusMode statusMode = REQ_UNRESOLVED;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
@@ -455,7 +468,10 @@ int cmdStat(int argc, const char **argv)
             statusMode = REQ_SUMMARY;
         } else if (0 == strcmp(arg, "-v")) {
             statusMode = REQ_ALL;
-        }
+        } else {
+			i--; // push back arg into the list
+			break; // leave remaining args for below
+		}
     }
 
     int r = loadConfiguration(configFile);
@@ -464,20 +480,8 @@ int cmdStat(int argc, const char **argv)
     r = loadRequirements();
     if (r != 0) return 1;
 
-    switch (statusMode) {
-    case REQ_SUMMARY:
-        printSummary(argc+i, argv+i);
-        break;
-    case REQ_UNRESOLVED:
-        printUnresolved(argc+i, argv+i);
-        break;
-    case REQ_ALL:
-        printAllRequirements(argc+i, argv+i);
-        break;
-    default:
-        LOG_ERROR("Unexpected statusMode %d", statusMode);
-        exit(1);
-    }
+	if (REQ_SUMMARY == statusMode) printSummary(argc-i, argv+i);
+	else printRequirements(statusMode, argc-i, argv+i);
 
     return 0;
 }
