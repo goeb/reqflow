@@ -40,26 +40,28 @@ void usage()
            "\n"
            "    stat [doc ...]  Print the status of requirements in all documents or the given documents.\n"
            "                    Without additionnal option, only unresolved coverage issues are reported.\n"
-           "         -s         Print a one-line summary of each document.\n"
+           "         -s         Print a one-line summary for each document.\n"
            "         -v         Print the status of all requirements.\n"
+           "                    Status codes:\n"
            "\n"
-           "    cov [doc ...]       Print the coverage matrix of the requirements (A covered by B).\n"
-           "        [-r]            Print the reverse coverage matrix (A covers B).\n"
+           "                        'U'  Uncovered\n"
            "\n"
-           "    config\n"
+           "    cov [doc ...]   Print the coverage matrix of the requirements (A covered by B).\n"
+           "        [-r]        Print the reverse coverage matrix (A covers B).\n"
+           "        [-x <fmt>]  Select export format: text (default), csv.\n"
            "\n"
-           "    pdf <file>\n"
-           "          Dump text extracted from pdf file (debug purpose).\n"
+           "    config          Print the list of configured documents.\n"
+           "\n"
+           "    pdf <file>      Dump text extracted from pdf file (debug purpose).\n"
            "\n"
            "    regex <pattern> <text>\n"
-           "          Test regex given by <pattern> applied on <text>\n"
+           "                    Test regex given by <pattern> applied on <text>.\n"
            "\n"
            "    version\n"
            "    help\n"
            "\n"
            "Options:\n"
            "    -c <config> Select configuration file. Defaults to 'req.conf'.\n"
-           "    -x <format> Select export format: text (default), csv"
            "\n"
            "\n");
     exit(1);
@@ -317,50 +319,67 @@ int loadRequirements()
     return result;
 }
 
+enum ReqExportFormat { REQ_X_TXT, REQ_X_CSV };
 #define ALIGN "%-35s"
-void printCoverageHeader(bool reverse)
+void printCoverageHeader(bool reverse, ReqExportFormat format)
 {
-    if (reverse) printf(ALIGN " " ALIGN, "Requirements", "Covering");
-    else printf(ALIGN " " ALIGN, "Requirements", "Covered By");
+    if (format == REQ_X_CSV) {
+        if (reverse) printf("%s,%s\r\n", "Requirements", "Covering");
+        else printf("%s,%s\r\n", "Requirements", "Covered By");
 
-    printf("\n");
-    printf("----------------------------------------------------------------------\n");
+    } else {
+        if (reverse) printf(ALIGN " " ALIGN, "Requirements", "Covering");
+        else printf(ALIGN " " ALIGN, "Requirements", "Covered By");
+
+        printf("\n");
+        printf("----------------------------------------------------------------------\n");
+    }
 }
 
-void printCoverage(const Requirement &r, bool reverse)
+void printCoverage(const Requirement &r, bool reverse, ReqExportFormat format)
 {
     if (reverse) { // A covering B
         if (r.covers.empty()) {
-            printf(ALIGN "\n", r.id.c_str());
+            if (format == REQ_X_CSV) printf("%s,\r\n", r.id.c_str());
+            else printf(ALIGN "\n", r.id.c_str());
         } else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.covers) {
-                printf(ALIGN " " ALIGN, r.id.c_str(), c->c_str());
+                if (format == REQ_X_CSV) printf("%s,%s", r.id.c_str(), c->c_str());
+                else printf(ALIGN " " ALIGN, r.id.c_str(), c->c_str());
                 if (!isReqDefined(*c)) {
                     printf(":Undefined");
                 }
-                printf("\n");
+                if (format == REQ_X_CSV) printf("\r\n");
+                else printf("\n");
             }
         }
 
     } else { // A covered by B
         if (r.coveredBy.empty()) {
-            printf(ALIGN "\n", r.id.c_str());
+            if (format == REQ_X_CSV) printf("%s,\r\n", r.id.c_str());
+            else printf(ALIGN "\n", r.id.c_str());
         } else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.coveredBy) {
-                printf(ALIGN " " ALIGN "\n", r.id.c_str(), c->c_str());
+                if (format == REQ_X_CSV) printf("%s,%s", r.id.c_str(), c->c_str());
+                else printf(ALIGN " " ALIGN, r.id.c_str(), c->c_str());
+                if (!isReqDefined(*c)) {
+                    printf(":Undefined");
+                }
+                if (format == REQ_X_CSV) printf("\r\n");
+                else printf("\n");
             }
         }
     }
 }
 
-void printCoverageOfFile(const char *docId, bool reverse)
+void printCoverageOfFile(const char *docId, bool reverse, ReqExportFormat format)
 {
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
         if (!docId || r->second.parentDocumentId == docId) {
-            printCoverage(r->second, reverse);
+            printCoverage(r->second, reverse, format);
         }
     }
 }
@@ -369,69 +388,33 @@ void printCoverageOfFile(const char *docId, bool reverse)
 /** if not 'reverse', then print matrix A covered by B
   * Else, print matrix A covers B.
   */
-void printMatrix(int argc, const char **argv, bool reverse)
+void printMatrix(int argc, const char **argv, bool reverse, ReqExportFormat format)
 {
-    printCoverageHeader(reverse);
+    printCoverageHeader(reverse, format);
 
     std::map<std::string, ReqFileConfig>::iterator file;
     if (!argc) {
         FOREACH(file, ReqConfig) {
-            printCoverageOfFile(file->second.id.c_str(), reverse);
+            printCoverageOfFile(file->second.id.c_str(), reverse, format);
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) {
             LOG_ERROR("Invalid document id: %s", docId);
-        } else printCoverageOfFile(file->second.id.c_str(), reverse);
+        } else printCoverageOfFile(file->second.id.c_str(), reverse, format);
         argc--;
         argv++;
-    }
-}
-
-void printRequirementsCsv()
-{
-    std::cout << "Requirements,Covered Requirements" << std::endl;
-
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        if (r->second.covers.empty()) {
-            std::cout << r->second.id << ',' << std::endl;
-
-        } else {
-            std::set<std::string>::iterator c;
-            FOREACH(c, r->second.covers) {
-                std::cout << r->second.id << ',' << *c;
-
-                if (!isReqDefined(*c)) {
-                    printf(":Undefined");
-                }
-                std::cout << std::endl;
-            }
-        }
-    }
-    // print inverted matrix
-    std::cout << "Requirements,Covered By" << std::endl;
-    FOREACH(r, Requirements) {
-        if (r->second.coveredBy.empty()) {
-            std::cout << r->second.id << ',' << std::endl;
-
-        } else {
-            std::set<std::string>::iterator c;
-            FOREACH(c, r->second.coveredBy) {
-                std::cout << r->second.id << ',' << *c << std::endl;
-            }
-        }
     }
 }
 
 static int reqTotal = 0;
 static int reqCovered = 0;
 
-
 void printSummaryHeader()
 {
     printf("%-30s    %% covered / total\n", "Document");
+    printf("----------------------------------------------------------------------\n");
 }
 
 void printPercent(int total, int covered, const char *docId, const char *path)
@@ -448,6 +431,7 @@ void printSummaryOfFile(const ReqFileConfig &f)
 
 	printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str());
 }
+
 void printSummary(int argc, const char **argv)
 {
     // compute global statistics
@@ -478,9 +462,8 @@ void printSummary(int argc, const char **argv)
     } else while (argc > 0) {
 		const char *docId = argv[0];
 		std::map<std::string, ReqFileConfig>::iterator file = ReqConfig.find(docId);
-		if (file == ReqConfig.end()) {
-			LOG_ERROR("Invalid document id: %s", docId);
-		} else printSummaryOfFile(file->second);
+        if (file == ReqConfig.end()) LOG_ERROR("Invalid document id: %s", docId);
+        else printSummaryOfFile(file->second);
 		argc--;
 		argv++;
     }
@@ -509,14 +492,17 @@ void printRequirementsOfFile(StatusMode status, const char *documentId)
 }
 void printRequirements(StatusMode status, uint argc, const char **argv)
 {
+    std::map<std::string, ReqFileConfig>::iterator file;
     if (!argc) {
 		// print requirements of all files
-		std::map<std::string, ReqFileConfig>::iterator file;
 		FOREACH(file, ReqConfig) {
 			printRequirementsOfFile(status, file->first.c_str());
 		}
     } else while (argc > 0) {
-		printRequirementsOfFile(status, argv[0]);
+        const char *docId = argv[0];
+        file = ReqConfig.find(docId);
+        if (file == ReqConfig.end()) LOG_ERROR("Invalid document id: %s", docId);
+        else printRequirementsOfFile(status, argv[0]);
 		argc--;
 		argv++;
     }
@@ -588,8 +574,8 @@ int cmdCov(int argc, const char **argv)
     r = loadRequirements();
     if (r != 0) return 1;
 
-    if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse);
-    else if (0 == strcmp(exportFormat, "csv")) printRequirementsCsv();
+    if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse, REQ_X_TXT);
+    else if (0 == strcmp(exportFormat, "csv")) printMatrix(argc-i, argv+i, reverse, REQ_X_CSV);
     else {
         LOG_ERROR("Invalid export format: %s", exportFormat);
     }
