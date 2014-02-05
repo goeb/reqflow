@@ -386,17 +386,26 @@ void printRequirementsCsv()
         }
     }
 }
-void printSummaryOfFile(const ReqFileConfig &f)
+
+static int reqTotal = 0;
+static int reqCovered = 0;
+
+void printPercent(int total, int covered, const char *docId, const char *path)
 {
 	int ratio = -1;
-	if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
-	printf("%-30s %3d%% %3d / %3d %s\n", f.id.c_str(), ratio,
-		   f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
+	if (total > 0) ratio = 100*covered/total;
+	printf("%-30s %3d%% %3d / %3d %s\n", docId, ratio, covered, total, path);
+}
 
+void printSummaryOfFile(const ReqFileConfig &f)
+{
+	reqTotal += f.nTotalRequirements;
+	reqCovered += f.nCoveredRequirements;
+
+	printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str());
 }
 void printSummary(int argc, const char **argv)
 {
-
     // compute global statistics
     std::map<std::string, ReqFileConfig>::iterator file;
     std::map<std::string, Requirement>::iterator req;
@@ -413,6 +422,9 @@ void printSummary(int argc, const char **argv)
     }
 
     // print statistics
+	bool doPrintTotal = true;
+	if (argc == 1) doPrintTotal = false;
+
     if (!argc) {
 		FOREACH(file, ReqConfig) {
 			printSummaryOfFile(file->second);
@@ -426,6 +438,8 @@ void printSummary(int argc, const char **argv)
 		argc--;
 		argv++;
     }
+
+	if (doPrintTotal) printPercent(reqTotal, reqCovered, "Total", "");
 }
 
 

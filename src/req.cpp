@@ -24,6 +24,7 @@ void ReqDocument::init()
 
 BlockStatus ReqDocument::processBlock(const std::string &text)
 {
+	LOG_DEBUG("processBlock: %s", text.c_str());
     // check the startAfter pattern
     if (!acquisitionStarted) {
         std::string start = getMatchingPattern(fileConfig.startAfterRegex, text);

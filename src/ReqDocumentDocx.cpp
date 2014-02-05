@@ -59,8 +59,6 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node)
 
 int ReqDocumentDocxXml::loadRequirements()
 {
-    init();
-
     const char *xml;
     int r = loadFile(fileConfig.path.c_str(), &xml);
     if (r <= 0) {
@@ -74,6 +72,8 @@ int ReqDocumentDocxXml::loadRequirements()
 
 int ReqDocumentDocxXml::loadContents(const char *xml, size_t size)
 {
+    init();
+
     xmlDocPtr document;
     xmlNode *root;
 
