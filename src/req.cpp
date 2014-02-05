@@ -45,7 +45,8 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
     std::string ref = getMatchingPattern(fileConfig.refRegex, text);
     if (!ref.empty()) {
         if (currentRequirement.empty()) {
-            LOG_ERROR("Reference found whereas no current requirement: %s", ref.c_str());
+            LOG_ERROR("Reference found whereas no current requirement: %s, file: %s",
+					  ref.c_str(), fileConfig.path.c_str());
         } else {
             Requirements[currentRequirement].covers.insert(ref);
         }
