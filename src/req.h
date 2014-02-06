@@ -43,9 +43,8 @@ struct Requirement {
 
 extern std::map<std::string, ReqFileConfig> ReqConfig;
 extern std::map<std::string, Requirement> Requirements;
+extern std::list<std::string> Errors;
 
-std::string getMatchingPattern(regex_t *regex, const std::string &text);
-std::string getMatchingPattern(regex_t *regex, const char *text);
 
 class ReqDocument {
 public:
@@ -58,6 +57,22 @@ protected:
     std::string currentText;
     ReqFileConfig fileConfig;
 };
+
+#define BF_SZ 1024
+#define PUSH_ERROR(...) { \
+    char buffer[BF_SZ]; \
+    snprintf(buffer, BF_SZ, __VA_ARGS__); \
+    Errors.push_back(buffer); \
+    }
+
+// exported functions
+
+void printErrors();
+Requirement *getRequirement(std::string id);
+void consolidateCoverage();
+void checkUndefinedRequirements();
+std::string getMatchingPattern(regex_t *regex, const std::string &text);
+std::string getMatchingPattern(regex_t *regex, const char *text);
 
 
 #endif

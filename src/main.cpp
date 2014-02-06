@@ -105,10 +105,10 @@ int loadConfiguration(const char * file)
     const char *config;
     int r = loadFile(file, &config);
     if (r<0) {
-        LOG_ERROR(_("Cannot load file '%s': %s"), file, strerror(errno));
+        PUSH_ERROR(_("Cannot load file '%s': %s"), file, strerror(errno));
         return 1;
     } else if (r == 0) {
-        LOG_ERROR(_("Empty configuration file '%s'."), file);
+        PUSH_ERROR(_("Empty configuration file '%s'."), file);
         return 1;
     }
     // parse the configuration
@@ -125,48 +125,48 @@ int loadConfiguration(const char * file)
             fileConfig.id = pop(*line);
             LOG_DEBUG("addFile '%s'...", fileConfig.id.c_str());
             if (fileConfig.id.empty()) {
-                LOG_ERROR("Missing identifier for file: line %d", lineNum);
+                PUSH_ERROR("Missing identifier for file: line %d", lineNum);
             }
 
             while (!line->empty()) {
                 std::string arg = pop(*line);
                 if (arg == "-path") {
                     if (line->empty()) {
-                        LOG_ERROR("Missing -path value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -path value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.path = pop(*line);
                 } else if (arg == "-start-after") {
                     if (line->empty()) {
-                        LOG_ERROR("Missing -start-after value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -start-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
 					fileConfig.startAfter = pop(*line);
 					fileConfig.startAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
                     if (reti) {
-                        LOG_ERROR("Cannot compile startAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
+                        PUSH_ERROR("Cannot compile startAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
 					
                 } else if (arg == "-stop-after") {
                     if (line->empty()) {
-                        LOG_ERROR("Missing -stop-after value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -stop-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
 					fileConfig.stopAfter = pop(*line);
 					fileConfig.stopAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
                     if (reti) {
-                        LOG_ERROR("Cannot compile stopAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
+                        PUSH_ERROR("Cannot compile stopAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
 					
                 } else if (arg == "-tag") {
                     if (line->empty()) {
-                        LOG_ERROR("Missing -tag value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -tag value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.tagPattern = pop(*line);
@@ -174,7 +174,7 @@ int loadConfiguration(const char * file)
                     fileConfig.tagRegex = new regex_t();
                     int reti = regcomp(fileConfig.tagRegex, fileConfig.tagPattern.c_str(), 0);
                     if (reti) {
-                        LOG_ERROR("Cannot compile tag regex for %s: %s", fileConfig.id.c_str(), fileConfig.tagPattern.c_str());
+                        PUSH_ERROR("Cannot compile tag regex for %s: %s", fileConfig.id.c_str(), fileConfig.tagPattern.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.tagPattern.c_str(), &fileConfig.tagRegex);
@@ -182,7 +182,7 @@ int loadConfiguration(const char * file)
 
                 } else if (arg == "-ref") {
                     if (line->empty()) {
-                        LOG_ERROR("Missing -ref value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -ref value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.refPattern = pop(*line);
@@ -190,32 +190,32 @@ int loadConfiguration(const char * file)
                     fileConfig.refRegex = new regex_t();
                     int reti = regcomp(fileConfig.refRegex, fileConfig.refPattern.c_str(), 0);
                     if (reti) {
-                        LOG_ERROR("Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
+                        PUSH_ERROR("Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
 #if 0
                 } else if (arg == "-depends-on") {
                     if (line->empty()) {
-                        LOG_ERROR("Missing -depends-on value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -depends-on value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.dependencies.insert(fileConfig.dependencies.begin(), line->begin(), line->end());
                     line->clear();
 #endif
                 } else {
-                    LOG_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
+                    PUSH_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
                 }
             }
             std::map<std::string, ReqFileConfig>::iterator c = ReqConfig.find(fileConfig.id);
             if (c != ReqConfig.end()) {
-                LOG_ERROR("Config error: duplicate id '%s'", fileConfig.id.c_str());
+                PUSH_ERROR("Config error: duplicate id '%s'", fileConfig.id.c_str());
                 return 1;
             }
             ReqConfig[fileConfig.id] = fileConfig;
 
         } else {
-            LOG_ERROR("Invalid token '%s': line %d", verb.c_str(), lineNum);
+            PUSH_ERROR("Invalid token '%s': line %d", verb.c_str(), lineNum);
         }
     }
     return 0;
@@ -238,44 +238,6 @@ ReqFileType getFileType(const std::string &path)
 }
 
 
-
-Requirement *getRequirement(std::string id)
-{
-    std::map<std::string, Requirement>::iterator req = Requirements.find(id);
-    if (req == Requirements.end()) return 0;
-    else return &(req->second);
-}
-
-/** Fulfill .coveredBy tables
-  */
-void consolidateCoverage()
-{
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        std::set<std::string>::iterator c;
-        FOREACH(c, r->second.covers) {
-			Requirement *req = getRequirement(*c);
-            if (req) req->coveredBy.insert(r->second.id);
-        }
-    }
-
-}
-
-/** Check that all referenced requirements exist
-  */
-void checkUndefinedRequirements()
-{
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        std::set<std::string>::iterator c;
-        FOREACH(c, r->second.covers) {
-            if (!getRequirement(*c)) {
-                LOG_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
-                          c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
-            }
-        }
-    }
-}
 
 int loadRequirements()
 {
@@ -705,15 +667,17 @@ int main(int argc, const char **argv)
     if (argc < 2) usage();
 
     const char *command = argv[1];
+    int rc = 0;
 
-    if (0 == strcmp(command, "stat"))         return cmdStat(argc-2, argv+2);
-    else if (0 == strcmp(command, "version")) return showVersion();
-    else if (0 == strcmp(command, "cov"))     return cmdCov(argc-2, argv+2);
-    else if (0 == strcmp(command, "config"))  return cmdConfig(argc-2, argv+2);
-    else if (0 == strcmp(command, "regex"))   return cmdRegex(argc-2, argv+2);
-    else if (0 == strcmp(command, "pdf"))     return cmdPdf(argc-2, argv+2);
+    if (0 == strcmp(command, "stat"))         rc = cmdStat(argc-2, argv+2);
+    else if (0 == strcmp(command, "version")) rc = showVersion();
+    else if (0 == strcmp(command, "cov"))     rc = cmdCov(argc-2, argv+2);
+    else if (0 == strcmp(command, "config"))  rc = cmdConfig(argc-2, argv+2);
+    else if (0 == strcmp(command, "regex"))   rc = cmdRegex(argc-2, argv+2);
+    else if (0 == strcmp(command, "pdf"))     rc = cmdPdf(argc-2, argv+2);
     else usage();
 
+    printErrors();
 
-    return 0;
+    return rc;
 }

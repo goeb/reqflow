@@ -1,10 +1,29 @@
+#include <stdarg.h>
+#include <list>
+#include <string>
+#include <stdio.h>
 
 #include "req.h"
+#include "global.h"
 #include "logging.h"
 
 // static objects
 std::map<std::string, ReqFileConfig> ReqConfig;
 std::map<std::string, Requirement> Requirements;
+std::list<std::string> Errors;
+
+void printErrors()
+{
+    if (Errors.empty()) fprintf(stderr, "Ok.\n");
+    else {
+        fprintf(stderr, "Error(s): %d\n", Errors.size());
+        std::list<std::string>::iterator e;
+        FOREACH(e, Errors) {
+            fprintf(stderr, "%s\n", e->c_str());
+        }
+    }
+
+}
 
 void ReqDocument::init()
 {
@@ -14,6 +33,12 @@ void ReqDocument::init()
 }
 
 
+Requirement *getRequirement(std::string id)
+{
+    std::map<std::string, Requirement>::iterator req = Requirements.find(id);
+    if (req == Requirements.end()) return 0;
+    else return &(req->second);
+}
 
 /** Process a block of text (a line or paragraph)
   *
@@ -45,7 +70,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
     std::string ref = getMatchingPattern(fileConfig.refRegex, text);
     if (!ref.empty()) {
         if (currentRequirement.empty()) {
-            LOG_ERROR("Reference found whereas no current requirement: %s, file: %s",
+            PUSH_ERROR("Reference found whereas no current requirement: %s, file: %s",
 					  ref.c_str(), fileConfig.path.c_str());
         } else {
             Requirements[currentRequirement].covers.insert(ref);
@@ -57,7 +82,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
     if (!reqId.empty() && reqId != ref) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
         if (r != Requirements.end()) {
-            LOG_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
+            PUSH_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
                       reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
             currentRequirement.clear();
 
@@ -108,7 +133,7 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
             if (pmatch[i].rm_so != -1) {
                 int length = pmatch[i].rm_eo - pmatch[i].rm_so;
                 if (length > LINE_SIZE_MAX-1) {
-                    LOG_ERROR("Requirement size too big (%d)", length);
+                    PUSH_ERROR("Requirement size too big (%d)", length);
                     break;
                 }
                 memcpy(buffer, text+pmatch[i].rm_so, length);
@@ -125,9 +150,41 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
     } else {
         char msgbuf[1024];
         regerror(reti, regex, msgbuf, sizeof(msgbuf));
-        LOG_ERROR("Regex match failed: %s", msgbuf);
+        PUSH_ERROR("Regex match failed: %s", msgbuf);
         matchingText = "";
     }
 
     return matchingText;
+}
+
+
+/** Fulfill .coveredBy tables
+  */
+void consolidateCoverage()
+{
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        std::set<std::string>::iterator c;
+        FOREACH(c, r->second.covers) {
+            Requirement *req = getRequirement(*c);
+            if (req) req->coveredBy.insert(r->second.id);
+        }
+    }
+
+}
+
+/** Check that all referenced requirements exist
+  */
+void checkUndefinedRequirements()
+{
+    std::map<std::string, Requirement>::iterator r;
+    FOREACH(r, Requirements) {
+        std::set<std::string>::iterator c;
+        FOREACH(c, r->second.covers) {
+            if (!getRequirement(*c)) {
+                PUSH_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
+                          c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
+            }
+        }
+    }
 }

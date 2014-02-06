@@ -21,6 +21,7 @@ SRCS_CPP = 	src/main.cpp \
 			src/ReqDocumentTxt.cpp \
 			src/ReqDocumentDocx.cpp \
 			src/ReqDocumentPdf.cpp \
+			src/renderingHtml.cpp \
 
 OBJS = $(SRCS_CPP:%.cpp=$(BUILD_DIR)/%.o)
 DEPENDS = $(SRCS_CPP:%.cpp=$(BUILD_DIR)/%.d)
