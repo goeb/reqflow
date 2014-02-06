@@ -44,6 +44,8 @@ struct Requirement {
 extern std::map<std::string, ReqFileConfig> ReqConfig;
 extern std::map<std::string, Requirement> Requirements;
 extern std::list<std::string> Errors;
+extern int ReqTotal;
+extern int ReqCovered;
 
 
 class ReqDocument {
@@ -59,11 +61,11 @@ protected:
 };
 
 #define BF_SZ 1024
-#define PUSH_ERROR(...) { \
+#define PUSH_ERROR(...) do { \
     char buffer[BF_SZ]; \
     snprintf(buffer, BF_SZ, __VA_ARGS__); \
     Errors.push_back(buffer); \
-    }
+    } while(0)
 
 // exported functions
 
@@ -73,6 +75,7 @@ void consolidateCoverage();
 void checkUndefinedRequirements();
 std::string getMatchingPattern(regex_t *regex, const std::string &text);
 std::string getMatchingPattern(regex_t *regex, const char *text);
+void computeGlobalStatistics();
 
 
 #endif

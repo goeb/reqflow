@@ -31,6 +31,7 @@
 #include "ReqDocumentDocx.h"
 #include "ReqDocumentTxt.h"
 #include "ReqDocumentPdf.h"
+#include "renderingHtml.h"
 
 void usage()
 {
@@ -278,6 +279,7 @@ int loadRequirements()
     }
     checkUndefinedRequirements();
     consolidateCoverage();
+    computeGlobalStatistics();
 
     return result;
 }
@@ -401,8 +403,6 @@ void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExp
     }
 }
 
-static int reqTotal = 0;
-static int reqCovered = 0;
 
 void printSummaryHeader()
 {
@@ -419,34 +419,21 @@ void printPercent(int total, int covered, const char *docId, const char *path)
 
 void printSummaryOfFile(const ReqFileConfig &f)
 {
-	reqTotal += f.nTotalRequirements;
-	reqCovered += f.nCoveredRequirements;
+    ReqTotal += f.nTotalRequirements;
+    ReqCovered += f.nCoveredRequirements;
 
 	printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str());
 }
 
 void printSummary(int argc, const char **argv)
 {
-    // compute global statistics
-    std::map<std::string, ReqFileConfig>::iterator file;
-    std::map<std::string, Requirement>::iterator req;
-    FOREACH(req, Requirements) {
-        file = ReqConfig.find(req->second.parentDocumentId);
-        if (file == ReqConfig.end()) {
-            LOG_ERROR("Cannot find parent document of requirement: %s", req->second.id.c_str());
-            continue;
-        }
-        file->second.nTotalRequirements++;
-        if (!req->second.coveredBy.empty()) {
-            file->second.nCoveredRequirements++;
-        }
-    }
-
     // print statistics
 	bool doPrintTotal = true;
 	if (argc == 1) doPrintTotal = false;
 
     printSummaryHeader();
+
+    std::map<std::string, ReqFileConfig>::iterator file;
 
     if (!argc) {
 		FOREACH(file, ReqConfig) {
@@ -461,7 +448,7 @@ void printSummary(int argc, const char **argv)
 		argv++;
     }
 
-	if (doPrintTotal) printPercent(reqTotal, reqCovered, "Total", "");
+    if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "");
 }
 
 void printRequirementsOfFile(StatusMode status, const char *documentId)
@@ -529,8 +516,9 @@ int cmdStat(int argc, const char **argv)
     r = loadRequirements();
     if (r != 0) return 1;
 
-	if (REQ_SUMMARY == statusMode) printSummary(argc-i, argv+i);
-	else printRequirements(statusMode, argc-i, argv+i);
+    if (REQ_SUMMARY == statusMode) {
+        printSummary(argc-i, argv+i);
+    } else printRequirements(statusMode, argc-i, argv+i);
 
     return 0;
 }
@@ -614,6 +602,33 @@ int cmdPdf(int argc, const char **argv)
 	}
 	return 0;
 }
+int cmdHtml(int argc, const char **argv)
+{
+    int i = 0;
+    const char *configFile = DEFAULT_CONF;
+    const char *arg = 0;
+    while (i<argc) {
+        arg = argv[i]; i++;
+        if (0 == strcmp(arg, "-c")) {
+            if (i>=argc) usage();
+            configFile = argv[i]; i++;
+        } else {
+            i--; // push back arg into the list
+            break; // leave remaining args for below
+        }
+    }
+
+    int r = loadConfiguration(configFile);
+    if (r != 0) return 1;
+
+    r = loadRequirements();
+    if (r != 0) return 1;
+
+    htmlRender(argc-i, argv+i);
+
+    return 0;
+}
+
 int cmdRegex(int argc, const char **argv)
 {
     if (argc != 2) usage();
@@ -673,6 +688,7 @@ int main(int argc, const char **argv)
     else if (0 == strcmp(command, "version")) rc = showVersion();
     else if (0 == strcmp(command, "cov"))     rc = cmdCov(argc-2, argv+2);
     else if (0 == strcmp(command, "config"))  rc = cmdConfig(argc-2, argv+2);
+    else if (0 == strcmp(command, "html"))    rc = cmdHtml(argc-2, argv+2);
     else if (0 == strcmp(command, "regex"))   rc = cmdRegex(argc-2, argv+2);
     else if (0 == strcmp(command, "pdf"))     rc = cmdPdf(argc-2, argv+2);
     else usage();

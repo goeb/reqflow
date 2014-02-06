@@ -11,6 +11,9 @@
 std::map<std::string, ReqFileConfig> ReqConfig;
 std::map<std::string, Requirement> Requirements;
 std::list<std::string> Errors;
+int ReqTotal = 0;
+int ReqCovered = 0;
+
 
 void printErrors()
 {
@@ -22,7 +25,6 @@ void printErrors()
             fprintf(stderr, "%s\n", e->c_str());
         }
     }
-
 }
 
 void ReqDocument::init()
@@ -185,6 +187,24 @@ void checkUndefinedRequirements()
                 PUSH_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
                           c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
             }
+        }
+    }
+}
+
+void computeGlobalStatistics()
+{
+    // compute global statistics
+    std::map<std::string, ReqFileConfig>::iterator file;
+    std::map<std::string, Requirement>::iterator req;
+    FOREACH(req, Requirements) {
+        file = ReqConfig.find(req->second.parentDocumentId);
+        if (file == ReqConfig.end()) {
+            PUSH_ERROR("Cannot find parent document of requirement: %s", req->second.id.c_str());
+            continue;
+        }
+        file->second.nTotalRequirements++;
+        if (!req->second.coveredBy.empty()) {
+            file->second.nCoveredRequirements++;
         }
     }
 }

@@ -7,7 +7,6 @@
 #include "req.h"
 
 
-void htmlRender(int argc, char **argv);
-
+void htmlRender(int argc, const char **argv);
 
 #endif

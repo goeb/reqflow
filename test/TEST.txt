@@ -10,7 +10,6 @@ T_01
     check that 01
 Ref: REQ_01
 Ref: REQ_02
-Ref: REQ_xy
 
 
 T_02
