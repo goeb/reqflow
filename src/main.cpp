@@ -239,11 +239,11 @@ ReqFileType getFileType(const std::string &path)
 
 
 
-bool isReqDefined(std::string id)
+Requirement *getRequirement(std::string id)
 {
     std::map<std::string, Requirement>::iterator req = Requirements.find(id);
-    if (req == Requirements.end()) return false;
-    else return true;
+    if (req == Requirements.end()) return 0;
+    else return &(req->second);
 }
 
 /** Fulfill .coveredBy tables
@@ -254,7 +254,8 @@ void consolidateCoverage()
     FOREACH(r, Requirements) {
         std::set<std::string>::iterator c;
         FOREACH(c, r->second.covers) {
-            if (isReqDefined(*c)) Requirements[*c].coveredBy.insert(r->second.id);
+			Requirement *req = getRequirement(*c);
+            if (req) req->coveredBy.insert(r->second.id);
         }
     }
 
@@ -268,7 +269,7 @@ void checkUndefinedRequirements()
     FOREACH(r, Requirements) {
         std::set<std::string>::iterator c;
         FOREACH(c, r->second.covers) {
-            if (!isReqDefined(*c)) {
+            if (!getRequirement(*c)) {
                 LOG_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
                           c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
             }
@@ -320,66 +321,98 @@ int loadRequirements()
 }
 
 enum ReqExportFormat { REQ_X_TXT, REQ_X_CSV };
-#define ALIGN "%-35s"
-void printCoverageHeader(bool reverse, ReqExportFormat format)
+#define ALIGN "%-50s"
+#define CRLF "\r\n"
+void printCoverageHeader(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (format == REQ_X_CSV) {
-        if (reverse) printf("%s,%s\r\n", "Requirements", "Covering");
-        else printf("%s,%s\r\n", "Requirements", "Covered By");
+		printf(",,"CRLF);
+		printf("Requirements of %s,", docId);
+        if (reverse) {
+			printf("Requirements Underneath");
+        } else {
+			printf("Requirements Above");
+		}
+		if (verbose) printf(",Document");
+		else printf(","); // always 3 columns
+		printf(CRLF);
 
     } else {
-        if (reverse) printf(ALIGN " " ALIGN, "Requirements", "Covering");
-        else printf(ALIGN " " ALIGN, "Requirements", "Covered By");
-
+		printf("\n");
+		printf("Requirements of %-34s ", docId);
+        if (reverse) printf(ALIGN, "Requirements Underneath");
+        else printf(ALIGN, "Requirements Above");
+		if (verbose) printf(" Document");
         printf("\n");
+		printf("----------------------------------------------");
         printf("----------------------------------------------------------------------\n");
+		
     }
 }
 
-void printCoverage(const Requirement &r, bool reverse, ReqExportFormat format)
+/** req2 and doc2Id may be null
+ */
+void printCoverageLine(const char *req1, const char *req2, const char *doc2Id, ReqExportFormat format)
+{
+	if (format == REQ_X_CSV) {
+		printf("%s,", req1);
+		if (req2) printf("%s", req2);
+		if (doc2Id) printf(",%s", doc2Id);
+		else printf(","); // always 3 columns
+		printf(CRLF);
+
+	} else { // text format
+		printf(ALIGN, req1);
+		if (req2) printf(" " ALIGN, req2);
+		if (doc2Id) printf(" %s", doc2Id);
+		printf("\n");
+	}
+}
+
+void printCoverage(const Requirement &r, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (reverse) { // A covering B
         if (r.covers.empty()) {
-            if (format == REQ_X_CSV) printf("%s,\r\n", r.id.c_str());
-            else printf(ALIGN "\n", r.id.c_str());
+			printCoverageLine(r.id.c_str(), 0, 0, format);
+
         } else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.covers) {
-                if (format == REQ_X_CSV) printf("%s,%s", r.id.c_str(), c->c_str());
-                else printf(ALIGN " " ALIGN, r.id.c_str(), c->c_str());
-                if (!isReqDefined(*c)) {
-                    printf(":Undefined");
-                }
-                if (format == REQ_X_CSV) printf("\r\n");
-                else printf("\n");
+				const char* docId = 0;
+				Requirement *ref = getRequirement(c->c_str());
+				if (!ref) docId = "Undefined";
+				else if (verbose) docId = ref->parentDocumentId.c_str();
+
+				printCoverageLine(r.id.c_str(), c->c_str(), docId, format);
             }
         }
 
     } else { // A covered by B
         if (r.coveredBy.empty()) {
-            if (format == REQ_X_CSV) printf("%s,\r\n", r.id.c_str());
-            else printf(ALIGN "\n", r.id.c_str());
+			printCoverageLine(r.id.c_str(), 0, 0, format);
+
         } else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.coveredBy) {
-                if (format == REQ_X_CSV) printf("%s,%s", r.id.c_str(), c->c_str());
-                else printf(ALIGN " " ALIGN, r.id.c_str(), c->c_str());
-                if (!isReqDefined(*c)) {
-                    printf(":Undefined");
-                }
-                if (format == REQ_X_CSV) printf("\r\n");
-                else printf("\n");
+				const char* docId = 0;
+				Requirement *above = getRequirement(c->c_str());
+				if (!above) docId = "Undefined";
+				else if (verbose) docId = above->parentDocumentId.c_str();
+
+				printCoverageLine(r.id.c_str(), c->c_str(), docId, format);
             }
         }
     }
 }
 
-void printCoverageOfFile(const char *docId, bool reverse, ReqExportFormat format)
+void printCoverageOfFile(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
+    printCoverageHeader(docId, reverse, verbose, format);
+
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
         if (!docId || r->second.parentDocumentId == docId) {
-            printCoverage(r->second, reverse, format);
+            printCoverage(r->second, reverse, verbose, format);
         }
     }
 }
@@ -388,21 +421,19 @@ void printCoverageOfFile(const char *docId, bool reverse, ReqExportFormat format
 /** if not 'reverse', then print matrix A covered by B
   * Else, print matrix A covers B.
   */
-void printMatrix(int argc, const char **argv, bool reverse, ReqExportFormat format)
+void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExportFormat format)
 {
-    printCoverageHeader(reverse, format);
-
     std::map<std::string, ReqFileConfig>::iterator file;
     if (!argc) {
         FOREACH(file, ReqConfig) {
-            printCoverageOfFile(file->second.id.c_str(), reverse, format);
+            printCoverageOfFile(file->second.id.c_str(), reverse, verbose, format);
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) {
             LOG_ERROR("Invalid document id: %s", docId);
-        } else printCoverageOfFile(file->second.id.c_str(), reverse, format);
+        } else printCoverageOfFile(file->second.id.c_str(), reverse, verbose, format);
         argc--;
         argv++;
     }
@@ -549,6 +580,7 @@ int cmdCov(int argc, const char **argv)
     const char *arg = 0;
     const char *exportFormat = "txt";
     bool reverse = false;
+	bool verbose = false;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
@@ -559,10 +591,9 @@ int cmdCov(int argc, const char **argv)
             if (i>=argc) usage();
             exportFormat = argv[i]; i++;
 
-        } else if (0 == strcmp(arg, "-r")) {
-            reverse = true;
-
-        } else {
+        } else if (0 == strcmp(arg, "-r")) reverse = true;
+        else if (0 == strcmp(arg, "-v")) verbose = true;
+        else {
             i--; // push back arg into the list
             break; // leave remaining args for below
         }
@@ -574,8 +605,8 @@ int cmdCov(int argc, const char **argv)
     r = loadRequirements();
     if (r != 0) return 1;
 
-    if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse, REQ_X_TXT);
-    else if (0 == strcmp(exportFormat, "csv")) printMatrix(argc-i, argv+i, reverse, REQ_X_CSV);
+    if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_TXT);
+    else if (0 == strcmp(exportFormat, "csv")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_CSV);
     else {
         LOG_ERROR("Invalid export format: %s", exportFormat);
     }
