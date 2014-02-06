@@ -53,6 +53,8 @@ void usage()
            "\n"
            "    config          Print the list of configured documents.\n"
            "\n"
+           "    html            Generate HTML report\n"
+           "\n"
            "    pdf <file>      Dump text extracted from pdf file (debug purpose).\n"
            "\n"
            "    regex <pattern> <text>\n"
