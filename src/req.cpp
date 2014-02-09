@@ -42,6 +42,14 @@ Requirement *getRequirement(std::string id)
     else return &(req->second);
 }
 
+ReqFileConfig *getDocument(std::string docId)
+{
+    std::map<std::string, ReqFileConfig>::iterator doc = ReqConfig.find(docId);
+    if (doc == ReqConfig.end()) return 0;
+    else return &(doc->second);
+}
+
+
 /** Process a block of text (a line or paragraph)
   *
   * Contextual variables:
@@ -169,7 +177,19 @@ void consolidateCoverage()
         std::set<std::string>::iterator c;
         FOREACH(c, r->second.covers) {
             Requirement *req = getRequirement(*c);
-            if (req) req->coveredBy.insert(r->second.id);
+            if (req) {
+                req->coveredBy.insert(r->second.id);
+
+                // compute documents dependencies
+                ReqFileConfig *fdown = getDocument(r->second.parentDocumentId);
+                ReqFileConfig *fup = getDocument(req->parentDocumentId);
+                if (!fdown) PUSH_ERROR("Cannot find document: %s", r->second.parentDocumentId.c_str());
+                else if (!fup) PUSH_ERROR("Cannot find document: %s", req->parentDocumentId.c_str());
+                else {
+                    fdown->upstreamDocuments.insert(fup->id);
+                    fup->downstreamDocuments.insert(fdown->id);
+                }
+            }
         }
     }
 

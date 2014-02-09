@@ -19,17 +19,70 @@ std::string getDatetime()
     return buffer;
 }
 
+/** Encode a string for URL
+  *
+  * Used typically for a parameter in the query string.
+  * Also used for file names than may originally cause conflicts with slashes, etc.
+  */
+std::string urlEncode(const std::string &src, char mark='%', const char *dontEscape="._-$,;~()")
+{
+    static const char *hex = "0123456789abcdef";
+    std::string dst;
+    size_t n = src.size();
+    size_t i;
+    for (i = 0; i < n; i++) {
+        if (isalnum((unsigned char) src[i]) ||
+                strchr(dontEscape, (unsigned char) src[i]) != NULL) dst += src[i];
+        else {
+            dst += mark;
+            dst += hex[((const unsigned char) src[i]) >> 4];
+            dst += hex[((const unsigned char) src[i]) & 0xf];
+        }
+    }
+    return dst;
+}
+
+std::string replaceAll(const std::string &in, char c, const char *replaceBy)
+{
+    std::string out;
+    size_t len = in.size();
+    size_t i = 0;
+    size_t savedOffset = 0;
+    while (i < len) {
+        if (in[i] == c) {
+            if (savedOffset < i) out += in.substr(savedOffset, i-savedOffset);
+            out += replaceBy;
+            savedOffset = i+1;
+        }
+        i++;
+    }
+    if (savedOffset < i) out += in.substr(savedOffset, i-savedOffset);
+    return out;
+}
+
+std::string htmlEscape(const std::string &value)
+{
+    std::string result = replaceAll(value, '&', "&#38;");
+    result = replaceAll(result, '"', "&quot;");
+    result = replaceAll(result, '<', "&lt;");
+    result = replaceAll(result, '>', "&gt;");
+    result = replaceAll(result, '\'', "&#39;");
+    return result;
+}
+
+
 void htmlPrintHeader()
 {
     printf("<!DOCTYPE HTML><html>\n"
            "<head>\n"
-           "<title>Requirements Coverage</title>\n"
+           "<title>Requirements Traceability</title>\n"
            "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n"
            "<style>\n"
            "body { font-family: Verdana,sans-serif; }\n"
-           ".r_date { font-size: small; }\n"
+           "h1 { background-color: #DDD; border: 1px #bbb solid; padding-left: 1em;}\n"
+           ".r_date { font-size: small; margin-bottom: 15px;}\n"
            ".r_path { font-size: small; }\n"
-           ".r_errors { border: 1px solid #BBB; white-space: pre; font-bold; color: red; }\n"
+           ".r_errors { border: 1px solid #BBB; white-space: pre; font-bold; color: red; padding: 0.5em;}\n"
            ".r_warning { color: red; font-weight: bold; }\n"
            ".r_no_error { color: grey; }\n"
            "table { border-collapse:collapse; }\n"
@@ -37,32 +90,30 @@ void htmlPrintHeader()
            "th.r_summary { text-align:center; padding-left: 1em; }\n"
            "td.r_coverage { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "th.r_coverage { text-align:left; padding-left: 1em; }\n"
+           "td.r_upstream { border: 1px solid grey; padding: 1em;}\n"
+           "td.r_downstream { border: 1px solid grey; padding: 1em; }\n"
+           ".r_no_coverage { color: #55B; padding-left: 1em;}\n"
            "</style>\n"
            "</head>\n"
            "<body>\n"
-           "<h1>Requirements Coverage</h1>"
+           "<h1>Requirements Traceability</h1>"
            "<div class=\"r_date\">Generated: %s</div>",
            getDatetime().c_str()
            );
 }
 
-void htmlPrintToc()
-{
-    // TODO
-}
-
 void htmlPrintErrors()
 {
-
+    printf("<h1 id=\"r_errors\">Errors</h1>\n");
     if (Errors.empty()) {
         printf("<div class=\"r_no_error\">\n");
         printf("No Error.\n");
     } else {
-        printf("<div class=\"r_errors\">\n");
-        fprintf(stderr, "Error(s): %d\n", Errors.size());
+        printf("<div class=\"r_errors\">");
+        printf("Error(s): %d\n", Errors.size());
         std::list<std::string>::iterator e;
         FOREACH(e, Errors) {
-            fprintf(stderr, "%s\n", e->c_str());
+            printf("%s\n", htmlEscape(*e).c_str());
         }
     }
     printf("</div>\n");
@@ -72,13 +123,21 @@ void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, c
 {
     const char *warning = "";
     if (ratio != 100) warning = "r_warning";
-    printf("<tr class=\"r_summary %s\"><td class=\"r_summary\">%s</td>"
-           "<td class=\"r_summary\">%d</td>"
-           "<td class=\"r_summary\">%d</td>"
-           "<td class=\"r_summary\">%d</td>"
-           "<td class=\"r_summary\">%s</td></tr>\n",
-           warning, docId, ratio, covered, total, path);
+    printf("<tr class=\"r_summary %s\"><td class=\"r_summary\">", warning);
+    if (strlen(path)) printf("<a href=\"#%s\">", urlEncode(docId).c_str()); // do not print href for the "total" line (no path)
+    printf("%s", htmlEscape(docId).c_str());
+    if (strlen(path)) printf("</a>"); // do not print href for the "total" line (no path)
+    printf("</td>");
 
+    printf("<td class=\"r_summary\">%d</td>"
+           "<td class=\"r_summary\">%d</td>"
+           "<td class=\"r_summary\">%d</td>",
+           ratio, covered, total);
+    printf("<td class=\"r_summary\">");
+    if (strlen(path)) printf("<a href=\"%s\">", urlEncode(path).c_str()); // do not print href for the "total" line (no path)
+    printf("%s", htmlEscape(path).c_str());
+    if (strlen(path)) printf("</a>"); // do not print href for the "total" line (no path)
+    printf("</td></tr>\n");
 }
 
 void htmlPrintSummaryOfFile(const ReqFileConfig &f, int &total, int &covered)
@@ -124,9 +183,11 @@ void htmlPrintSummary(const std::list<std::string> &documents)
     htmlPrintSummaryContents(documents);
 
     printf("</table>");
+
+    if (Errors.size()) printf("<a href=\"#r_errors\">Errors</a>\n");
 }
 
-void htmlPrintCoverageRow(const char *req1, const char *req2, const char *doc2Id, bool warning)
+void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *doc2Id, bool warning)
 {
     const char *warningStyle = "";
     if (warning) warningStyle = "r_warning";
@@ -134,15 +195,21 @@ void htmlPrintCoverageRow(const char *req1, const char *req2, const char *doc2Id
     printf("<tr class=\"r_coverage %s\">", warningStyle);
     printf("<td class=\"r_coverage\">%s</td>", req1);
     printf("<td class=\"r_coverage\">%s</td>", req2);
-    printf("<td class=\"r_coverage\">%s</td>", doc2Id);
+
+    // doc id
+    printf("<td class=\"r_coverage\">");
+    if (doc2Id) {
+        printf("<a href=\"#%s\">%s</a>", urlEncode(doc2Id).c_str(), urlEncode(doc2Id).c_str());
+    }
+    printf("</td>");
     printf("\n");
 }
 
 
-void htmlPrintCoverage(const Requirement &r, bool forward)
+void htmlPrintTraceability(const Requirement &r, bool forward)
 {
     if (forward) { // A covered by B
-        if (r.coveredBy.empty()) htmlPrintCoverageRow(r.id.c_str(), "", "", true);
+        if (r.coveredBy.empty()) htmlPrintTraceabilityRow(r.id.c_str(), "", "", true);
         else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.coveredBy) {
@@ -154,11 +221,11 @@ void htmlPrintCoverage(const Requirement &r, bool forward)
                     warning = true;
                 } else docId = above->parentDocumentId.c_str();
 
-                htmlPrintCoverageRow(r.id.c_str(), c->c_str(), docId, warning);
+                htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, warning);
             }
         }
     } else { // A covering B
-        if (r.covers.empty()) htmlPrintCoverageRow(r.id.c_str(), "", "", false);
+        if (r.covers.empty()) htmlPrintTraceabilityRow(r.id.c_str(), "", "", false);
         else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.covers) {
@@ -167,66 +234,103 @@ void htmlPrintCoverage(const Requirement &r, bool forward)
                 if (!ref) docId = "Undefined";
                 else docId = ref->parentDocumentId.c_str();
 
-                htmlPrintCoverageRow(r.id.c_str(), c->c_str(), docId, false);
+                htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, false);
             }
         }
 
     }
 }
 
+void htmlPrintDependencies(const ReqFileConfig &f)
+{
+    printf("<h2>Dependencies for: %s</h2>", htmlEscape(f.id).c_str());
+
+    printf("<table class=\"r_dependencies\">");
+    printf("<tr class=\"r_dependencies\">");
+    printf("<th class=\"r_dependencies\">Upstream Documents</th>");
+    printf("<th class=\"r_dependencies\"></th>");
+    printf("<th class=\"r_dependencies\">Downstream Documents</th>");
+    printf("</tr>\n");
+
+    std::set<std::string>::iterator doc;
+    // upstream documents
+    printf("<td class=\"r_upstream\">");
+    FOREACH(doc, f.upstreamDocuments) {
+        printf("<a href=\"#%s\">%s</a><br>", urlEncode(*doc).c_str(), htmlEscape(*doc).c_str());
+    }
+    printf("</td>");
+
+    printf("<td>-> %s-></td>", htmlEscape(f.id).c_str());
+
+    // downstream documents
+    printf("<td class=\"r_downstream\">");
+    FOREACH(doc, f.downstreamDocuments) {
+        printf("<a href=\"#%s\">%s</a><br>", urlEncode(*doc).c_str(), htmlEscape(*doc).c_str());
+    }
+    printf("</td>");
+
+    printf("</table>\n");
+
+}
+
 void htmlPrintMatrix(const ReqFileConfig &f, bool forward)
 {
 
-    printf("<h2 name=\"%s\">", f.id.c_str());
+    printf("<h2>");
     if (forward) printf("Forward Coverage");
     else printf("Reverse Coverage");
-    printf(" for: %s</h2>\n", f.id.c_str());
+    printf(" for: %s</h2>\n", htmlEscape(f.id).c_str());
 
-    printf("<div class=\"r_path\">%s</div>", f.path.c_str());
+    if (forward && f.downstreamDocuments.empty()) {
+        printf("<div class=\"r_no_coverage\">No requirement covered downstream.</div>");
+        return;
+    } else if (!forward && f.upstreamDocuments.empty()) {
+        printf("<div class=\"r_no_coverage\">This documents covers no requirement from upstream.</div>");
+        return;
+    }
 
     printf("<table class=\"r_coverage\">");
     printf("<tr class=\"r_coverage\"><th class=\"r_coverage\">Requirements</th>");
     if (forward) {
-        printf("<th class=\"r_coverage\">Requirements Above</th>");
-        printf("<th class=\"r_coverage\">Documents Above</th>");
+        printf("<th class=\"r_coverage\">Descendants</th>");
+        printf("<th class=\"r_coverage\">Downstream Documents</th>");
     } else {
         // reverse
-        printf("<th class=\"r_coverage\">Requirements Underneath</th>");
-        printf("<th class=\"r_coverage\">Documents Underneath</th>");
+        printf("<th class=\"r_coverage\">Origins</th>");
+        printf("<th class=\"r_coverage\">Upstream Documents</th>");
     }
     printf("</tr>\n");
 
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
         if (r->second.parentDocumentId == f.id) {
-            htmlPrintCoverage(r->second, forward);
+            htmlPrintTraceability(r->second, forward);
         }
     }
     printf("</table>\n");
 }
 
-void htmlPrintCoverage(const std::list<std::string> documents, bool forward)
+void htmlPrintAllTraceability(const std::list<std::string> documents)
 {
     std::list<std::string>::const_iterator docId;
     FOREACH(docId, documents) {
         std::map<std::string, ReqFileConfig>::const_iterator file = ReqConfig.find(*docId);
         if (file == ReqConfig.end()) PUSH_ERROR("Invalid document id: %s", docId->c_str());
-        else htmlPrintMatrix(file->second, forward);
+        else {
+            printf("<div class=\"r_coverage\">");
+            printf("<h1 id=\"%s\">%s</h1>", urlEncode(*docId).c_str(), urlEncode(*docId).c_str());
+
+            printf("<div class=\"r_path\"><a href=\"%s\">%s</a></div>",
+                   urlEncode(file->second.path).c_str(), htmlEscape(file->second.path).c_str());
+
+            htmlPrintDependencies(file->second);
+            htmlPrintMatrix(file->second, true);
+            htmlPrintMatrix(file->second, false);
+            printf("</div>");
+
+        }
     }
 }
-
-void htmlPrintAllCoverage(const std::list<std::string> &documents)
-{
-    // forward coverage (A covered by B)
-    printf("<div class=\"r_coverage\">");
-
-    htmlPrintCoverage(documents, true);
-
-    htmlPrintCoverage(documents, false);
-
-    printf("</div>");
-}
-
 
 void htmlPrintFooter()
 {
@@ -257,16 +361,13 @@ void htmlRender(int argc, const char **argv)
     // print header
     htmlPrintHeader();
 
-    // print table of contents
-    htmlPrintToc();
-
     // print summary
     htmlPrintSummary(documents);
 
     // print dependencies between documents
 
     // print coverage for each document (A>B and A<B)
-    htmlPrintAllCoverage(documents);
+    htmlPrintAllTraceability(documents);
 
     // print errors
     htmlPrintErrors();

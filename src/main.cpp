@@ -48,12 +48,12 @@ void usage()
            "                        'U'  Uncovered\n"
            "\n"
            "    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).\n"
-           "         [-r]        Print the reverse traceability matrix (A covers B).\n"
-           "         [-x <fmt>]  Select export format: text (default), csv.\n"
+           "         [-r]       Print the reverse traceability matrix (A covers B).\n"
+           "         [-x <fmt>] Select export format: text (default), csv.\n"
            "\n"
            "    config          Print the list of configured documents.\n"
            "\n"
-           "    html            Generate HTML report\n"
+           "    report [-html]  Generate HTML report\n"
            "\n"
            "    pdf <file>      Dump text extracted from pdf file (debug purpose).\n"
            "\n"
@@ -606,6 +606,7 @@ int cmdPdf(int argc, const char **argv)
 	}
 	return 0;
 }
+
 int cmdHtml(int argc, const char **argv)
 {
     int i = 0;
@@ -632,6 +633,19 @@ int cmdHtml(int argc, const char **argv)
 
     return 0;
 }
+
+int cmdReport(int argc, const char **argv)
+{
+    std::string format = "-html"; // default format is HTML
+    if (argc > 0 && 0 == strcmp("-html", argv[0])) {
+        format = argv[0];
+        argc--; argv++;
+    }
+
+    if (format == "-html") return cmdHtml(argc, argv);
+    else usage();
+}
+
 
 int cmdRegex(int argc, const char **argv)
 {
@@ -685,16 +699,16 @@ int main(int argc, const char **argv)
 {
     if (argc < 2) usage();
 
-    const char *command = argv[1];
+    std::string command = argv[1];
     int rc = 0;
 
-    if (0 == strcmp(command, "stat"))         rc = cmdStat(argc-2, argv+2);
-    else if (0 == strcmp(command, "version")) rc = showVersion();
-    else if (0 == strcmp(command, "trac"))    rc = cmdTrac(argc-2, argv+2);
-    else if (0 == strcmp(command, "config"))  rc = cmdConfig(argc-2, argv+2);
-    else if (0 == strcmp(command, "html"))    rc = cmdHtml(argc-2, argv+2);
-    else if (0 == strcmp(command, "regex"))   rc = cmdRegex(argc-2, argv+2);
-    else if (0 == strcmp(command, "pdf"))     rc = cmdPdf(argc-2, argv+2);
+    if (command == "stat")         rc = cmdStat(argc-2, argv+2);
+    else if (command == "version") rc = showVersion();
+    else if (command == "trac")    rc = cmdTrac(argc-2, argv+2);
+    else if (command == "config")  rc = cmdConfig(argc-2, argv+2);
+    else if (command == "report")  rc = cmdHtml(argc-2, argv+2);
+    else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
+    else if (command == "pdf")     rc = cmdPdf(argc-2, argv+2);
     else usage();
 
     printErrors();
