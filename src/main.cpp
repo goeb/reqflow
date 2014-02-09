@@ -18,7 +18,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <regex.h>
+#include <pcreposix.h>
 #include <map>
 #include <set>
 #include <fstream>
@@ -30,7 +30,9 @@
 #include "req.h"
 #include "ReqDocumentDocx.h"
 #include "ReqDocumentTxt.h"
+#ifndef _WIN32
 #include "ReqDocumentPdf.h"
+#endif
 #include "renderingHtml.h"
 
 void usage()
@@ -56,6 +58,7 @@ void usage()
            "    report [-html]  Generate HTML report\n"
            "\n"
            "    pdf <file>      Dump text extracted from pdf file (debug purpose).\n"
+           "                    (not supported on Windows)\n"
            "\n"
            "    regex <pattern> <text>\n"
            "                    Test regex given by <pattern> applied on <text>.\n"
@@ -236,7 +239,9 @@ ReqFileType getFileType(const std::string &path)
     else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
     else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
     else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
+#ifndef _WIN32
     else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
+#endif
     else return RF_UNKNOWN;
 }
 
@@ -268,12 +273,14 @@ int loadRequirements()
             doc.loadRequirements();
             break;
         }
+#ifndef _WIN32
 		case RF_PDF:
         {
             ReqDocumentPdf doc(fileConfig);
             doc.loadRequirements();
 			break;
         }
+#endif
         default:
             LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
             result = -1;
@@ -295,9 +302,9 @@ void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFor
 		printf(",,"CRLF);
 		printf("Requirements of %s,", docId);
         if (reverse) {
-			printf("Requirements Underneath");
+            printf("Requirements Downstream");
         } else {
-			printf("Requirements Above");
+            printf("Requirements Upstream");
 		}
 		if (verbose) printf(",Document");
 		else printf(","); // always 3 columns
@@ -306,8 +313,8 @@ void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFor
     } else {
 		printf("\n");
 		printf("Requirements of %-34s ", docId);
-        if (reverse) printf(ALIGN, "Requirements Underneath");
-        else printf(ALIGN, "Requirements Above");
+        if (reverse) printf(ALIGN, "Requirements Downstream");
+        else printf(ALIGN, "Requirements Upstream");
 		if (verbose) printf(" Document");
         printf("\n");
 		printf("----------------------------------------------");
@@ -474,7 +481,7 @@ void printRequirementsOfFile(StatusMode status, const char *documentId)
 		}
 	}
 }
-void printRequirements(StatusMode status, uint argc, const char **argv)
+void printRequirements(StatusMode status, int argc, const char **argv)
 {
     std::map<std::string, ReqFileConfig>::iterator file;
     if (!argc) {
@@ -595,7 +602,7 @@ int cmdConfig(int argc, const char **argv)
 
     return 0;
 }
-
+#ifndef _WIN32
 int cmdPdf(int argc, const char **argv)
 {
 	if (!argc) usage();
@@ -606,6 +613,7 @@ int cmdPdf(int argc, const char **argv)
 	}
 	return 0;
 }
+#endif
 
 int cmdHtml(int argc, const char **argv)
 {
@@ -644,6 +652,7 @@ int cmdReport(int argc, const char **argv)
 
     if (format == "-html") return cmdHtml(argc, argv);
     else usage();
+    return 0;
 }
 
 
@@ -708,7 +717,9 @@ int main(int argc, const char **argv)
     else if (command == "config")  rc = cmdConfig(argc-2, argv+2);
     else if (command == "report")  rc = cmdHtml(argc-2, argv+2);
     else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
+#ifndef _WIN32
     else if (command == "pdf")     rc = cmdPdf(argc-2, argv+2);
+#endif
     else usage();
 
     printErrors();

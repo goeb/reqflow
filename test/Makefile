@@ -1,6 +1,6 @@
 
 
 test:
-	../req cov -c req.conf
-	../req cov -c req2.conf
-	../req cov -c req3.conf || echo "expected error: ok"
+	../req trac -c req.conf
+	../req trac -c req2.conf
+	../req trac -c req3.conf || echo "expected error: ok"

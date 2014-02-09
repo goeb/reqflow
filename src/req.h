@@ -1,7 +1,7 @@
 #ifndef _req_h
 #define _req_h
 
-#include <regex.h>
+#include <pcreposix.h>
 #include <string>
 #include <map>
 #include <list>
