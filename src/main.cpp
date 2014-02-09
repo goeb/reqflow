@@ -47,9 +47,9 @@ void usage()
            "\n"
            "                        'U'  Uncovered\n"
            "\n"
-           "    cov [doc ...]   Print the coverage matrix of the requirements (A covered by B).\n"
-           "        [-r]        Print the reverse coverage matrix (A covers B).\n"
-           "        [-x <fmt>]  Select export format: text (default), csv.\n"
+           "    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).\n"
+           "         [-r]        Print the reverse traceability matrix (A covers B).\n"
+           "         [-x <fmt>]  Select export format: text (default), csv.\n"
            "\n"
            "    config          Print the list of configured documents.\n"
            "\n"
@@ -289,7 +289,7 @@ int loadRequirements()
 enum ReqExportFormat { REQ_X_TXT, REQ_X_CSV };
 #define ALIGN "%-50s"
 #define CRLF "\r\n"
-void printCoverageHeader(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
+void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (format == REQ_X_CSV) {
 		printf(",,"CRLF);
@@ -318,7 +318,7 @@ void printCoverageHeader(const char *docId, bool reverse, bool verbose, ReqExpor
 
 /** req2 and doc2Id may be null
  */
-void printCoverageLine(const char *req1, const char *req2, const char *doc2Id, ReqExportFormat format)
+void printTracLine(const char *req1, const char *req2, const char *doc2Id, ReqExportFormat format)
 {
 	if (format == REQ_X_CSV) {
 		printf("%s,", req1);
@@ -335,11 +335,11 @@ void printCoverageLine(const char *req1, const char *req2, const char *doc2Id, R
 	}
 }
 
-void printCoverage(const Requirement &r, bool reverse, bool verbose, ReqExportFormat format)
+void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (reverse) { // A covering B
         if (r.covers.empty()) {
-			printCoverageLine(r.id.c_str(), 0, 0, format);
+            printTracLine(r.id.c_str(), 0, 0, format);
 
         } else {
             std::set<std::string>::iterator c;
@@ -349,13 +349,13 @@ void printCoverage(const Requirement &r, bool reverse, bool verbose, ReqExportFo
 				if (!ref) docId = "Undefined";
 				else if (verbose) docId = ref->parentDocumentId.c_str();
 
-				printCoverageLine(r.id.c_str(), c->c_str(), docId, format);
+                printTracLine(r.id.c_str(), c->c_str(), docId, format);
             }
         }
 
     } else { // A covered by B
         if (r.coveredBy.empty()) {
-			printCoverageLine(r.id.c_str(), 0, 0, format);
+            printTracLine(r.id.c_str(), 0, 0, format);
 
         } else {
             std::set<std::string>::iterator c;
@@ -365,20 +365,22 @@ void printCoverage(const Requirement &r, bool reverse, bool verbose, ReqExportFo
 				if (!above) docId = "Undefined";
 				else if (verbose) docId = above->parentDocumentId.c_str();
 
-				printCoverageLine(r.id.c_str(), c->c_str(), docId, format);
+                printTracLine(r.id.c_str(), c->c_str(), docId, format);
             }
         }
     }
 }
 
-void printCoverageOfFile(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
+/** Print traceability matrix of file.
+  */
+void printTracOfFile(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
-    printCoverageHeader(docId, reverse, verbose, format);
+    printTracHeader(docId, reverse, verbose, format);
 
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
         if (!docId || r->second.parentDocumentId == docId) {
-            printCoverage(r->second, reverse, verbose, format);
+            printTrac(r->second, reverse, verbose, format);
         }
     }
 }
@@ -392,14 +394,14 @@ void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExp
     std::map<std::string, ReqFileConfig>::iterator file;
     if (!argc) {
         FOREACH(file, ReqConfig) {
-            printCoverageOfFile(file->second.id.c_str(), reverse, verbose, format);
+            printTracOfFile(file->second.id.c_str(), reverse, verbose, format);
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) {
             LOG_ERROR("Invalid document id: %s", docId);
-        } else printCoverageOfFile(file->second.id.c_str(), reverse, verbose, format);
+        } else printTracOfFile(file->second.id.c_str(), reverse, verbose, format);
         argc--;
         argv++;
     }
@@ -525,7 +527,7 @@ int cmdStat(int argc, const char **argv)
     return 0;
 }
 
-int cmdCov(int argc, const char **argv)
+int cmdTrac(int argc, const char **argv)
 {
     int i = 0;
     const char *configFile = DEFAULT_CONF;
@@ -688,7 +690,7 @@ int main(int argc, const char **argv)
 
     if (0 == strcmp(command, "stat"))         rc = cmdStat(argc-2, argv+2);
     else if (0 == strcmp(command, "version")) rc = showVersion();
-    else if (0 == strcmp(command, "cov"))     rc = cmdCov(argc-2, argv+2);
+    else if (0 == strcmp(command, "trac"))    rc = cmdTrac(argc-2, argv+2);
     else if (0 == strcmp(command, "config"))  rc = cmdConfig(argc-2, argv+2);
     else if (0 == strcmp(command, "html"))    rc = cmdHtml(argc-2, argv+2);
     else if (0 == strcmp(command, "regex"))   rc = cmdRegex(argc-2, argv+2);
