@@ -16,8 +16,8 @@ enum BlockStatus { NOT_STARTED, STOP_REACHED, REQ_OK };
 struct ReqFileConfig {
     std::string id;
     std::string path;
-    std::string tagPattern;
-    regex_t *tagRegex;
+    std::string reqPattern;
+    regex_t *reqRegex;
     std::string refPattern;
     regex_t *refRegex;
 	std::string startAfter;
@@ -34,7 +34,7 @@ struct ReqFileConfig {
     int nCoveredRequirements;
 	Encoding encoding;
 
-    ReqFileConfig(): tagRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0),
+    ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0),
 		nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8) {}
 };
 

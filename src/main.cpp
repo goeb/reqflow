@@ -170,20 +170,20 @@ int loadConfiguration(const char * file)
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
 					
-                } else if (arg == "-tag") {
+                } else if (arg == "-req") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -tag value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR("Missing -req value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.tagPattern = pop(*line);
+                    fileConfig.reqPattern = pop(*line);
                     /* Compile regular expression */
-                    fileConfig.tagRegex = new regex_t();
-                    int reti = regcomp(fileConfig.tagRegex, fileConfig.tagPattern.c_str(), 0);
+                    fileConfig.reqRegex = new regex_t();
+                    int reti = regcomp(fileConfig.reqRegex, fileConfig.reqPattern.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile tag regex for %s: %s", fileConfig.id.c_str(), fileConfig.tagPattern.c_str());
+                        PUSH_ERROR("Cannot compile req regex for %s: %s", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
                         exit(1);
                     }
-                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.tagPattern.c_str(), &fileConfig.tagRegex);
+                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.reqPattern.c_str(), &fileConfig.reqRegex);
 
 
                 } else if (arg == "-ref") {

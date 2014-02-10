@@ -87,7 +87,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
         }
     }
 
-    std::string reqId = getMatchingPattern(fileConfig.tagRegex, text);
+    std::string reqId = getMatchingPattern(fileConfig.reqRegex, text);
 
     if (!reqId.empty() && reqId != ref) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
