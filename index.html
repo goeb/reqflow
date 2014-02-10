@@ -76,21 +76,21 @@ Options:
 </code></pre>
 <h2 id="sample-configuration-file">Sample Configuration File</h2>
 <p><code>req.conf</code></p>
-<pre><code># addFile &lt;document-id&gt; -path &lt;document-path&gt; -tag &lt;pattern&gt; \
+<pre><code># addFile &lt;document-id&gt; -path &lt;document-path&gt; -req &lt;pattern&gt; \
 #         [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;]
 #
 # &lt;pattern&gt; must be a Perl Compatible Regular Expression (PCRE)
-# -tag indicates how the requirements must be acquired
-# -ref indicates how the referenced requirements must be acquired
+# -req indicates how the requirements must be captured
+# -ref indicates how the referenced requirements must be captured
 # 
 # Parameters containing spaces must be enclosed by quotes: &quot;The file.doxc&quot;
 # Escape character (for quotes, etc.): antislash (\).
 # Thus any \ must be written \\.
 # 
 
-addFile SPEC -path SPEC.docx -tag REQ_[-a-zA-Z0-9_]* -stop-after Annex
+addFile SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
 addFile TEST -path TEST.txt \
-    -tag T_[-a-zA-Z0-9_]* \
+    -req T_[-a-zA-Z0-9_]* \
     -ref &quot;Ref:  *(.*)&quot; \
     -stop-after &quot;Annex&quot; \
     -start-after &quot;Tests cases&quot;

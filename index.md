@@ -64,21 +64,21 @@ Options:
 `req.conf`
 
 ```
-# addFile <document-id> -path <document-path> -tag <pattern> \
+# addFile <document-id> -path <document-path> -req <pattern> \
 #         [-stop-after <pattern>] [-ref <pattern>] [-start-after <pattern>]
 #
 # <pattern> must be a Perl Compatible Regular Expression (PCRE)
-# -tag indicates how the requirements must be acquired
-# -ref indicates how the referenced requirements must be acquired
+# -req indicates how the requirements must be captured
+# -ref indicates how the referenced requirements must be captured
 # 
 # Parameters containing spaces must be enclosed by quotes: "The file.doxc"
 # Escape character (for quotes, etc.): antislash (\).
 # Thus any \ must be written \\.
 # 
 
-addFile SPEC -path SPEC.docx -tag REQ_[-a-zA-Z0-9_]* -stop-after Annex
+addFile SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
 addFile TEST -path TEST.txt \
-    -tag T_[-a-zA-Z0-9_]* \
+    -req T_[-a-zA-Z0-9_]* \
     -ref "Ref:  *(.*)" \
     -stop-after "Annex" \
     -start-after "Tests cases"
