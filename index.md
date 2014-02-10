@@ -15,6 +15,8 @@ Req is a free and open-source traceability tool designed to analyse documents wi
 ### Linux
 
     git clone https://github.com/goeb/req.git
+    make
+    cd test && ../req stat -s
 
 ### Windows
 
