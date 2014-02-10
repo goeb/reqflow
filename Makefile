@@ -7,12 +7,14 @@ ifeq ($(WIN),1)
 	LIBXML = $(HOME)/Downloads/libxml2-2.9.1
 	LIBZIP = $(HOME)/Downloads/libzip-0.11.2
 	LIBPCRE = $(HOME)/Downloads/pcre-8.34
+	LIBZ = $(HOME)/Downloads/zlib-1.2.8
 	LDFLAGS += -lws2_32 -lgdi32
 	LDFLAGS += -Wl,-Bstatic
   	LDFLAGS += -L$(LIBXML)/.libs -lxml2
-	LDFLAGS += $(LIBZIP)/lib/.libs/libzip.dll.a $(LIBZIP)/lib/.libs/libzip.a
-   	LDFLAGS +=$(LIBPCRE)/.libs/libpcreposix.a $(LIBPCRE)/.libs/libpcreposix.dll.a
+	LDFLAGS += $(LIBZIP)/lib/.libs/libzip.a $(LIBZ)/libz.a
+   	LDFLAGS += $(LIBPCRE)/.libs/libpcreposix.a $(LIBPCRE)/.libs/libpcre.a
 	CFLAGS += -I$(LIBXML)/include -I$(LIBZIP)/lib -I$(LIBPCRE)
+	CFLAGS += -DLIBXML_STATIC -DPCRE_STATIC -DZIP_EXTERN= -DZLIB_INTERNAL
 	PACK_NAME = smit-win32
 else
 	EXE = req
@@ -82,5 +84,10 @@ clean:
 	find . -name "*.o" -delete
 	find . -name "*.d" -delete
 	rm $(EXE)
+
+win:
+	$(MAKE) WIN=1
+	i586-mingw32msvc-strip req.exe
+
 
 include $(DEPENDS)

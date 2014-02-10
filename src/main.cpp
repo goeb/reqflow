@@ -77,7 +77,7 @@ enum StatusMode { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL };
 
 int showVersion()
 {
-    printf("Small Issue Tracker v%s\n"
+    printf("Req v%s\n"
            "Copyright (C) 2013 Frederic Hoerni\n"
            "\n"
            "This program is free software; you can redistribute it and/or modify\n"
@@ -715,7 +715,7 @@ int main(int argc, const char **argv)
     else if (command == "version") rc = showVersion();
     else if (command == "trac")    rc = cmdTrac(argc-2, argv+2);
     else if (command == "config")  rc = cmdConfig(argc-2, argv+2);
-    else if (command == "report")  rc = cmdHtml(argc-2, argv+2);
+    else if (command == "report")  rc = cmdReport(argc-2, argv+2);
     else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
 #ifndef _WIN32
     else if (command == "pdf")     rc = cmdPdf(argc-2, argv+2);
