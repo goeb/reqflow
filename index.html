@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Req Traceability Tool</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    </head>
+
+    <body>
+        <div class="header">
+
+        </div>
+        <div class="page">
+<aside class='menu'>
+<ul>
+<li class='active'>Req Traceability Tool
+<ul class=menu_level2>
+<li><a href='#supported-input-formats'>Supported Input Formats</a></li>
+<li><a href='#download'>Download</a></li>
+<li><a href='#usage'>Usage</a></li>
+<li><a href='#sample-configuration-file'>Sample Configuration File</a></li>
+<li><a href='#external-dependencies'>External Dependencies</a></li>
+<li><a href='#license-gplv2'>License GPLv2</a></li>
+</ul>
+</li>
+</ul>
+</aside>
+<div class='contents'>
+<h1 id="req-traceability-tool">Req Traceability Tool</h1>
+<p>Req is a free and open-source traceability tool designed to analyse documents with speed and efficiency.</p>
+<h2 id="supported-input-formats">Supported Input Formats</h2>
+<ul>
+<li>docx (Open Xml)</li>
+<li>text</li>
+<li>pdf (experimental, Linux only)</li>
+</ul>
+<h2 id="download">Download</h2>
+<h3 id="linux">Linux</h3>
+<pre><code>git clone https://github.com/goeb/req.git</code></pre>
+<h3 id="windows">Windows</h3>
+<p><a href="download/req-v1.0.zip">req-v1.0.zip</a></p>
+<h2 id="usage">Usage</h2>
+<pre><code>Usage: req &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
+
+Commands:
+
+    stat [doc ...]  Print the status of requirements in all documents or the given documents.
+                    Without additionnal option, only unresolved coverage issues are reported.
+         -s         Print a one-line summary for each document.
+         -v         Print the status of all requirements.
+                    Status codes:
+
+                        &#39;U&#39;  Uncovered
+
+    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).
+         [-r]       Print the reverse traceability matrix (A covers B).
+         [-x &lt;fmt&gt;] Select export format: text (default), csv.
+
+    config          Print the list of configured documents.
+
+    report [-html]  Generate HTML report
+
+    pdf &lt;file&gt;      Dump text extracted from pdf file (debug purpose).
+                    (not supported on Windows)
+
+    regex &lt;pattern&gt; &lt;text&gt;
+                    Test regex given by &lt;pattern&gt; applied on &lt;text&gt;.
+
+    version
+    help
+
+Options:
+    -c &lt;config&gt; Select configuration file. Defaults to &#39;req.conf&#39;.
+</code></pre>
+<h2 id="sample-configuration-file">Sample Configuration File</h2>
+<p><code>req.conf</code></p>
+<pre><code># addFile &lt;document-id&gt; -path &lt;document-path&gt; -tag &lt;pattern&gt; \
+#         [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;]
+#
+# &lt;pattern&gt; must be a Perl Compatible Regular Expression (PCRE)
+# -tag indicates how the requirements must be acquired
+# -ref indicates how the referenced requirements must be acquired
+# 
+# Parameters containing spaces must be enclosed by quotes: &quot;The file.doxc&quot;
+# Escape character (for quotes, etc.): antislash (\).
+# Thus any \ must be written \\.
+# 
+
+addFile SPEC -path SPEC.docx -tag REQ_[-a-zA-Z0-9_]* -stop-after Annex
+addFile TEST -path TEST.txt \
+    -tag T_[-a-zA-Z0-9_]* \
+    -ref &quot;Ref:  *(.*)&quot; \
+    -stop-after &quot;Annex&quot; \
+    -start-after &quot;Tests cases&quot;
+</code></pre>
+<h2 id="external-dependencies">External Dependencies</h2>
+<ul>
+<li>libz</li>
+<li>libzip</li>
+<li>libxml2</li>
+<li>lippoppler-cpp</li>
+</ul>
+<p>(The Windows release includes these as static libraries)</p>
+<h2 id="license-gplv2">License GPLv2</h2>
+<p>Req Copyright (C) 2013 Frederic Hoerni</p>
+<p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
+</div>
+        </div> <!-- div class page -->
+        <div class="footer">
+            Copyright &copy; 2014, Frédéric Hoerni<br>
+            Page updated on 10 Feb 2014
+        </div>
+    </body>
+</html>
