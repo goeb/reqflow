@@ -49,8 +49,10 @@ Options:
 
 # External Dependencies
 
+- libz
 - libzip
 - libxml2
+- libpcre
 - lippoppler-cpp
 
 # License 
