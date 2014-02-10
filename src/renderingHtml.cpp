@@ -19,12 +19,10 @@ std::string getDatetime()
     return buffer;
 }
 
-/** Encode a string for URL
+/** Encode a string for HREF
   *
-  * Used typically for a parameter in the query string.
-  * Also used for file names than may originally cause conflicts with slashes, etc.
   */
-std::string urlEncode(const std::string &src, char mark='%', const char *dontEscape="._-$,;~()")
+std::string hrefEncode(const std::string &src, char mark='%', const char *dontEscape="._-$,;~()/")
 {
     static const char *hex = "0123456789abcdef";
     std::string dst;
@@ -87,6 +85,7 @@ void htmlPrintHeader()
            ".r_no_error { color: grey; }\n"
            "table { border-collapse:collapse; }\n"
            "td.r_summary { text-align:right; border-bottom: 1px grey solid; padding-left: 1em; }\n"
+           "td.r_summary_l { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "th.r_summary { text-align:center; padding-left: 1em; }\n"
            "td.r_coverage { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "th.r_coverage { text-align:left; padding-left: 1em; }\n"
@@ -123,8 +122,8 @@ void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, c
 {
     const char *warning = "";
     if (ratio != 100) warning = "r_warning";
-    printf("<tr class=\"r_summary %s\"><td class=\"r_summary\">", warning);
-    if (strlen(path)) printf("<a href=\"#%s\">", urlEncode(docId).c_str()); // do not print href for the "total" line (no path)
+    printf("<tr class=\"%s\"><td class=\"r_summary_l\">", warning);
+    if (strlen(path)) printf("<a href=\"#%s\">", hrefEncode(docId).c_str()); // do not print href for the "total" line (no path)
     printf("%s", htmlEscape(docId).c_str());
     if (strlen(path)) printf("</a>"); // do not print href for the "total" line (no path)
     printf("</td>");
@@ -133,8 +132,8 @@ void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, c
            "<td class=\"r_summary\">%d</td>"
            "<td class=\"r_summary\">%d</td>",
            ratio, covered, total);
-    printf("<td class=\"r_summary\">");
-    if (strlen(path)) printf("<a href=\"%s\">", urlEncode(path).c_str()); // do not print href for the "total" line (no path)
+    printf("<td class=\"r_summary_l\">");
+    if (strlen(path)) printf("<a href=\"%s\">", hrefEncode(path).c_str()); // do not print href for the "total" line (no path)
     printf("%s", htmlEscape(path).c_str());
     if (strlen(path)) printf("</a>"); // do not print href for the "total" line (no path)
     printf("</td></tr>\n");
@@ -199,7 +198,7 @@ void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *do
     // doc id
     printf("<td class=\"r_coverage\">");
     if (doc2Id) {
-        printf("<a href=\"#%s\">%s</a>", urlEncode(doc2Id).c_str(), urlEncode(doc2Id).c_str());
+        printf("<a href=\"#%s\">%s</a>", hrefEncode(doc2Id).c_str(), htmlEscape(doc2Id).c_str());
     }
     printf("</td>");
     printf("\n");
@@ -256,7 +255,7 @@ void htmlPrintDependencies(const ReqFileConfig &f)
     // upstream documents
     printf("<td class=\"r_upstream\">");
     FOREACH(doc, f.upstreamDocuments) {
-        printf("<a href=\"#%s\">%s</a><br>", urlEncode(*doc).c_str(), htmlEscape(*doc).c_str());
+        printf("<a href=\"#%s\">%s</a><br>", hrefEncode(*doc).c_str(), htmlEscape(*doc).c_str());
     }
     printf("</td>");
 
@@ -265,7 +264,7 @@ void htmlPrintDependencies(const ReqFileConfig &f)
     // downstream documents
     printf("<td class=\"r_downstream\">");
     FOREACH(doc, f.downstreamDocuments) {
-        printf("<a href=\"#%s\">%s</a><br>", urlEncode(*doc).c_str(), htmlEscape(*doc).c_str());
+        printf("<a href=\"#%s\">%s</a><br>", hrefEncode(*doc).c_str(), htmlEscape(*doc).c_str());
     }
     printf("</td>");
 
@@ -318,10 +317,10 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
         if (file == ReqConfig.end()) PUSH_ERROR("Invalid document id: %s", docId->c_str());
         else {
             printf("<div class=\"r_coverage\">");
-            printf("<h1 id=\"%s\">%s</h1>", urlEncode(*docId).c_str(), urlEncode(*docId).c_str());
+            printf("<h1 id=\"%s\">%s</h1>", hrefEncode(*docId).c_str(), htmlEscape(*docId).c_str());
 
             printf("<div class=\"r_path\"><a href=\"%s\">%s</a></div>",
-                   urlEncode(file->second.path).c_str(), htmlEscape(file->second.path).c_str());
+                   hrefEncode(file->second.path).c_str(), htmlEscape(file->second.path).c_str());
 
             htmlPrintDependencies(file->second);
             htmlPrintMatrix(file->second, true);
