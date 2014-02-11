@@ -1,7 +1,7 @@
 
-# Req Traceability Tool
+# Requirements Traceability Tool
 
-Req is a free and open-source traceability tool designed to analyse documents with speed and efficiency.
+Req is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.
 
 ## Supported Input Formats
 
@@ -98,7 +98,7 @@ addFile TEST -path TEST.txt \
 ## License GPLv2
 
 Req
-Copyright (C) 2013 Frederic Hoerni
+Copyright (C) 2014 Frederic Hoerni
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
