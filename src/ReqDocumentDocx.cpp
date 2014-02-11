@@ -99,9 +99,14 @@ int ReqDocumentDocx::loadRequirements()
     const char *CONTENTS = "word/document.xml";
     int i = zip_name_locate(zipFile, CONTENTS, 0);
     if (i < 0) {
-        LOG_ERROR("Not a valid docx document; %s", fileConfig.path.c_str());
-        zip_close(zipFile);
-        return -1;
+		LOG_INFO("Not a Open XML document (missing word/document.xml). Trying Open Document.");
+		const char *OPEN_DOC_CONTENTS = "content.xml";
+		i = zip_name_locate(zipFile, OPEN_DOC_CONTENTS, 0);
+		if (i < 0) {
+			LOG_ERROR("Not a valid docx document; %s", fileConfig.path.c_str());
+			zip_close(zipFile);
+			return -1;
+		}
     }
 
     std::string contents; // buffer for loading the XML contents
