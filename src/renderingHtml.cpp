@@ -78,16 +78,19 @@ void htmlPrintHeader()
            "<style>\n"
            "body { font-family: Verdana,sans-serif; }\n"
            "h1 { background-color: #DDD; border: 1px #bbb solid; padding-left: 1em;}\n"
+           "a[href], a[href]:link { color:blue; text-decoration: none; }\n"
+           "a[href]:hover { color:blue; text-decoration: underline; }\n"
            ".r_date { font-size: small; margin-bottom: 15px;}\n"
            ".r_path { font-size: small; }\n"
            ".r_errors { border: 1px solid #BBB; white-space: pre; font-bold; color: red; padding: 0.5em;}\n"
-           ".r_warning { color: red; font-weight: bold; }\n"
+           ".r_errors_summary { padding: 1em; font-size: 200%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
+           ".r_warning { background-color: #FBB; }\n"
            ".r_no_error { color: grey; }\n"
            "table { border-collapse:collapse; }\n"
            "td.r_summary { text-align:right; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "td.r_summary_l { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "th.r_summary { text-align:center; padding-left: 1em; }\n"
-           "td.r_coverage { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
+           "td.r_coverage { text-align:left; border: 1px grey solid; padding-left: 1em; }\n"
            "th.r_coverage { text-align:left; padding-left: 1em; }\n"
            "td.r_upstream { border: 1px solid grey; padding: 1em;}\n"
            "td.r_downstream { border: 1px solid grey; padding: 1em; }\n"
@@ -103,6 +106,11 @@ void htmlPrintHeader()
 
 void htmlPrintErrors()
 {
+    if (Errors.size()) {
+        printf("<div class=\"r_errors_summary\">");
+        printf("<a href=\"#r_errors\">Error(s): %d</a></div>\n", Errors.size());
+    }
+
     printf("<h1 id=\"r_errors\">Errors</h1>\n");
     if (Errors.empty()) {
         printf("<div class=\"r_no_error\">\n");
@@ -182,8 +190,6 @@ void htmlPrintSummary(const std::list<std::string> &documents)
     htmlPrintSummaryContents(documents);
 
     printf("</table>");
-
-    if (Errors.size()) printf("<a href=\"#r_errors\">Errors</a>\n");
 }
 
 void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *doc2Id, bool warning)

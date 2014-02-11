@@ -1,0 +1,13 @@
+
+Test Plan for RFC1950
+---------------------
+
+T_01
+    test Application data protocol...
+
+Ref: 10. Application data protocol
+
+T_02
+    Support vectors.
+
+Ref: 4.3. Vectors
