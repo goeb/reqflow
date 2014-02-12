@@ -20,7 +20,7 @@ Req is a free and open-source tool for traceability of requirements across docum
 
 ### Windows
 
-[req-v1.0.zip](download/req-v1.0.zip)
+[req-v1.1.zip](download/req-v1.1.zip)
 
 ## Usage
 
