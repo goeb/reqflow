@@ -45,8 +45,8 @@ Commands:
 
     report [-html]  Generate HTML report
 
-    pdf <file>      Dump text extracted from pdf file (debug purpose).
-                    (not supported on Windows)
+    debug <file>    Dump text extracted from file (debug purpose).
+                    (PDF not supported on Windows)
 
     regex <pattern> <text>
                     Test regex given by <pattern> applied on <text>.
