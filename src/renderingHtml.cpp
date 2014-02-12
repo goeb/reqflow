@@ -126,20 +126,28 @@ void htmlPrintErrors()
     printf("</div>\n");
 }
 
-void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, const char *path)
+/** a ratio -1 indicates that this info is not relevant (no coverage needed)
+ */
+void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, const char *path )
 {
     const char *warning = "";
-    if (ratio != 100) warning = "r_warning";
+    if (ratio != 100 && ratio != -1) warning = "r_warning";
     printf("<tr class=\"%s\"><td class=\"r_summary_l\">", warning);
     if (strlen(path)) printf("<a href=\"#%s\">", hrefEncode(docId).c_str()); // do not print href for the "total" line (no path)
     printf("%s", htmlEscape(docId).c_str());
     if (strlen(path)) printf("</a>"); // do not print href for the "total" line (no path)
     printf("</td>");
 
-    printf("<td class=\"r_summary\">%d</td>"
-           "<td class=\"r_summary\">%d</td>"
-           "<td class=\"r_summary\">%d</td>",
-           ratio, covered, total);
+	if (ratio != -1) {
+		printf("<td class=\"r_summary\">%d</td>"
+			"<td class=\"r_summary\">%d</td>",
+			ratio, covered);
+	} else {
+#define NOCOV "<span title=\"Coverage not relevant\r\n(option -nocov)\">nocov</span>"
+		printf("<td class=\"r_summary\">" NOCOV "</td><td class=\"r_summary\">" NOCOV "</td>");
+	}
+
+	printf("<td class=\"r_summary\">%d</td>", total);
     printf("<td class=\"r_summary_l\">");
     if (strlen(path)) printf("<a href=\"%s\">", hrefEncode(path).c_str()); // do not print href for the "total" line (no path)
     printf("%s", htmlEscape(path).c_str());
@@ -149,11 +157,14 @@ void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, c
 
 void htmlPrintSummaryOfFile(const ReqFileConfig &f, int &total, int &covered)
 {
-    total += f.nTotalRequirements;
-    covered += f.nCoveredRequirements;
-
-    int ratio = -1;
-    if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
+	int ratio = 0;
+	if (f.nocov) {
+		ratio = -1;
+	} else {
+		total += f.nTotalRequirements;
+		covered += f.nCoveredRequirements;
+		if (f.nTotalRequirements > 0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
+	}
 
     htmlPrintSummaryRow(f.id.c_str(), ratio, f.nCoveredRequirements, f.nTotalRequirements, f.path.c_str());
 }
@@ -170,7 +181,7 @@ void htmlPrintSummaryContents(const std::list<std::string> &documents)
         else htmlPrintSummaryOfFile(file->second, total, covered);
     }
 
-    int ratio = -1;
+    int ratio = 0;
     if (total > 0) ratio = 100*covered/total;
     htmlPrintSummaryRow("Total", ratio, covered, total, "");
 

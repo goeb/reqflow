@@ -428,19 +428,26 @@ void printSummaryHeader()
     printf("----------------------------------------------------------------------\n");
 }
 
-void printPercent(int total, int covered, const char *docId, const char *path)
+/** Option 'nocov' indicates if coverage is relevant for this document
+ */
+void printPercent(int total, int covered, const char *docId, const char *path, bool nocov)
 {
-	int ratio = -1;
-	if (total > 0) ratio = 100*covered/total;
-    printf("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
+    if (nocov) printf("%-30s nocov  nocov / %5d %s\n", docId, total, path);
+    else {
+		int ratio = 0;
+		if (total > 0) ratio = 100*covered/total;
+		printf("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
+	}
 }
 
 void printSummaryOfFile(const ReqFileConfig &f)
 {
-    ReqTotal += f.nTotalRequirements;
-    ReqCovered += f.nCoveredRequirements;
+	if (!f.nocov) {
+		ReqTotal += f.nTotalRequirements;
+		ReqCovered += f.nCoveredRequirements;
+	}
+	printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str(), f.nocov);
 
-	printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str());
 }
 
 void printSummary(int argc, const char **argv)
@@ -466,7 +473,7 @@ void printSummary(int argc, const char **argv)
 		argv++;
     }
 
-    if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "");
+    if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "", false);
 }
 
 void printRequirementsOfFile(StatusMode status, const char *documentId)
