@@ -34,8 +34,13 @@ struct ReqFileConfig {
     int nCoveredRequirements;
 	Encoding encoding;
 
+	// indicate if no coverage check should be done on this document
+	// ie: no forward traceability is printed and no uncovered status neither
+	bool nocov;
+
+
     ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0),
-		nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8) {}
+		nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false) {}
 };
 
 struct Requirement {
@@ -55,7 +60,7 @@ extern int ReqCovered;
 
 class ReqDocument {
 public:
-    virtual int loadRequirements() = 0;
+    virtual int loadRequirements(bool debug) = 0;
     BlockStatus processBlock(const std::string &text);
 protected:
     void init();
@@ -74,6 +79,7 @@ protected:
 
 // exported functions
 
+void dumpText(const char *text);
 void printErrors();
 Requirement *getRequirement(std::string id);
 ReqFileConfig *getDocument(std::string docId);

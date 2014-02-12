@@ -10,34 +10,7 @@ typedef std::vector<char> byte_array;
 #include "logging.h"
 #include "req.h"
 
-void ReqDocumentPdf::dumpText(const char *file, Encoding encoding)
-{
-	poppler::document *doc = poppler::document::load_from_file(file);
-	if (!doc) {
-		LOG_ERROR("Cannot open file: %s", file);
-		return;
-	}
-	const int pagesNbr = doc->pages();
-	LOG_DEBUG("loadPdf: page count: %d", pagesNbr);
-	
-	for (int i = 0; i < pagesNbr; ++i) {
-        switch(encoding) {
-        case LATIN1:
-            printf("%s", doc->create_page(i)->text().to_latin1().c_str());
-            break;
-        case UTF8:
-        default:
-        {
-            byte_array pageText = doc->create_page(i)->text().to_utf8();
-            std::string pageLines(pageText.begin(), pageText.end());
-			printf("%s", pageLines.c_str());
-            break;
-        }
-        }
-	}
-}
-
-int ReqDocumentPdf::loadRequirements()
+int ReqDocumentPdf::loadRequirements(bool debug)
 {
     LOG_DEBUG("ReqDocumentPdf::loadRequirements: %s", fileConfig.path.c_str());
     init();
@@ -80,11 +53,16 @@ int ReqDocumentPdf::loadRequirements()
 			std::string line;
 			line.assign(startOfLine, length);
 
-            BlockStatus status = processBlock(line);
-            if (status == STOP_REACHED) {
-                delete doc;
-                return 0;
-            }
+			if (debug) {
+				dumpText(line.c_str());
+
+			} else {
+				BlockStatus status = processBlock(line);
+				if (status == STOP_REACHED) {
+					delete doc;
+					return 0;
+				}
+			}
 
 			if (!endOfLine) break;
 			if (endOfLine == startOfLine + strlen(startOfLine) - 1) break;

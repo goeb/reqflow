@@ -5,9 +5,8 @@
 
 class ReqDocumentPdf: public ReqDocument {
 public:
-    ReqDocumentPdf(ReqFileConfig &c) {fileConfig = c;}
-    int loadRequirements();
-    static void dumpText(const char *file, Encoding encoding);
+    ReqDocumentPdf(const ReqFileConfig &c) {fileConfig = c;}
+    int loadRequirements(bool debug);
 };
 
 

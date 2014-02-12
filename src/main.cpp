@@ -57,8 +57,8 @@ void usage()
            "\n"
            "    report [-html]  Generate HTML report\n"
            "\n"
-           "    pdf <file>      Dump text extracted from pdf file (debug purpose).\n"
-           "                    (not supported on Windows)\n"
+           "    debug <file>    Dump text extracted from file (debug purpose).\n"
+           "                    (PDF not supported on Windows)\n"
            "\n"
            "    regex <pattern> <text>\n"
            "                    Test regex given by <pattern> applied on <text>.\n"
@@ -151,7 +151,7 @@ int loadConfiguration(const char * file)
 					fileConfig.startAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile startAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
+                        PUSH_ERROR("Cannot compile startAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
@@ -165,11 +165,14 @@ int loadConfiguration(const char * file)
 					fileConfig.stopAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile stopAfter regex for %s: %s", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
+                        PUSH_ERROR("Cannot compile stopAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
 					
+                } else if (arg == "-nocov") {
+					fileConfig.nocov = true;
+
                 } else if (arg == "-req") {
                     if (line->empty()) {
                         PUSH_ERROR("Missing -req value for %s", fileConfig.id.c_str());
@@ -180,11 +183,10 @@ int loadConfiguration(const char * file)
                     fileConfig.reqRegex = new regex_t();
                     int reti = regcomp(fileConfig.reqRegex, fileConfig.reqPattern.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile req regex for %s: %s", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
+                        PUSH_ERROR("Cannot compile req regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.reqPattern.c_str(), &fileConfig.reqRegex);
-
 
                 } else if (arg == "-ref") {
                     if (line->empty()) {
@@ -245,46 +247,51 @@ ReqFileType getFileType(const std::string &path)
     else return RF_UNKNOWN;
 }
 
+int loadRequirementsOfFile(const ReqFileConfig fileConfig, bool debug)
+{
+    int result = 0;
+	ReqFileType fileType = getFileType(fileConfig.path);
+	switch(fileType) {
+		case RF_TEXT:
+			{
+				ReqDocumentTxt doc(fileConfig);
+				doc.loadRequirements(debug);
+				break;
+			}
+		case RF_DOCX:
+			{
+				ReqDocumentDocx doc(fileConfig);
+				doc.loadRequirements(debug);
+				break;
+			}
+		case RF_DOCX_XML: // mainly for test purpose
+			{
+				ReqDocumentDocxXml doc(fileConfig);
+				doc.loadRequirements(debug);
+				break;
+			}
+#ifndef _WIN32
+		case RF_PDF:
+			{
+				ReqDocumentPdf doc(fileConfig);
+				doc.loadRequirements(debug);
+				break;
+			}
+#endif
+		default:
+			LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
+			result = -1;
+	}
+	return result;
+}
 
-
-int loadRequirements()
+int loadRequirements(bool debug)
 {
     int result = 0;
     std::map<std::string, ReqFileConfig>::iterator c;
     FOREACH(c, ReqConfig) {
         ReqFileConfig &fileConfig = c->second;
-        ReqFileType fileType = getFileType(fileConfig.path);
-        switch(fileType) {
-        case RF_TEXT:
-        {
-            ReqDocumentTxt doc(fileConfig);
-            doc.loadRequirements();
-            break;
-        }
-       case RF_DOCX:
-        {
-            ReqDocumentDocx doc(fileConfig);
-            doc.loadRequirements();
-            break;
-        }
-        case RF_DOCX_XML: // mainly for test purpose
-        {
-            ReqDocumentDocxXml doc(fileConfig);
-            doc.loadRequirements();
-            break;
-        }
-#ifndef _WIN32
-		case RF_PDF:
-        {
-            ReqDocumentPdf doc(fileConfig);
-            doc.loadRequirements();
-			break;
-        }
-#endif
-        default:
-            LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
-            result = -1;
-        }
+		result = loadRequirementsOfFile(fileConfig, debug);
     }
     checkUndefinedRequirements();
     consolidateCoverage();
@@ -524,7 +531,7 @@ int cmdStat(int argc, const char **argv)
     int r = loadConfiguration(configFile);
     if (r != 0) return 1;
 
-    r = loadRequirements();
+    r = loadRequirements(false);
     if (r != 0) return 1;
 
     if (REQ_SUMMARY == statusMode) {
@@ -563,7 +570,7 @@ int cmdTrac(int argc, const char **argv)
     int r = loadConfiguration(configFile);
     if (r != 0) return 1;
 
-    r = loadRequirements();
+    r = loadRequirements(false);
     if (r != 0) return 1;
 
     if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_TXT);
@@ -602,18 +609,6 @@ int cmdConfig(int argc, const char **argv)
 
     return 0;
 }
-#ifndef _WIN32
-int cmdPdf(int argc, const char **argv)
-{
-	if (!argc) usage();
-	while (argc) {
-        ReqDocumentPdf::dumpText(argv[0], UTF8); // TODO take encoding from command line
-		argc--;
-		argv++;
-	}
-	return 0;
-}
-#endif
 
 int cmdHtml(int argc, const char **argv)
 {
@@ -634,12 +629,23 @@ int cmdHtml(int argc, const char **argv)
     int r = loadConfiguration(configFile);
     if (r != 0) return 1;
 
-    r = loadRequirements();
+    r = loadRequirements(false);
     if (r != 0) return 1;
 
     htmlRender(argc-i, argv+i);
 
     return 0;
+}
+
+int cmdDebug(int argc, const char **argv)
+{
+	if (argc == 0) usage();
+
+    std::map<std::string, ReqFileConfig>::iterator c;
+    ReqFileConfig fileConfig;
+	fileConfig.path = argv[0];
+	loadRequirementsOfFile(fileConfig, true);
+	return 0;
 }
 
 int cmdReport(int argc, const char **argv)
@@ -718,7 +724,7 @@ int main(int argc, const char **argv)
     else if (command == "report")  rc = cmdReport(argc-2, argv+2);
     else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
 #ifndef _WIN32
-    else if (command == "pdf")     rc = cmdPdf(argc-2, argv+2);
+    else if (command == "debug")   rc = cmdDebug(argc-2, argv+2);
 #endif
     else usage();
 

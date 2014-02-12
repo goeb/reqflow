@@ -5,7 +5,7 @@
 #include "logging.h"
 #include "req.h"
 
-int ReqDocumentTxt::loadRequirements()
+int ReqDocumentTxt::loadRequirements(bool debug)
 {
     init();
 
@@ -24,8 +24,13 @@ int ReqDocumentTxt::loadRequirements()
 
 	int linenum = 1;
     while (ifs.getline(line, LINE_SIZE_MAX)) { // stop if line too long
-        BlockStatus status = processBlock(line);
-        if (status == STOP_REACHED) return 0;
+		if (debug) {
+			printf("%s", line);
+
+		} else {
+	        BlockStatus status = processBlock(line);
+			if (status == STOP_REACHED) return 0;
+		}
 		linenum++;
     }
 	if (!ifs.eof()) {

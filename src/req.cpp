@@ -14,6 +14,10 @@ std::list<std::string> Errors;
 int ReqTotal = 0;
 int ReqCovered = 0;
 
+void dumpText(const char *text)
+{
+    printf("%s\n", text);
+}
 
 void printErrors()
 {

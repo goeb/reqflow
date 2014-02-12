@@ -10,16 +10,16 @@
 
 class ReqDocumentDocx: public ReqDocument {
 public:
-    ReqDocumentDocx(ReqFileConfig &c) {fileConfig = c;}
-    int loadRequirements();
+    ReqDocumentDocx(const ReqFileConfig &c) {fileConfig = c;}
+    int loadRequirements(bool debug);
 };
 
 class ReqDocumentDocxXml: public ReqDocument {
 public:
-    ReqDocumentDocxXml(ReqFileConfig &c) {fileConfig = c;}
-    int loadRequirements();
-    int loadContents(const char *xml, size_t size);
-    int loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node);
+    ReqDocumentDocxXml(const ReqFileConfig &c) {fileConfig = c;}
+    int loadRequirements(bool debug);
+    int loadContents(const char *xml, size_t size, bool debug);
+    int loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug);
 
 
 private:

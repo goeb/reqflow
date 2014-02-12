@@ -286,11 +286,8 @@ void htmlPrintMatrix(const ReqFileConfig &f, bool forward)
     else printf("Reverse Coverage");
     printf(" for: %s</h2>\n", htmlEscape(f.id).c_str());
 
-    if (forward && f.downstreamDocuments.empty()) {
-        printf("<div class=\"r_no_coverage\">No requirement covered downstream.</div>");
-        return;
-    } else if (!forward && f.upstreamDocuments.empty()) {
-        printf("<div class=\"r_no_coverage\">This documents covers no requirement from upstream.</div>");
+    if (forward && f.nocov) {
+        printf("<div class=\"r_no_coverage\">No forward tracebility configured (-nocov flag).</div>");
         return;
     }
 

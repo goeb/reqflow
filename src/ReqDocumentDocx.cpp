@@ -6,7 +6,7 @@
 #include "logging.h"
 #include "parseConfig.h"
 
-int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node)
+int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug)
 {
     xmlNode *currentNode = NULL;
 
@@ -43,12 +43,17 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node)
             xmlFree(text);
         }
 
-        loadDocxXmlNode(doc, currentNode->children);
+        loadDocxXmlNode(doc, currentNode->children, debug);
 
         if (nodeName =="p" && !textInParagraphCurrent.empty()) {
-            // process text of paragraph
-            BlockStatus status = processBlock(textInParagraphCurrent);
-            if (status == STOP_REACHED) return 0;
+			if (debug) {
+				 dumpText(textInParagraphCurrent.c_str());
+
+			} else {
+				// process text of paragraph
+				BlockStatus status = processBlock(textInParagraphCurrent);
+				if (status == STOP_REACHED) return 0;
+			}
 
             textInParagraphCurrent.clear();
         }
@@ -57,7 +62,7 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node)
 }
 
 
-int ReqDocumentDocxXml::loadRequirements()
+int ReqDocumentDocxXml::loadRequirements(bool debug)
 {
     const char *xml;
     int r = loadFile(fileConfig.path.c_str(), &xml);
@@ -65,12 +70,12 @@ int ReqDocumentDocxXml::loadRequirements()
         LOG_ERROR("Cannot read file (or empty): %s", fileConfig.path.c_str());
         return -1;
     }
-    loadContents(xml, r);
+    loadContents(xml, r, debug);
     free((void*)xml);
     return 0;
 }
 
-int ReqDocumentDocxXml::loadContents(const char *xml, size_t size)
+int ReqDocumentDocxXml::loadContents(const char *xml, size_t size, bool debug)
 {
     init();
 
@@ -80,10 +85,10 @@ int ReqDocumentDocxXml::loadContents(const char *xml, size_t size)
     document = xmlReadMemory(xml, size, 0, 0, 0);
     root = xmlDocGetRootElement(document);
 
-    return loadDocxXmlNode(document, root);
+	return loadDocxXmlNode(document, root, debug);
 }
 
-int ReqDocumentDocx::loadRequirements()
+int ReqDocumentDocx::loadRequirements(bool debug)
 {
     init();
 
@@ -128,5 +133,5 @@ int ReqDocumentDocx::loadRequirements()
 
     // parse the XML
     ReqDocumentDocxXml docXml(fileConfig);
-    return docXml.loadContents(contents.data(),contents.size());
+    return docXml.loadContents(contents.data(),contents.size(), debug);
 }
