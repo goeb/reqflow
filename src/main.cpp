@@ -104,6 +104,23 @@ std::string pop(std::list<std::string> & L)
     return token;
 }
 
+
+
+std::string replaceDefinedVariable(const std::map<std::string, std::string> &definedVariables, const std::string &token)
+{
+    std::string result = token;
+    std::map<std::string, std::string>::const_iterator v;
+    FOREACH(v, definedVariables) {
+        size_t pos;
+        while ( (pos = result.find (v->first)) != std::string::npos) {
+            result = result.replace(pos, v->first.size(), v->second);
+        }
+    }
+    LOG_DEBUG("replace(%s) => %s", token.c_str(), result.c_str());
+    return result;
+}
+
+
 int loadConfiguration(const char * file)
 {
     LOG_DEBUG(_("Loading configuration file: '%s'"), file);
@@ -120,6 +137,8 @@ int loadConfiguration(const char * file)
     // parse the configuration
     std::list<std::list<std::string> > configTokens = parseConfigTokens(config, r);
     free((void*)config);
+
+    std::map<std::string, std::string> defs;
 
     std::list<std::list<std::string> >::iterator line;
     int lineNum = 0;
@@ -141,13 +160,14 @@ int loadConfiguration(const char * file)
                         PUSH_ERROR("Missing -path value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.path = pop(*line);
+                    fileConfig.path = replaceDefinedVariable(defs, pop(*line));
+
                 } else if (arg == "-start-after") {
                     if (line->empty()) {
                         PUSH_ERROR("Missing -start-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-					fileConfig.startAfter = pop(*line);
+                    fileConfig.startAfter = replaceDefinedVariable(defs, pop(*line));
 					fileConfig.startAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
                     if (reti) {
@@ -161,7 +181,7 @@ int loadConfiguration(const char * file)
                         PUSH_ERROR("Missing -stop-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-					fileConfig.stopAfter = pop(*line);
+                    fileConfig.stopAfter = replaceDefinedVariable(defs, pop(*line));
 					fileConfig.stopAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
                     if (reti) {
@@ -178,7 +198,7 @@ int loadConfiguration(const char * file)
                         PUSH_ERROR("Missing -req value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.reqPattern = pop(*line);
+                    fileConfig.reqPattern = replaceDefinedVariable(defs, pop(*line));
                     /* Compile regular expression */
                     fileConfig.reqRegex = new regex_t();
                     int reti = regcomp(fileConfig.reqRegex, fileConfig.reqPattern.c_str(), 0);
@@ -193,7 +213,7 @@ int loadConfiguration(const char * file)
                         PUSH_ERROR("Missing -ref value for %s", fileConfig.id.c_str());
                         return -1;
                     }
-                    fileConfig.refPattern = pop(*line);
+                    fileConfig.refPattern = replaceDefinedVariable(defs, pop(*line));
                     /* Compile regular expression */
                     fileConfig.refRegex = new regex_t();
                     int reti = regcomp(fileConfig.refRegex, fileConfig.refPattern.c_str(), 0);
@@ -202,15 +222,7 @@ int loadConfiguration(const char * file)
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
-#if 0
-                } else if (arg == "-depends-on") {
-                    if (line->empty()) {
-                        PUSH_ERROR("Missing -depends-on value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    fileConfig.dependencies.insert(fileConfig.dependencies.begin(), line->begin(), line->end());
-                    line->clear();
-#endif
+
                 } else {
                     PUSH_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
                 }
@@ -222,6 +234,15 @@ int loadConfiguration(const char * file)
             }
             ReqConfig[fileConfig.id] = fileConfig;
 
+        } else if (verb == "define") {
+            if (line->size() != 2) {
+                PUSH_ERROR("Invalid defined: missing value, line %d", lineNum);
+            } else {
+                std::string key = pop(*line);
+                std::string value = pop(*line);
+                LOG_DEBUG("Add variable '%s'='%s'", key.c_str(), value.c_str());
+                defs[key] = value;
+            }
         } else {
             PUSH_ERROR("Invalid token '%s': line %d", verb.c_str(), lineNum);
         }
