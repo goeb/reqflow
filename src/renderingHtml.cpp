@@ -69,7 +69,7 @@ std::string htmlEscape(const std::string &value)
 }
 
 
-void htmlPrintHeader(const std::string &cmdline)
+void htmlPrintHeader()
 {
     printf("<!DOCTYPE HTML><html>\n"
            "<head>\n"
@@ -77,10 +77,10 @@ void htmlPrintHeader(const std::string &cmdline)
            "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n"
            "<style>\n"
            "body { font-family: Verdana,sans-serif; }\n"
-           "h1 { background-color: #DDD; border: 1px #bbb solid; padding-left: 1em;}\n"
-           "a[href], a[href]:link { color:blue; text-decoration: none; }\n"
-           "a[href]:hover { color:blue; text-decoration: underline; }\n"
-           ".r_technical_header { font-size: small; font-family: monospace; color: grey; }\n"
+           "h1 { border-bottom: 1px #bbb solid; margin-top: 15px;}\n"
+           "a[href], a[href]:link { color: blue; text-decoration: none; }\n"
+           "a[href]:hover { color: blue; text-decoration: underline; }\n"
+           ".r_footer { font-size: small; font-family: monospace; color: grey; }\n"
            ".r_document_summary { font-size: small; }\n"
            ".r_errors { border: 1px solid #BBB; white-space: pre; font-family: monospace; color: red; padding: 0.5em;}\n"
            ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
@@ -94,13 +94,11 @@ void htmlPrintHeader(const std::string &cmdline)
            "th.r_matrix { text-align:left; padding-left: 1em; }\n"
            "td.r_upstream { border: 1px solid grey; padding: 1em;}\n"
            "td.r_downstream { border: 1px solid grey; padding: 1em; }\n"
-           ".r_no_coverage { color: #55B; padding-left: 1em;}\n"
+           ".r_no_coverage { color: grey; }\n"
            "</style>\n"
            "</head>\n"
            "<body>\n"
            "<h1>Requirements Traceability</h1>"
-           "<div class=\"r_technical_header\">Generated: %s<br>Command Line: %s</div><br>",
-           getDatetime().c_str(), cmdline.c_str()
            );
 }
 
@@ -351,8 +349,11 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
     }
 }
 
-void htmlPrintFooter()
+void htmlPrintFooter(const std::string &cmdline)
 {
+    printf("<br><br>\n");
+    printf("<div class=\"r_footer\">Date: %s<br>Command Line: %s<br>Version: %s</div><br>",
+           getDatetime().c_str(), cmdline.c_str(), VERSION);
     printf("</body></html>\n");
 }
 
@@ -378,7 +379,7 @@ void htmlRender(const std::string &cmdline, int argc, const char **argv)
 
 
     // print header
-    htmlPrintHeader(cmdline);
+    htmlPrintHeader();
 
     // print summary
     htmlPrintSummary(documents);
@@ -392,5 +393,5 @@ void htmlRender(const std::string &cmdline, int argc, const char **argv)
     htmlPrintErrors();
 
     // print footer
-    htmlPrintFooter();
+    htmlPrintFooter(cmdline);
 }
