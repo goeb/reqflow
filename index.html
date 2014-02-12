@@ -76,8 +76,8 @@ Options:
 </code></pre>
 <h2 id="sample-configuration-file">Sample Configuration File</h2>
 <p><code>req.conf</code></p>
-<pre><code># addFile &lt;document-id&gt; -path &lt;document-path&gt; -req &lt;pattern&gt; \
-#         [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;]
+<pre><code># document &lt;document-id&gt; -path &lt;document-path&gt; -req &lt;pattern&gt; \
+#          [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;]
 #
 # &lt;pattern&gt; must be a Perl Compatible Regular Expression (PCRE)
 # -req indicates how the requirements must be captured
@@ -87,9 +87,13 @@ Options:
 # Escape character (for quotes, etc.): antislash (\).
 # Thus any \ must be written \\.
 # 
+# Keyword &#39;define&#39;:
+# define PATH
+# document x -path PATH/x.txt
+# document y -path PATH/y.txt
 
-addFile SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
-addFile TEST -path TEST.txt \
+document SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
+document TEST -path TEST.txt \
     -req T_[-a-zA-Z0-9_]* \
     -ref &quot;Ref:  *(.*)&quot; \
     -stop-after &quot;Annex&quot; \

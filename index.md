@@ -55,17 +55,17 @@ Commands:
     help
 
 Options:
-    -c <config> Select configuration file. Defaults to 'req.conf'.
+    -c <config> Select configuration file. Defaults to 'conf.req'.
 
 ```
 
 ## Sample Configuration File
 
-`req.conf`
+`conf.req`
 
 ```
-# addFile <document-id> -path <document-path> -req <pattern> \
-#         [-stop-after <pattern>] [-ref <pattern>] [-start-after <pattern>]
+# document <document-id> -path <document-path> -req <pattern> \
+#          [-stop-after <pattern>] [-ref <pattern>] [-start-after <pattern>]
 #
 # <pattern> must be a Perl Compatible Regular Expression (PCRE)
 # -req indicates how the requirements must be captured
@@ -75,9 +75,13 @@ Options:
 # Escape character (for quotes, etc.): antislash (\).
 # Thus any \ must be written \\.
 # 
+# Keyword 'define':
+# define PATH
+# document x -path PATH/x.txt
+# document y -path PATH/y.txt
 
-addFile SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
-addFile TEST -path TEST.txt \
+document SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
+document TEST -path TEST.txt \
     -req T_[-a-zA-Z0-9_]* \
     -ref "Ref:  *(.*)" \
     -stop-after "Annex" \
