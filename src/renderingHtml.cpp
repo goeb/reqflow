@@ -83,7 +83,7 @@ void htmlPrintHeader()
            ".r_date { font-size: small; margin-bottom: 15px;}\n"
            ".r_path { font-size: small; }\n"
            ".r_errors { border: 1px solid #BBB; white-space: pre; font-bold; color: red; padding: 0.5em;}\n"
-           ".r_errors_summary { padding: 1em; font-size: 200%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
+           ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
            ".r_warning { background-color: #FBB; }\n"
            ".r_no_error { color: grey; }\n"
            "table { border-collapse:collapse; }\n"
