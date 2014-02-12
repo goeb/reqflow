@@ -85,6 +85,7 @@ void htmlPrintHeader()
            ".r_errors { border: 1px solid #BBB; white-space: pre; font-bold; color: red; padding: 0.5em;}\n"
            ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
            ".r_warning { background-color: #FBB; }\n"
+           ".r_samereq { color: grey; }\n"
            ".r_no_error { color: grey; }\n"
            "table { border-collapse:collapse; }\n"
            "td.r_summary { text-align:right; border-bottom: 1px grey solid; padding-left: 1em; }\n"
@@ -208,14 +209,26 @@ void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *do
     const char *warningStyle = "";
     if (warning) warningStyle = "r_warning";
 
+	const char *styleSameReq = "";
+	const char *samereqTitle = "";
+	if (req1 && req2 && 0 == strcmp(req1, req2)) {
+		styleSameReq = "r_samereq";
+		samereqTitle = "title=\"Both identifiers are the same\"";
+	}
+
+#define CELL_CONTENTS "<span class=\"%s %s\" %s>%s</span>"
     printf("<tr class=\"r_coverage %s\">", warningStyle);
-    printf("<td class=\"r_coverage\">%s</td>", req1);
-    printf("<td class=\"r_coverage\">%s</td>", req2);
+    printf("<td class=\"r_coverage %s\">" CELL_CONTENTS "</td>", warningStyle, 
+			warningStyle, styleSameReq, samereqTitle, htmlEscape(req1).c_str());
+    printf("<td class=\"r_coverage %s\">" CELL_CONTENTS "</td>", warningStyle,
+			warningStyle, styleSameReq, samereqTitle, htmlEscape(req2).c_str());
 
     // doc id
     printf("<td class=\"r_coverage\">");
     if (doc2Id) {
-        printf("<a href=\"#%s\">%s</a>", hrefEncode(doc2Id).c_str(), htmlEscape(doc2Id).c_str());
+        printf("<a href=\"#%s\">" CELL_CONTENTS "</a>",
+				hrefEncode(doc2Id).c_str(), warningStyle, styleSameReq, samereqTitle,
+				htmlEscape(doc2Id).c_str());
     }
     printf("</td>");
     printf("\n");
