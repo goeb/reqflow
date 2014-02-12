@@ -1,0 +1,5 @@
+
+document RFC2246-pdf -path rfc2246-spec.pdf -req ^[1-9A-Z][0-9]*\\..* -start-after "Full Copyright Statement"
+document TEST-RFC2246 -path rfc2246-test.txt -req T_.* -ref "Ref: *(.*)" -nocov
+
+

@@ -67,7 +67,7 @@ void usage()
            "    help\n"
            "\n"
            "Options:\n"
-           "    -c <config> Select configuration file. Defaults to 'req.conf'.\n"
+           "    -c <config> Select configuration file. Defaults to 'conf.req'.\n"
            "\n"
            "\n");
     exit(1);
@@ -149,10 +149,10 @@ int loadConfiguration(const char * file)
     FOREACH(line, configTokens) {
         lineNum++;
         std::string verb = pop(*line);
-        if (verb == "addFile") {
+        if (verb == "document") {
             ReqFileConfig fileConfig;
             fileConfig.id = pop(*line);
-            LOG_DEBUG("addFile '%s'...", fileConfig.id.c_str());
+            LOG_DEBUG("document '%s'...", fileConfig.id.c_str());
             if (fileConfig.id.empty()) {
                 PUSH_ERROR("Missing identifier for file: line %d", lineNum);
             }

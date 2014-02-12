@@ -1,9 +1,9 @@
 
 define REQ_PATTERN REQ_[-a-zA-Z0-9_]*
 
-addFile SPEC -path SPEC.docx -req REQ_PATTERN -stop-after Annexe
+document SPEC -path SPEC.docx -req REQ_PATTERN -stop-after Annexe
 
-addFile TEST -path TEST.txt \
+document TEST -path TEST.txt \
     -req T_[-a-zA-Z0-9_]* \
     -ref "Ref:  *(.*)" \
 	-stop-after "Annex" \
