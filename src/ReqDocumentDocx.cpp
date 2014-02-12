@@ -104,7 +104,7 @@ int ReqDocumentDocx::loadRequirements(bool debug)
     const char *CONTENTS = "word/document.xml";
     int i = zip_name_locate(zipFile, CONTENTS, 0);
     if (i < 0) {
-		LOG_INFO("Not a Open XML document (missing word/document.xml). Trying Open Document.");
+        LOG_DEBUG("Not a Open XML document (missing word/document.xml). Trying Open Document.");
 		const char *OPEN_DOC_CONTENTS = "content.xml";
 		i = zip_name_locate(zipFile, OPEN_DOC_CONTENTS, 0);
 		if (i < 0) {

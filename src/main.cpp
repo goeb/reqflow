@@ -111,7 +111,11 @@ std::string replaceDefinedVariable(const std::map<std::string, std::string> &def
     std::string result = token;
     std::map<std::string, std::string>::const_iterator v;
     FOREACH(v, definedVariables) {
-        size_t pos;
+        size_t pos = v->second.find(v->first);
+        if (pos != std::string::npos) {
+            LOG_ERROR("Recursive pattern in defined variable: %s => %s", v->first.c_str(), v->second.c_str());
+            exit(1);
+        }
         while ( (pos = result.find (v->first)) != std::string::npos) {
             result = result.replace(pos, v->first.size(), v->second);
         }
@@ -168,30 +172,30 @@ int loadConfiguration(const char * file)
                         return -1;
                     }
                     fileConfig.startAfter = replaceDefinedVariable(defs, pop(*line));
-					fileConfig.startAfterRegex = new regex_t();
+                    fileConfig.startAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
                     if (reti) {
                         PUSH_ERROR("Cannot compile startAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
-					
+
                 } else if (arg == "-stop-after") {
                     if (line->empty()) {
                         PUSH_ERROR("Missing -stop-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.stopAfter = replaceDefinedVariable(defs, pop(*line));
-					fileConfig.stopAfterRegex = new regex_t();
+                    fileConfig.stopAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
                     if (reti) {
                         PUSH_ERROR("Cannot compile stopAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
                         exit(1);
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
-					
+
                 } else if (arg == "-nocov") {
-					fileConfig.nocov = true;
+                    fileConfig.nocov = true;
 
                 } else if (arg == "-req") {
                     if (line->empty()) {
@@ -271,39 +275,41 @@ ReqFileType getFileType(const std::string &path)
 int loadRequirementsOfFile(const ReqFileConfig fileConfig, bool debug)
 {
     int result = 0;
-	ReqFileType fileType = getFileType(fileConfig.path);
-	switch(fileType) {
-		case RF_TEXT:
-			{
-				ReqDocumentTxt doc(fileConfig);
-				doc.loadRequirements(debug);
-				break;
-			}
-		case RF_DOCX:
-			{
-				ReqDocumentDocx doc(fileConfig);
-				doc.loadRequirements(debug);
-				break;
-			}
-		case RF_DOCX_XML: // mainly for test purpose
-			{
-				ReqDocumentDocxXml doc(fileConfig);
-				doc.loadRequirements(debug);
-				break;
-			}
+    ReqFileType fileType = getFileType(fileConfig.path);
+    switch(fileType) {
+    case RF_TEXT:
+    {
+        ReqDocumentTxt doc(fileConfig);
+        doc.loadRequirements(debug);
+        break;
+    }
+    case RF_ODT:
+    case RF_DOCX:
+    {
+        ReqDocumentDocx doc(fileConfig);
+        doc.loadRequirements(debug);
+        break;
+    }
+    case RF_DOCX_XML: // mainly for test purpose
+    {
+        ReqDocumentDocxXml doc(fileConfig);
+        doc.loadRequirements(debug);
+        break;
+    }
+
 #ifndef _WIN32
-		case RF_PDF:
-			{
-				ReqDocumentPdf doc(fileConfig);
-				doc.loadRequirements(debug);
-				break;
-			}
+    case RF_PDF:
+    {
+        ReqDocumentPdf doc(fileConfig);
+        doc.loadRequirements(debug);
+        break;
+    }
 #endif
-		default:
-			LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
-			result = -1;
-	}
-	return result;
+    default:
+        LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
+        result = -1;
+    }
+    return result;
 }
 
 int loadRequirements(bool debug)
@@ -312,7 +318,7 @@ int loadRequirements(bool debug)
     std::map<std::string, ReqFileConfig>::iterator c;
     FOREACH(c, ReqConfig) {
         ReqFileConfig &fileConfig = c->second;
-		result = loadRequirementsOfFile(fileConfig, debug);
+        result = loadRequirementsOfFile(fileConfig, debug);
     }
     checkUndefinedRequirements();
     consolidateCoverage();
@@ -327,27 +333,27 @@ enum ReqExportFormat { REQ_X_TXT, REQ_X_CSV };
 void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (format == REQ_X_CSV) {
-		printf(",,"CRLF);
-		printf("Requirements of %s,", docId);
+        printf(",,"CRLF);
+        printf("Requirements of %s,", docId);
         if (reverse) {
             printf("Requirements Downstream");
         } else {
             printf("Requirements Upstream");
-		}
-		if (verbose) printf(",Document");
-		else printf(","); // always 3 columns
-		printf(CRLF);
+        }
+        if (verbose) printf(",Document");
+        else printf(","); // always 3 columns
+        printf(CRLF);
 
     } else {
-		printf("\n");
-		printf("Requirements of %-34s ", docId);
+        printf("\n");
+        printf("Requirements of %-34s ", docId);
         if (reverse) printf(ALIGN, "Requirements Downstream");
         else printf(ALIGN, "Requirements Upstream");
-		if (verbose) printf(" Document");
+        if (verbose) printf(" Document");
         printf("\n");
-		printf("----------------------------------------------");
+        printf("----------------------------------------------");
         printf("----------------------------------------------------------------------\n");
-		
+
     }
 }
 
@@ -355,19 +361,19 @@ void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFor
  */
 void printTracLine(const char *req1, const char *req2, const char *doc2Id, ReqExportFormat format)
 {
-	if (format == REQ_X_CSV) {
-		printf("%s,", req1);
-		if (req2) printf("%s", req2);
-		if (doc2Id) printf(",%s", doc2Id);
-		else printf(","); // always 3 columns
-		printf(CRLF);
+    if (format == REQ_X_CSV) {
+        printf("%s,", req1);
+        if (req2) printf("%s", req2);
+        if (doc2Id) printf(",%s", doc2Id);
+        else printf(","); // always 3 columns
+        printf(CRLF);
 
-	} else { // text format
-		printf(ALIGN, req1);
-		if (req2) printf(" " ALIGN, req2);
-		if (doc2Id) printf(" %s", doc2Id);
-		printf("\n");
-	}
+    } else { // text format
+        printf(ALIGN, req1);
+        if (req2) printf(" " ALIGN, req2);
+        if (doc2Id) printf(" %s", doc2Id);
+        printf("\n");
+    }
 }
 
 void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat format)
@@ -379,10 +385,10 @@ void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat
         } else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.covers) {
-				const char* docId = 0;
-				Requirement *ref = getRequirement(c->c_str());
-				if (!ref) docId = "Undefined";
-				else if (verbose) docId = ref->parentDocumentId.c_str();
+                const char* docId = 0;
+                Requirement *ref = getRequirement(c->c_str());
+                if (!ref) docId = "Undefined";
+                else if (verbose) docId = ref->parentDocumentId.c_str();
 
                 printTracLine(r.id.c_str(), c->c_str(), docId, format);
             }
@@ -395,10 +401,10 @@ void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat
         } else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.coveredBy) {
-				const char* docId = 0;
-				Requirement *above = getRequirement(c->c_str());
-				if (!above) docId = "Undefined";
-				else if (verbose) docId = above->parentDocumentId.c_str();
+                const char* docId = 0;
+                Requirement *above = getRequirement(c->c_str());
+                if (!above) docId = "Undefined";
+                else if (verbose) docId = above->parentDocumentId.c_str();
 
                 printTracLine(r.id.c_str(), c->c_str(), docId, format);
             }
@@ -455,43 +461,43 @@ void printPercent(int total, int covered, const char *docId, const char *path, b
 {
     if (nocov) printf("%-30s nocov  nocov / %5d %s\n", docId, total, path);
     else {
-		int ratio = 0;
-		if (total > 0) ratio = 100*covered/total;
-		printf("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
-	}
+        int ratio = 0;
+        if (total > 0) ratio = 100*covered/total;
+        printf("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
+    }
 }
 
 void printSummaryOfFile(const ReqFileConfig &f)
 {
-	if (!f.nocov) {
-		ReqTotal += f.nTotalRequirements;
-		ReqCovered += f.nCoveredRequirements;
-	}
-	printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str(), f.nocov);
+    if (!f.nocov) {
+        ReqTotal += f.nTotalRequirements;
+        ReqCovered += f.nCoveredRequirements;
+    }
+    printPercent(f.nTotalRequirements, f.nCoveredRequirements, f.id.c_str(), f.path.c_str(), f.nocov);
 
 }
 
 void printSummary(int argc, const char **argv)
 {
     // print statistics
-	bool doPrintTotal = true;
-	if (argc == 1) doPrintTotal = false;
+    bool doPrintTotal = true;
+    if (argc == 1) doPrintTotal = false;
 
     printSummaryHeader();
 
     std::map<std::string, ReqFileConfig>::iterator file;
 
     if (!argc) {
-		FOREACH(file, ReqConfig) {
-			printSummaryOfFile(file->second);
-		}
+        FOREACH(file, ReqConfig) {
+            printSummaryOfFile(file->second);
+        }
     } else while (argc > 0) {
-		const char *docId = argv[0];
-		std::map<std::string, ReqFileConfig>::iterator file = ReqConfig.find(docId);
+        const char *docId = argv[0];
+        std::map<std::string, ReqFileConfig>::iterator file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) LOG_ERROR("Invalid document id: %s", docId);
         else printSummaryOfFile(file->second);
-		argc--;
-		argv++;
+        argc--;
+        argv++;
     }
 
     if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "", false);
@@ -500,37 +506,37 @@ void printSummary(int argc, const char **argv)
 void printRequirementsOfFile(StatusMode status, const char *documentId)
 {
     std::map<std::string, Requirement>::iterator r;
-	FOREACH(r, Requirements) {
-		if (!documentId || r->second.parentDocumentId == documentId) {
-			bool doPrint = false;
-			if (REQ_ALL == status || r->second.coveredBy.empty()) doPrint = true;
+    FOREACH(r, Requirements) {
+        if (!documentId || r->second.parentDocumentId == documentId) {
+            bool doPrint = false;
+            if (REQ_ALL == status || r->second.coveredBy.empty()) doPrint = true;
 
-			if (doPrint) {
-				if (r->second.coveredBy.empty()) printf("U");
-				else printf(" ");
+            if (doPrint) {
+                if (r->second.coveredBy.empty()) printf("U");
+                else printf(" ");
 
-				printf(" %s", r->second.id.c_str());
-				if (REQ_ALL == status) printf(" %s", r->second.parentDocumentId.c_str());
-				printf("\n");
-			}
-		}
-	}
+                printf(" %s", r->second.id.c_str());
+                if (REQ_ALL == status) printf(" %s", r->second.parentDocumentId.c_str());
+                printf("\n");
+            }
+        }
+    }
 }
 void printRequirements(StatusMode status, int argc, const char **argv)
 {
     std::map<std::string, ReqFileConfig>::iterator file;
     if (!argc) {
-		// print requirements of all files
-		FOREACH(file, ReqConfig) {
-			printRequirementsOfFile(status, file->first.c_str());
-		}
+        // print requirements of all files
+        FOREACH(file, ReqConfig) {
+            printRequirementsOfFile(status, file->first.c_str());
+        }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) LOG_ERROR("Invalid document id: %s", docId);
         else printRequirementsOfFile(status, argv[0]);
-		argc--;
-		argv++;
+        argc--;
+        argv++;
     }
 }
 
@@ -540,7 +546,7 @@ int cmdStat(int argc, const char **argv)
     int i = 0;
     const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
-	StatusMode statusMode = REQ_UNRESOLVED;
+    StatusMode statusMode = REQ_UNRESOLVED;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
@@ -551,9 +557,9 @@ int cmdStat(int argc, const char **argv)
         } else if (0 == strcmp(arg, "-v")) {
             statusMode = REQ_ALL;
         } else {
-			i--; // push back arg into the list
-			break; // leave remaining args for below
-		}
+            i--; // push back arg into the list
+            break; // leave remaining args for below
+        }
     }
 
     int r = loadConfiguration(configFile);
@@ -576,7 +582,7 @@ int cmdTrac(int argc, const char **argv)
     const char *arg = 0;
     const char *exportFormat = "txt";
     bool reverse = false;
-	bool verbose = false;
+    bool verbose = false;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
@@ -638,7 +644,7 @@ int cmdConfig(int argc, const char **argv)
     return 0;
 }
 
-int cmdHtml(int argc, const char **argv)
+int cmdHtml(const std::string &cmdline, int argc, const char **argv)
 {
     int i = 0;
     const char *configFile = DEFAULT_CONF;
@@ -660,23 +666,23 @@ int cmdHtml(int argc, const char **argv)
     r = loadRequirements(false);
     if (r != 0) return 1;
 
-    htmlRender(argc-i, argv+i);
+    htmlRender(cmdline, argc-i, argv+i);
 
     return 0;
 }
 
 int cmdDebug(int argc, const char **argv)
 {
-	if (argc == 0) usage();
+    if (argc == 0) usage();
 
     std::map<std::string, ReqFileConfig>::iterator c;
     ReqFileConfig fileConfig;
-	fileConfig.path = argv[0];
-	loadRequirementsOfFile(fileConfig, true);
-	return 0;
+    fileConfig.path = argv[0];
+    loadRequirementsOfFile(fileConfig, true);
+    return 0;
 }
 
-int cmdReport(int argc, const char **argv)
+int cmdReport(const std::string &cmdline, int argc, const char **argv)
 {
     std::string format = "-html"; // default format is HTML
     if (argc > 0 && 0 == strcmp("-html", argv[0])) {
@@ -684,7 +690,7 @@ int cmdReport(int argc, const char **argv)
         argc--; argv++;
     }
 
-    if (format == "-html") return cmdHtml(argc, argv);
+    if (format == "-html") return cmdHtml(cmdline, argc, argv);
     else usage();
     return 0;
 }
@@ -749,8 +755,13 @@ int main(int argc, const char **argv)
     else if (command == "version") rc = showVersion();
     else if (command == "trac")    rc = cmdTrac(argc-2, argv+2);
     else if (command == "config")  rc = cmdConfig(argc-2, argv+2);
-    else if (command == "report")  rc = cmdReport(argc-2, argv+2);
-    else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
+    else if (command == "report")  {
+        // get command line
+        std::string cmdline;
+        int i;
+        for(i=0; i<argc; i++) cmdline += argv[i] + std::string(" ");
+        rc = cmdReport(cmdline, argc-2, argv+2);
+    } else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
 #ifndef _WIN32
     else if (command == "debug")   rc = cmdDebug(argc-2, argv+2);
 #endif

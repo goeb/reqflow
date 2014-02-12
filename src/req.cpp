@@ -84,7 +84,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
     std::string ref = getMatchingPattern(fileConfig.refRegex, text);
     if (!ref.empty()) {
         if (currentRequirement.empty()) {
-            PUSH_ERROR("Reference found whereas no current requirement: %s, file: %s",
+            PUSH_ERROR("%s: Reference, but no current requirement, file: %s",
 					  ref.c_str(), fileConfig.path.c_str());
         } else {
             Requirements[currentRequirement].covers.insert(ref);
@@ -96,7 +96,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
     if (!reqId.empty() && reqId != ref) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
         if (r != Requirements.end()) {
-            PUSH_ERROR("Duplicate requirement %s in documents: '%s' and '%s'",
+            PUSH_ERROR("%s: Duplicate requirement in documents '%s' and '%s'",
                       reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
             currentRequirement.clear();
 
@@ -208,7 +208,7 @@ void checkUndefinedRequirements()
         std::set<std::string>::iterator c;
         FOREACH(c, r->second.covers) {
             if (!getRequirement(*c)) {
-                PUSH_ERROR("Undefined requirement: %s, referenced by: %s (%s)",
+                PUSH_ERROR("%s: Undefined requirement, referenced by: %s (%s)",
                           c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
             }
         }
@@ -223,7 +223,7 @@ void computeGlobalStatistics()
     FOREACH(req, Requirements) {
         file = ReqConfig.find(req->second.parentDocumentId);
         if (file == ReqConfig.end()) {
-            PUSH_ERROR("Cannot find parent document of requirement: %s", req->second.id.c_str());
+            PUSH_ERROR("%s: Cannot find parent document", req->second.id.c_str());
             continue;
         }
         file->second.nTotalRequirements++;

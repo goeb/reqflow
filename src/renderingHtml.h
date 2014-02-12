@@ -7,6 +7,6 @@
 #include "req.h"
 
 
-void htmlRender(int argc, const char **argv);
+void htmlRender(const std::string &cmdline, int argc, const char **argv);
 
 #endif
