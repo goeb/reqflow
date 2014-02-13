@@ -77,12 +77,12 @@ void htmlPrintHeader()
            "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n"
            "<style>\n"
            "body { font-family: Verdana,sans-serif; }\n"
-           "h1 { background-color: #DDD; border: 1px #bbb solid; padding-left: 1em;}\n"
-           "a[href], a[href]:link { color:blue; text-decoration: none; }\n"
-           "a[href]:hover { color:blue; text-decoration: underline; }\n"
-           ".r_date { font-size: small; margin-bottom: 15px;}\n"
-           ".r_path { font-size: small; }\n"
-           ".r_errors { border: 1px solid #BBB; white-space: pre; font-bold; color: red; padding: 0.5em;}\n"
+           "h1 { border-bottom: 1px #bbb solid; margin-top: 15px;}\n"
+           "a[href], a[href]:link { color: blue; text-decoration: none; }\n"
+           "a[href]:hover { color: blue; text-decoration: underline; }\n"
+           ".r_footer { font-size: small; font-family: monospace; color: grey; }\n"
+           ".r_document_summary { font-size: small; }\n"
+           ".r_errors { border: 1px solid #BBB; white-space: pre; font-family: monospace; color: red; padding: 0.5em;}\n"
            ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
            ".r_warning { background-color: #FBB; }\n"
            ".r_samereq { color: grey; }\n"
@@ -91,17 +91,15 @@ void htmlPrintHeader()
            "td.r_summary { text-align:right; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "td.r_summary_l { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "th.r_summary { text-align:center; padding-left: 1em; }\n"
-           "td.r_coverage { text-align:left; border: 1px grey solid; padding-left: 1em; }\n"
-           "th.r_coverage { text-align:left; padding-left: 1em; }\n"
+           "td.r_matrix { text-align:left; border: 1px grey solid; padding-left: 1em; }\n"
+           "th.r_matrix { text-align:left; padding-left: 1em; }\n"
            "td.r_upstream { border: 1px solid grey; padding: 1em;}\n"
            "td.r_downstream { border: 1px solid grey; padding: 1em; }\n"
-           ".r_no_coverage { color: #55B; padding-left: 1em;}\n"
+           ".r_no_coverage { color: grey; }\n"
            "</style>\n"
            "</head>\n"
            "<body>\n"
            "<h1>Requirements Traceability</h1>"
-           "<div class=\"r_date\">Generated: %s</div>",
-           getDatetime().c_str()
            );
 }
 
@@ -217,14 +215,14 @@ void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *do
 	}
 
 #define CELL_CONTENTS "<span class=\"%s %s\" %s>%s</span>"
-    printf("<tr class=\"r_coverage %s\">", warningStyle);
-    printf("<td class=\"r_coverage %s\">" CELL_CONTENTS "</td>", warningStyle, 
+    printf("<tr class=\"r_matrix %s\">", warningStyle);
+    printf("<td class=\"r_matrix %s\">" CELL_CONTENTS "</td>", warningStyle, 
 			warningStyle, styleSameReq, samereqTitle, htmlEscape(req1).c_str());
-    printf("<td class=\"r_coverage %s\">" CELL_CONTENTS "</td>", warningStyle,
+    printf("<td class=\"r_matrix %s\">" CELL_CONTENTS "</td>", warningStyle,
 			warningStyle, styleSameReq, samereqTitle, htmlEscape(req2).c_str());
 
     // doc id
-    printf("<td class=\"r_coverage\">");
+    printf("<td class=\"r_matrix\">");
     if (doc2Id) {
         printf("<a href=\"#%s\">" CELL_CONTENTS "</a>",
 				hrefEncode(doc2Id).c_str(), warningStyle, styleSameReq, samereqTitle,
@@ -315,15 +313,15 @@ void htmlPrintMatrix(const ReqFileConfig &f, bool forward)
         return;
     }
 
-    printf("<table class=\"r_coverage\">");
-    printf("<tr class=\"r_coverage\"><th class=\"r_coverage\">Requirements</th>");
+    printf("<table class=\"r_matrix\">");
+    printf("<tr class=\"r_matrix\"><th class=\"r_matrix\">Requirements</th>");
     if (forward) {
-        printf("<th class=\"r_coverage\">Descendants</th>");
-        printf("<th class=\"r_coverage\">Downstream Documents</th>");
+        printf("<th class=\"r_matrix\">Descendants</th>");
+        printf("<th class=\"r_matrix\">Downstream Documents</th>");
     } else {
         // reverse
-        printf("<th class=\"r_coverage\">Origins</th>");
-        printf("<th class=\"r_coverage\">Upstream Documents</th>");
+        printf("<th class=\"r_matrix\">Origins</th>");
+        printf("<th class=\"r_matrix\">Upstream Documents</th>");
     }
     printf("</tr>\n");
 
@@ -343,28 +341,37 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
         std::map<std::string, ReqFileConfig>::const_iterator file = ReqConfig.find(*docId);
         if (file == ReqConfig.end()) PUSH_ERROR("Invalid document id: %s", docId->c_str());
         else {
-            printf("<div class=\"r_coverage\">");
+            ReqFileConfig f = file->second;
             printf("<h1 id=\"%s\">%s</h1>", hrefEncode(*docId).c_str(), htmlEscape(*docId).c_str());
 
-            printf("<div class=\"r_path\"><a href=\"%s\">%s</a></div>",
-                   hrefEncode(file->second.path).c_str(), htmlEscape(file->second.path).c_str());
+            printf("<div class=\"r_document_summary\">");
+            printf("Path: <a href=\"%s\">%s</a><br>", hrefEncode(f.path).c_str(), htmlEscape(f.path).c_str());
+            printf("Requirements: %d<br>", f.nTotalRequirements);
+            if (!f.nocov) {
+                int ratio = 0;
+                if (f.nTotalRequirements>0) ratio = 100*f.nCoveredRequirements/f.nTotalRequirements;
+                printf("Covered: %d (%d%%)<br>", f.nCoveredRequirements, ratio);
+            }
+            printf("</div>\n");
 
-            htmlPrintDependencies(file->second);
-            htmlPrintMatrix(file->second, true);
-            htmlPrintMatrix(file->second, false);
-            printf("</div>");
 
+            htmlPrintDependencies(f);
+            htmlPrintMatrix(f, true);
+            htmlPrintMatrix(f, false);
         }
     }
 }
 
-void htmlPrintFooter()
+void htmlPrintFooter(const std::string &cmdline)
 {
+    printf("<br><br>\n");
+    printf("<div class=\"r_footer\">Date: %s<br>Command Line: %s<br>Version: %s</div><br>",
+           getDatetime().c_str(), cmdline.c_str(), VERSION);
     printf("</body></html>\n");
 }
 
 
-void htmlRender(int argc, const char **argv)
+void htmlRender(const std::string &cmdline, int argc, const char **argv)
 {
 
     // parse HTML specific options
@@ -399,5 +406,5 @@ void htmlRender(int argc, const char **argv)
     htmlPrintErrors();
 
     // print footer
-    htmlPrintFooter();
+    htmlPrintFooter(cmdline);
 }

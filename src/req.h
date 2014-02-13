@@ -8,7 +8,7 @@
 #include <set>
 
 
-#define DEFAULT_CONF "req.conf"
+#define DEFAULT_CONF "conf.req"
 
 enum Encoding { UTF8, LATIN1 };
 enum BlockStatus { NOT_STARTED, STOP_REACHED, REQ_OK };
