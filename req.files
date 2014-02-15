@@ -22,3 +22,7 @@
 /home/fred/reference/req/src/ReqDocumentTxt.h
 /home/fred/reference/req/src/unzip.c
 /home/fred/reference/req/src/xml.c
+src/ReqDocumentHtml.h
+src/ReqDocumentHtml.cpp
+src/stringTools.h
+src/stringTools.cpp

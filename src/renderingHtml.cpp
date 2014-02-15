@@ -5,19 +5,7 @@
 #include "logging.h"
 #include "req.h"
 #include "global.h"
-
-std::string getDatetime()
-{
-    struct tm date;
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    localtime_r(&tv.tv_sec, &date);
-    //int milliseconds = tv.tv_usec / 1000;
-    char buffer[100];
-    sprintf(buffer, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", date.tm_year + 1900,
-            date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
-    return buffer;
-}
+#include "stringTools.h"
 
 /** Encode a string for HREF
   *
@@ -40,24 +28,6 @@ std::string hrefEncode(const std::string &src, char mark='%', const char *dontEs
     return dst;
 }
 
-std::string replaceAll(const std::string &in, char c, const char *replaceBy)
-{
-    std::string out;
-    size_t len = in.size();
-    size_t i = 0;
-    size_t savedOffset = 0;
-    while (i < len) {
-        if (in[i] == c) {
-            if (savedOffset < i) out += in.substr(savedOffset, i-savedOffset);
-            out += replaceBy;
-            savedOffset = i+1;
-        }
-        i++;
-    }
-    if (savedOffset < i) out += in.substr(savedOffset, i-savedOffset);
-    return out;
-}
-
 std::string htmlEscape(const std::string &value)
 {
     std::string result = replaceAll(value, '&', "&#38;");
@@ -67,7 +37,6 @@ std::string htmlEscape(const std::string &value)
     result = replaceAll(result, '\'', "&#39;");
     return result;
 }
-
 
 void htmlPrintHeader()
 {

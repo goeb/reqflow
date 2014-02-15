@@ -29,7 +29,7 @@ bool doPrint(enum LogLevel msgLevel);
     else { LOG_SHORT(_level, __VA_ARGS__); }
 
 #define LOG_FULL(_level, _file, _line, ...) do { \
-    fprintf(stderr, "%s %s %s:%d ", getLocalTimestamp().c_str(), _level, _file, _line); \
+    fprintf(stderr, "%s %s %s:%d ", getDatetime().c_str(), _level, _file, _line); \
     fprintf(stderr, __VA_ARGS__); \
     fprintf(stderr, "\n"); \
     } while (0)

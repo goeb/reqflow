@@ -34,6 +34,8 @@ SRCS_CPP += \
 			src/req.cpp \
 			src/ReqDocumentTxt.cpp \
 			src/ReqDocumentDocx.cpp \
+			src/ReqDocumentHtml.cpp \
+			src/stringTools.cpp \
 			src/renderingHtml.cpp \
 
 

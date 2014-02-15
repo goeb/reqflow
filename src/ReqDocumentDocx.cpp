@@ -10,7 +10,6 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
 {
     xmlNode *currentNode = NULL;
 
-    static std::string currentRequirement;
     static std::string textInParagraphCurrent; // consolidated over recursive calls
 
     for (currentNode = a_node; currentNode; currentNode = currentNode->next) {

@@ -1,5 +1,5 @@
-/*   Small Issue Tracker
- *   Copyright (C) 2013 Frederic Hoerni
+/*   Req
+ *   Copyright (C) 2014 Frederic Hoerni
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,29 +17,6 @@
 
 #include "global.h"
 #include "dateTools.h"
-
-std::string getLocalTimestamp()
-{
-
-    struct tm t;
-    time_t now = time(0);
-    localtime_r(&now, &t);
-
-    const int SIZ = 30;
-    char buffer[SIZ+1];
-    size_t n = strftime(buffer, SIZ, "%Y-%m-%d %H:%M:%S", &t);
-
-    if (n != 19) return "invalid-timestamp";
-
-    // add milliseconds
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    int milliseconds = tv.tv_usec/1000;
-
-    snprintf(buffer+n, SIZ-n, ".%03d", milliseconds);
-
-    return buffer;
-}
 
 std::string epochToString(time_t t)
 {
@@ -70,3 +47,17 @@ std::string epochToStringDelta(time_t t)
 
     return std::string(datetime);
 }
+
+std::string getDatetime()
+{
+    struct tm date;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    localtime_r(&tv.tv_sec, &date);
+    //int milliseconds = tv.tv_usec / 1000;
+    char buffer[100];
+    sprintf(buffer, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", date.tm_year + 1900,
+            date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
+    return buffer;
+}
+

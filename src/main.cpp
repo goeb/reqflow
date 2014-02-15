@@ -30,6 +30,8 @@
 #include "req.h"
 #include "ReqDocumentDocx.h"
 #include "ReqDocumentTxt.h"
+#include "ReqDocumentHtml.h"
+#include "stringTools.h"
 #ifndef _WIN32
 #include "ReqDocumentPdf.h"
 #endif
@@ -92,18 +94,6 @@ int showVersion()
            , VERSION);
     exit(1);
 }
-
-
-std::string pop(std::list<std::string> & L)
-{
-    std::string token = "";
-    if (!L.empty()) {
-        token = L.front();
-        L.pop_front();
-    }
-    return token;
-}
-
 
 
 std::string replaceDefinedVariable(const std::map<std::string, std::string> &definedVariables, const std::string &token)
@@ -254,7 +244,7 @@ int loadConfiguration(const char * file)
     return 0;
 }
 
-enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_PDF, RF_UNKNOWN };
+enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_HTML, RF_PDF, RF_UNKNOWN };
 ReqFileType getFileType(const std::string &path)
 {
     size_t i = path.find_last_of('.');
@@ -266,6 +256,8 @@ ReqFileType getFileType(const std::string &path)
     else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
     else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
     else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
+    else if (0 == strcasecmp(extension.c_str(), "htm")) return RF_HTML;
+    else if (0 == strcasecmp(extension.c_str(), "html")) return RF_HTML;
 #ifndef _WIN32
     else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
 #endif
@@ -293,6 +285,12 @@ int loadRequirementsOfFile(const ReqFileConfig fileConfig, bool debug)
     case RF_DOCX_XML: // mainly for test purpose
     {
         ReqDocumentDocxXml doc(fileConfig);
+        doc.loadRequirements(debug);
+        break;
+    }
+    case RF_HTML: // mainly for test purpose
+    {
+        ReqDocumentHtml doc(fileConfig);
         doc.loadRequirements(debug);
         break;
     }
