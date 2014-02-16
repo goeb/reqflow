@@ -63,7 +63,7 @@ public:
     virtual int loadRequirements(bool debug) = 0;
     BlockStatus processBlock(const std::string &text);
 protected:
-    void init();
+    virtual void init();
     bool acquisitionStarted; // indicate if the parsing passed the point after which requirement may be acquired
     std::string currentRequirement;
     std::string currentText;

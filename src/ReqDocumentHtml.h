@@ -12,7 +12,9 @@ class ReqDocumentHtml: public ReqDocument {
 public:
     ReqDocumentHtml(const ReqFileConfig &c) {fileConfig = c;}
     int loadRequirements(bool debug);
-    int loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug);
+    BlockStatus processParagraph(std::string &text, bool inParagaph, bool debug);
+    BlockStatus loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool inParagraph, bool debug);
+    void init();
 };
 
 #endif
