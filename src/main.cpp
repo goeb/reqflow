@@ -166,7 +166,7 @@ int loadConfiguration(const char * file)
                     int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
                     if (reti) {
                         PUSH_ERROR("Cannot compile startAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
-                        exit(1);
+                        return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
 
@@ -180,7 +180,7 @@ int loadConfiguration(const char * file)
                     int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
                     if (reti) {
                         PUSH_ERROR("Cannot compile stopAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
-                        exit(1);
+                        return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
 
@@ -198,7 +198,7 @@ int loadConfiguration(const char * file)
                     int reti = regcomp(fileConfig.reqRegex, fileConfig.reqPattern.c_str(), 0);
                     if (reti) {
                         PUSH_ERROR("Cannot compile req regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
-                        exit(1);
+                        return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.reqPattern.c_str(), &fileConfig.reqRegex);
 
@@ -213,7 +213,7 @@ int loadConfiguration(const char * file)
                     int reti = regcomp(fileConfig.refRegex, fileConfig.refPattern.c_str(), 0);
                     if (reti) {
                         PUSH_ERROR("Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
-                        exit(1);
+                        return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
 
