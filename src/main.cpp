@@ -96,10 +96,10 @@ int showVersion()
 }
 
 
-std::string replaceDefinedVariable(const std::map<std::string, std::string> &definedVariables, const std::string &token)
+std::string replaceDefinedVariable(const std::list<std::pair<std::string, std::string> > &definedVariables, const std::string &token)
 {
     std::string result = token;
-    std::map<std::string, std::string>::const_iterator v;
+    std::list<std::pair<std::string, std::string> >::const_iterator v;
     FOREACH(v, definedVariables) {
         size_t pos = v->second.find(v->first);
         if (pos != std::string::npos) {
@@ -132,7 +132,7 @@ int loadConfiguration(const char * file)
     std::list<std::list<std::string> > configTokens = parseConfigTokens(config, r);
     free((void*)config);
 
-    std::map<std::string, std::string> defs;
+    std::list<std::pair<std::string, std::string> > defs;
 
     std::list<std::list<std::string> >::iterator line;
     int lineNum = 0;
@@ -235,7 +235,7 @@ int loadConfiguration(const char * file)
                 std::string key = pop(*line);
                 std::string value = pop(*line);
                 LOG_DEBUG("Add variable '%s'='%s'", key.c_str(), value.c_str());
-                defs[key] = value;
+                defs.push_back(std::make_pair(key, value));
             }
         } else {
             PUSH_ERROR("Invalid token '%s': line %d", verb.c_str(), lineNum);
@@ -334,9 +334,9 @@ void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFor
         printf(",,"CRLF);
         printf("Requirements of %s,", docId);
         if (reverse) {
-            printf("Requirements Downstream");
-        } else {
             printf("Requirements Upstream");
+        } else {
+            printf("Requirements Downstream");
         }
         if (verbose) printf(",Document");
         else printf(","); // always 3 columns
@@ -345,8 +345,8 @@ void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFor
     } else {
         printf("\n");
         printf("Requirements of %-34s ", docId);
-        if (reverse) printf(ALIGN, "Requirements Downstream");
-        else printf(ALIGN, "Requirements Upstream");
+        if (reverse) printf(ALIGN, "Requirements Upstream");
+        else printf(ALIGN, "Requirements Downstream");
         if (verbose) printf(" Document");
         printf("\n");
         printf("----------------------------------------------");
