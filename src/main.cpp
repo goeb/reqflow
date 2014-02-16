@@ -636,7 +636,14 @@ int cmdConfig(int argc, const char **argv)
     // display a summary of the configuration
     std::map<std::string, ReqFileConfig>::iterator c;
     FOREACH(c, ReqConfig) {
-        printf("%s: %s\n", c->first.c_str(), c->second.path.c_str());
+        ReqFileConfig f = c->second;
+        printf("%s: -path '%s'\n", c->first.c_str(), f.path.c_str());
+        printf("%s: -req '%s'", c->first.c_str(), f.reqPattern.c_str());
+        if (!f.reqPattern.empty()) printf(" -ref '%s'", f.refPattern.c_str());
+        if (!f.startAfter.empty()) printf(" -start '%s'", f.startAfter.c_str());
+        if (!f.stopAfter.empty()) printf(" -stop '%s'", f.stopAfter.c_str());
+        if (!f.nocov) printf(" -nocov");
+        printf("\n");
     }
 
     return 0;
