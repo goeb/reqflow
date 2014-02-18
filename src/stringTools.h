@@ -15,8 +15,6 @@ std::vector<std::string> split(const std::string &s, const char *c, int limit = 
 
 std::string join(const std::list<std::string> &items, const char *separator);
 std::string getBasename(const std::string &path);
-int icompare(const std::string &s1, const std::string &s2);
-int icompare(const char *s1, const char *s2);
 std::string replaceAll(const std::string &in, char c, const char *replaceBy);
 
 

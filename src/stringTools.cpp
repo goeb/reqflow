@@ -116,24 +116,6 @@ std::string getBasename(const std::string &path)
     else return path.substr(i+1);
 }
 
-// case insensitive comparison of 2 strings
-int icompare(const std::string &s1, const std::string &s2)
-{
-    return icompare(s1.c_str(), s2.c_str());
-}
-
-int icompare(const char *s1, const char *s2)
-{
-#if defined(_WIN32)
-    int diff;
-    do {
-        diff = lowercase(s1++) - lowercase(s2++);
-    } while (diff == 0 && s1[-1] != '\0');
-    return diff;
-#else
-    return strcasecmp(s1, s2);
-#endif
-}
 
 std::string replaceAll(const std::string &in, char c, const char *replaceBy)
 {

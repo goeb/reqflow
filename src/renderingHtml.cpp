@@ -52,6 +52,7 @@ void htmlPrintHeader()
            ".r_footer { font-size: small; font-family: monospace; color: grey; }\n"
            ".r_document_summary { font-size: small; }\n"
            ".r_errors { border: 1px solid #BBB; white-space: pre; font-family: monospace; color: red; padding: 0.5em;}\n"
+           ".r_main { position: relative; }\n"
            ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
            ".r_warning { background-color: #FBB; }\n"
            ".r_samereq { color: grey; }\n"
@@ -68,7 +69,8 @@ void htmlPrintHeader()
            "</style>\n"
            "</head>\n"
            "<body>\n"
-           "<h1>Requirements Traceability</h1>"
+           "<h1>Requirements Traceability</h1>\n"
+           "<div class=\"r_main\">\n"
            );
 }
 
@@ -333,6 +335,7 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
 
 void htmlPrintFooter(const std::string &cmdline)
 {
+    printf("</div>\n"); // end of "r_main"
     printf("<br><br>\n");
     printf("<div class=\"r_footer\">Date: %s<br>Command Line: %s<br>Version: %s</div><br>",
            getDatetime().c_str(), cmdline.c_str(), VERSION);
