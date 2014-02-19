@@ -15,7 +15,8 @@
 <ul>
 <li class='active'>Requirements Traceability Tool
 <ul class=menu_level2>
-<li><a href='#supported-input-formats'>Supported Input Formats</a></li>
+<li><a href='#supported-formats'>Supported Formats</a></li>
+<li><a href='#example-of-report'>Example of Report</a></li>
 <li><a href='#download'>Download</a></li>
 <li><a href='#usage'>Usage</a></li>
 <li><a href='#sample-configuration-file'>Sample Configuration File</a></li>
@@ -28,12 +29,23 @@
 <div class='contents'>
 <h1 id="requirements-traceability-tool">Requirements Traceability Tool</h1>
 <p>Req is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.</p>
-<h2 id="supported-input-formats">Supported Input Formats</h2>
+<h2 id="supported-formats">Supported Formats</h2>
+<h3 id="input-formats">Input formats</h3>
 <ul>
 <li>docx (Open Xml)</li>
+<li>odt (Open Document)</li>
 <li>text</li>
+<li>html</li>
 <li>pdf (experimental, Linux only)</li>
 </ul>
+<h3 id="output-formats">Output formats</h3>
+<ul>
+<li>text</li>
+<li>CSV</li>
+<li>HTML</li>
+</ul>
+<h2 id="example-of-report">Example of Report</h2>
+<p>No screenshot, but an example: <a href="reqReport.html">reqReport.html</a></p>
 <h2 id="download">Download</h2>
 <h3 id="linux">Linux</h3>
 <pre><code>git clone https://github.com/goeb/req.git
@@ -115,7 +127,7 @@ document TEST -path TEST.txt \
         </div> <!-- div class page -->
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
-            Page updated on 12 Feb 2014
+            Page updated on 19 Feb 2014
         </div>
     </body>
 </html>

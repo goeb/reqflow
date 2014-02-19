@@ -3,12 +3,25 @@
 
 Req is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.
 
-## Supported Input Formats
+## Supported Formats
+
+### Input formats
 
 - docx (Open Xml)
+- odt (Open Document)
 - text
+- html
 - pdf (experimental, Linux only)
 
+### Output formats
+
+- text
+- CSV
+- HTML
+
+## Example of Report
+
+No screenshot, but an example: [reqReport.html](reqReport.html)
 
 ## Download
 

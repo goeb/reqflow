@@ -1,0 +1,74 @@
+<!DOCTYPE HTML><html>
+<head>
+<title>Requirements Traceability</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<style>
+body { font-family: Verdana,sans-serif; }
+h1 { border-bottom: 1px #bbb solid; margin-top: 15px;}
+a[href], a[href]:link { color: blue; text-decoration: none; }
+a[href]:hover { color: blue; text-decoration: underline; }
+.r_footer { font-size: small; font-family: monospace; color: grey; }
+.r_document_summary { font-size: small; }
+.r_errors { border: 1px solid #BBB; white-space: pre; font-family: monospace; color: red; padding: 0.5em;}
+.r_main { position: relative; }
+.r_errors_summary { padding: 1em; font-size: 200%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}
+.r_warning { background-color: #FBB; }
+.r_samereq { color: grey; }
+.r_no_error { color: grey; }
+table { border-collapse:collapse; }
+td.r_summary { text-align:right; border-bottom: 1px grey solid; padding-left: 1em; }
+td.r_summary_l { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }
+th.r_summary { text-align:center; padding-left: 1em; }
+td.r_matrix { text-align:left; border: 1px grey solid; padding-left: 1em; }
+th.r_matrix { text-align:left; padding-left: 1em; }
+td.r_upstream { border: 1px solid grey; padding: 1em;}
+td.r_downstream { border: 1px solid grey; padding: 1em; }
+.r_no_coverage { color: grey; }
+</style>
+</head>
+<body>
+<h1>Requirements Traceability</h1>
+<div class="r_main">
+<table class="r_summary"><tr class="r_summary"><th class="r_summary">Documents</th><th class="r_summary">Coverage (%)</th><th class="r_summary">Req Covered</th><th class="r_summary">Req Total</th><th class="r_summary">Document Path</th></tr><tr class=""><td class="r_summary_l"><a href="#SPEC">SPEC</a></td><td class="r_summary">100</td><td class="r_summary">3</td><td class="r_summary">3</td><td class="r_summary_l"><a href="SPEC.docx">SPEC.docx</a></td></tr>
+<tr class=""><td class="r_summary_l"><a href="#TEST">TEST</a></td><td class="r_summary"><span title="Coverage not relevant
+(option -nocov)">nocov</span></td><td class="r_summary"><span title="Coverage not relevant
+(option -nocov)">nocov</span></td><td class="r_summary">4</td><td class="r_summary_l"><a href="TEST.txt">TEST.txt</a></td></tr>
+<tr class=""><td class="r_summary_l">Total</td><td class="r_summary">100</td><td class="r_summary">3</td><td class="r_summary">3</td><td class="r_summary_l"></td></tr>
+</table><h1 id="SPEC">SPEC</h1><div class="r_document_summary">Path: <a href="SPEC.docx">SPEC.docx</a><br>Requirements: 3<br>Covered: 3 (100%)<br></div>
+<h2>Dependencies for: SPEC</h2><table class="r_dependencies"><tr class="r_dependencies"><th class="r_dependencies">Upstream Documents</th><th class="r_dependencies"></th><th class="r_dependencies">Downstream Documents</th></tr>
+<td class="r_upstream"></td><td>-> SPEC-></td><td class="r_downstream"><a href="#TEST">TEST</a><br></td></table>
+<h2>Forward Coverage for: SPEC</h2>
+<table class="r_matrix"><tr class="r_matrix"><th class="r_matrix">Requirements</th><th class="r_matrix">Descendants</th><th class="r_matrix">Downstream Documents</th></tr>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_01</span></td><td class="r_matrix "><span class=" " >T_01</span></td><td class="r_matrix"><a href="#TEST"><span class=" " >TEST</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_01</span></td><td class="r_matrix "><span class=" " >T_02</span></td><td class="r_matrix"><a href="#TEST"><span class=" " >TEST</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_02</span></td><td class="r_matrix "><span class=" " >T_01</span></td><td class="r_matrix"><a href="#TEST"><span class=" " >TEST</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_03</span></td><td class="r_matrix "><span class=" " >T_05</span></td><td class="r_matrix"><a href="#TEST"><span class=" " >TEST</span></a></td>
+</table>
+<h2>Reverse Coverage for: SPEC</h2>
+<table class="r_matrix"><tr class="r_matrix"><th class="r_matrix">Requirements</th><th class="r_matrix">Origins</th><th class="r_matrix">Upstream Documents</th></tr>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_01</span></td><td class="r_matrix "><span class=" " >SYS_155</span></td><td class="r_matrix"><a href="#Undefined"><span class=" " >Undefined</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_02</span></td><td class="r_matrix "><span class=" " ></span></td><td class="r_matrix"><a href="#"><span class=" " ></span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >REQ_03</span></td><td class="r_matrix "><span class=" " ></span></td><td class="r_matrix"><a href="#"><span class=" " ></span></a></td>
+</table>
+<h1 id="TEST">TEST</h1><div class="r_document_summary">Path: <a href="TEST.txt">TEST.txt</a><br>Requirements: 4<br></div>
+<h2>Dependencies for: TEST</h2><table class="r_dependencies"><tr class="r_dependencies"><th class="r_dependencies">Upstream Documents</th><th class="r_dependencies"></th><th class="r_dependencies">Downstream Documents</th></tr>
+<td class="r_upstream"><a href="#SPEC">SPEC</a><br></td><td>-> TEST-></td><td class="r_downstream"></td></table>
+<h2>Forward Coverage for: TEST</h2>
+<div class="r_no_coverage">No forward tracebility configured (-nocov flag).</div><h2>Reverse Coverage for: TEST</h2>
+<table class="r_matrix"><tr class="r_matrix"><th class="r_matrix">Requirements</th><th class="r_matrix">Origins</th><th class="r_matrix">Upstream Documents</th></tr>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >T_01</span></td><td class="r_matrix "><span class=" " >REQ_01</span></td><td class="r_matrix"><a href="#SPEC"><span class=" " >SPEC</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >T_01</span></td><td class="r_matrix "><span class=" " >REQ_02</span></td><td class="r_matrix"><a href="#SPEC"><span class=" " >SPEC</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >T_01</span></td><td class="r_matrix "><span class=" " >REQ_333</span></td><td class="r_matrix"><a href="#Undefined"><span class=" " >Undefined</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >T_02</span></td><td class="r_matrix "><span class=" " >REQ_01</span></td><td class="r_matrix"><a href="#SPEC"><span class=" " >SPEC</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >T_05</span></td><td class="r_matrix "><span class=" " >REQ_03</span></td><td class="r_matrix"><a href="#SPEC"><span class=" " >SPEC</span></a></td>
+<tr class="r_matrix "><td class="r_matrix "><span class=" " >T_21</span></td><td class="r_matrix "><span class=" " ></span></td><td class="r_matrix"><a href="#"><span class=" " ></span></a></td>
+</table>
+<div class="r_errors_summary"><a href="#r_errors">Error(s): 2</a></div>
+<h1 id="r_errors">Errors</h1>
+<div class="r_errors">Error(s): 2
+SYS_155: Undefined requirement, referenced by: REQ_01 (SPEC.docx)
+REQ_333: Undefined requirement, referenced by: T_01 (TEST.txt)
+</div>
+</div>
+<br><br>
+<div class="r_footer">Date: 2014-02-19 20:25:22<br>Command Line: ../req report <br>Version: 1.1-rc2</div><br></body></html>
