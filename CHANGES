@@ -1,0 +1,13 @@
+
+Req v1.2, 19 Feb 2014
+    
+    Support for input documents HTML
+    Support for input documents PDF on Windows
+    HTML report: CSS styles improved
+
+
+Req v1.1
+
+    Support for input documents ODT
+    Configuration file syntax: keywords "define", "document" 
+    Config Option -nocov
