@@ -8,14 +8,18 @@ ifeq ($(WIN),1)
 	LIBZIP = $(HOME)/Downloads/libzip-0.11.2
 	LIBPCRE = $(HOME)/Downloads/pcre-8.34
 	LIBZ = $(HOME)/Downloads/zlib-1.2.8
-	LIBPOPPLER = $(HOME)/Downloads/poppler-0.24.5
+	LIBPOPPLER = $(HOME)/win32libs/poppler-0.24.5
+	LIBICONV = $(HOME)/win32libs/libiconv-1.14
+	#LIBFREETYPE = $(HOME)/win32libs/freetype-2.5.2
 	LDFLAGS += -lws2_32 -lgdi32
 	LDFLAGS += -Wl,-Bstatic
   	LDFLAGS += -L$(LIBXML)/.libs -lxml2
 	LDFLAGS += $(LIBZIP)/lib/.libs/libzip.a $(LIBZ)/libz.a
    	LDFLAGS += $(LIBPCRE)/.libs/libpcreposix.a $(LIBPCRE)/.libs/libpcre.a
-	LDFLAGS += $(LIBPOPPLER)/poppler/.libs/libpoppler.a
-	CFLAGS += -I$(LIBXML)/include -I$(LIBZIP)/lib -I$(LIBPCRE) -I$(LIBPOPPLER)
+	LDFLAGS += $(LIBPOPPLER)/lib/libpoppler-cpp.a $(LIBPOPPLER)/lib/libpoppler.a
+	LDFLAGS += $(LIBICONV)/lib/libiconv.a
+	#LDFLAGS += $(LIBFREETYPE)/
+	CFLAGS += -I$(LIBXML)/include -I$(LIBZIP)/lib -I$(LIBPCRE) -I$(LIBPOPPLER)/include
 	CFLAGS += -DLIBXML_STATIC -DPCRE_STATIC -DZIP_EXTERN= -DZLIB_INTERNAL -Dpoppler_cpp_EXPORTS
 	PACK_NAME = smit-win32
 else

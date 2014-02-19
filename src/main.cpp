@@ -32,9 +32,7 @@
 #include "ReqDocumentTxt.h"
 #include "ReqDocumentHtml.h"
 #include "stringTools.h"
-#ifndef _WIN32
 #include "ReqDocumentPdf.h"
-#endif
 #include "renderingHtml.h"
 
 void usage()
@@ -258,9 +256,7 @@ ReqFileType getFileType(const std::string &path)
     else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
     else if (0 == strcasecmp(extension.c_str(), "htm")) return RF_HTML;
     else if (0 == strcasecmp(extension.c_str(), "html")) return RF_HTML;
-#ifndef _WIN32
     else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
-#endif
     else return RF_UNKNOWN;
 }
 
@@ -294,15 +290,12 @@ int loadRequirementsOfFile(const ReqFileConfig fileConfig, bool debug)
         doc.loadRequirements(debug);
         break;
     }
-
-#ifndef _WIN32
     case RF_PDF:
     {
         ReqDocumentPdf doc(fileConfig);
         doc.loadRequirements(debug);
         break;
     }
-#endif
     default:
         LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
         result = -1;
