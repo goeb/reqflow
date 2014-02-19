@@ -33,7 +33,7 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 ### Windows
 
-[req-v1.1.zip](download/req-v1.1.zip)
+[req-v1.2.0.zip](download/req-v1.2.0.zip)
 
 ## Usage
 
@@ -55,11 +55,11 @@ Commands:
          [-x <fmt>] Select export format: text (default), csv.
 
     config          Print the list of configured documents.
+                    (useful for debugging defines)
 
     report [-html]  Generate HTML report
 
     debug <file>    Dump text extracted from file (debug purpose).
-                    (PDF not supported on Windows)
 
     regex <pattern> <text>
                     Test regex given by <pattern> applied on <text>.
@@ -78,7 +78,8 @@ Options:
 
 ```
 # document <document-id> -path <document-path> -req <pattern> \
-#          [-stop-after <pattern>] [-ref <pattern>] [-start-after <pattern>]
+#          [-stop-after <pattern>] [-ref <pattern>] [-start-after <pattern>] \
+#          [-nocov]
 #
 # <pattern> must be a Perl Compatible Regular Expression (PCRE)
 # -req indicates how the requirements must be captured
@@ -88,28 +89,30 @@ Options:
 # Escape character (for quotes, etc.): antislash (\).
 # Thus any \ must be written \\.
 # 
-# Keyword 'define':
-# define PATH
-# document x -path PATH/x.txt
-# document y -path PATH/y.txt
+# Keyword 'define' may be used to define values:
+# 
+#   define PATH
+#   document x -path PATH/x.txt
+#   document y -path PATH/y.txt
 
 document SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
 document TEST -path TEST.txt \
     -req T_[-a-zA-Z0-9_]* \
     -ref "Ref:  *(.*)" \
     -stop-after "Annex" \
-    -start-after "Tests cases"
+    -start-after "Tests cases" \
+    -nocov
 
 ```
 
 ## External Dependencies
 
-- libz
-- libzip
+- libz, libzip
 - libxml2
-- lippoppler-cpp
+- libpoppler, libpoppler-cpp
+- libpcreposix, libpcre
 
-(The Windows release includes these as static libraries)
+The Windows release includes these as static libraries.
 
 
 ## License GPLv2

@@ -52,7 +52,7 @@
 make
 cd test &amp;&amp; ../req stat -s</code></pre>
 <h3 id="windows">Windows</h3>
-<p><a href="download/req-v1.1.zip">req-v1.1.zip</a></p>
+<p><a href="download/req-v1.2.0.zip">req-v1.2.0.zip</a></p>
 <h2 id="usage">Usage</h2>
 <pre><code>Usage: req &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
 
@@ -71,11 +71,11 @@ Commands:
          [-x &lt;fmt&gt;] Select export format: text (default), csv.
 
     config          Print the list of configured documents.
+                    (useful for debugging defines)
 
     report [-html]  Generate HTML report
 
     debug &lt;file&gt;    Dump text extracted from file (debug purpose).
-                    (PDF not supported on Windows)
 
     regex &lt;pattern&gt; &lt;text&gt;
                     Test regex given by &lt;pattern&gt; applied on &lt;text&gt;.
@@ -89,7 +89,8 @@ Options:
 <h2 id="sample-configuration-file">Sample Configuration File</h2>
 <p><code>conf.req</code></p>
 <pre><code># document &lt;document-id&gt; -path &lt;document-path&gt; -req &lt;pattern&gt; \
-#          [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;]
+#          [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;] \
+#          [-nocov]
 #
 # &lt;pattern&gt; must be a Perl Compatible Regular Expression (PCRE)
 # -req indicates how the requirements must be captured
@@ -99,26 +100,28 @@ Options:
 # Escape character (for quotes, etc.): antislash (\).
 # Thus any \ must be written \\.
 # 
-# Keyword &#39;define&#39;:
-# define PATH
-# document x -path PATH/x.txt
-# document y -path PATH/y.txt
+# Keyword &#39;define&#39; may be used to define values:
+# 
+#   define PATH
+#   document x -path PATH/x.txt
+#   document y -path PATH/y.txt
 
 document SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
 document TEST -path TEST.txt \
     -req T_[-a-zA-Z0-9_]* \
     -ref &quot;Ref:  *(.*)&quot; \
     -stop-after &quot;Annex&quot; \
-    -start-after &quot;Tests cases&quot;
+    -start-after &quot;Tests cases&quot; \
+    -nocov
 </code></pre>
 <h2 id="external-dependencies">External Dependencies</h2>
 <ul>
-<li>libz</li>
-<li>libzip</li>
+<li>libz, libzip</li>
 <li>libxml2</li>
-<li>lippoppler-cpp</li>
+<li>libpoppler, libpoppler-cpp</li>
+<li>libpcreposix, libpcre</li>
 </ul>
-<p>(The Windows release includes these as static libraries)</p>
+<p>The Windows release includes these as static libraries.</p>
 <h2 id="license-gplv2">License GPLv2</h2>
 <p>Req Copyright (C) 2014 Frederic Hoerni</p>
 <p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
