@@ -10,8 +10,8 @@ Req is a free and open-source tool for traceability of requirements across docum
 - docx (Open Xml)
 - odt (Open Document)
 - text
-- html
-- pdf (experimental, Linux only)
+- HTML
+- PDF
 
 ### Output formats
 
