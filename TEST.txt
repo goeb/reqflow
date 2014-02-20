@@ -1,0 +1,41 @@
+
+# Test plan:
+
+## Tests cases
+
+T_01
+    do this 01
+    do that 01
+    check this 01
+    check that 01
+Ref: REQ_01
+Ref: REQ_02
+Ref: REQ_333
+
+
+T_02
+    do this 02
+    do that 02
+    check this 02
+    check that 02
+Ref: REQ_01
+
+T_05
+    do this 05
+    do that 05
+    check this 05
+    check that 05
+Ref: REQ_03
+
+T_21
+    this test is an extra test...
+    yyy
+
+
+## Annex: summary of tests
+
+	T_01
+	T_02
+	T_05
+
+
