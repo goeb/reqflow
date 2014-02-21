@@ -9,7 +9,7 @@
 
 // static objects
 std::map<std::string, ReqFileConfig> ReqConfig;
-std::map<std::string, Requirement> Requirements;
+std::map<std::string, Requirement, stringCompare> Requirements;
 std::list<std::string> Errors;
 int ReqTotal = 0;
 int ReqCovered = 0;
