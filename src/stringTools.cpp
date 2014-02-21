@@ -14,6 +14,8 @@
 
 #include <sstream>
 #include <string.h>
+#include <stdlib.h>
+
 
 #include "stringTools.h"
 #include "global.h"
@@ -133,5 +135,69 @@ std::string replaceAll(const std::string &in, char c, const char *replaceBy)
     }
     if (savedOffset < i) out += in.substr(savedOffset, i-savedOffset);
     return out;
+}
+
+/** Compare 2 strings in order to have the following ordering:
+  * REQ_1.1
+  * REQ_1.2
+  * REQ_1.10
+  * REQ_3.1.1
+  * REQ_3.17
+  *
+  */
+bool stringCompare::operator()(const std::string &s1, const std::string &s2)
+{
+	enum mode_t { STRING, NUMBER } mode = STRING;
+	const char *l = s1.c_str();
+	const char *r = s2.c_str();
+
+	while (*l && *r)
+	{
+		if (mode == STRING) {
+			char l_char, r_char;
+			while ( (l_char=*l) && (r_char=*r) )
+			{
+				// check if this are digit characters
+				const bool l_digit = isdigit(l_char);
+				const bool r_digit = isdigit(r_char);
+				// if both characters are digits, we continue in NUMBER mode
+				if (l_digit && r_digit) {
+					mode=NUMBER;
+					break;
+				}
+				// if only the left character is a digit, we have a result
+				if (l_digit) return true;
+				// if only the right character is a digit, we have a result
+				if (r_digit) return false;
+				// compute the difference of both characters
+				const int diff = l_char - r_char;
+				// if they differ we have a result
+				if (diff < 0) return true;
+				else if (diff > 0 ) return false;
+				// otherwise process the next characters
+				++l;
+				++r;
+			}
+		} else { // mode==NUMBER
+			// get the left number
+			char *end;
+			unsigned long l_int = strtoul(l, &end, 0);
+			l = end;
+
+			// get the right number
+			unsigned long r_int = strtoul(r, &end, 0);
+			r = end;
+
+			// if the difference is not equal to zero, we have a comparison result
+			if (l_int < r_int) return true;
+			else if (l_int > r_int) return false;
+
+			// otherwise we process the next substring in STRING mode
+			mode = STRING;
+		}
+	}
+
+	if (*r) return true;
+	return false;
 }
 

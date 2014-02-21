@@ -7,6 +7,7 @@
 #include <list>
 #include <set>
 
+#include "stringTools.h"
 
 #define DEFAULT_CONF "conf.req"
 
@@ -51,8 +52,10 @@ struct Requirement {
     std::set<std::string> coveredBy;
 };
 
+
+
 extern std::map<std::string, ReqFileConfig> ReqConfig;
-extern std::map<std::string, Requirement> Requirements;
+extern std::map<std::string, Requirement, stringCompare> Requirements;
 extern std::list<std::string> Errors;
 extern int ReqTotal;
 extern int ReqCovered;
