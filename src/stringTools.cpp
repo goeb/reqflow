@@ -151,32 +151,28 @@ bool stringCompare::operator()(const std::string &s1, const std::string &s2)
 	const char *l = s1.c_str();
 	const char *r = s2.c_str();
 
-	while (*l && *r)
-	{
+	while (*l && *r) {
 		if (mode == STRING) {
-			char l_char, r_char;
-			while ( (l_char=*l) && (r_char=*r) )
-			{
+			while (*l && *r) {
 				// check if this are digit characters
-				const bool l_digit = isdigit(l_char);
-				const bool r_digit = isdigit(r_char);
+				const int l_digit = isdigit(*l);
+				const int r_digit = isdigit(*r);
 				// if both characters are digits, we continue in NUMBER mode
 				if (l_digit && r_digit) {
-					mode=NUMBER;
+					mode = NUMBER;
 					break;
 				}
 				// if only the left character is a digit, we have a result
 				if (l_digit) return true;
 				// if only the right character is a digit, we have a result
 				if (r_digit) return false;
-				// compute the difference of both characters
-				const int diff = l_char - r_char;
+
 				// if they differ we have a result
-				if (diff < 0) return true;
-				else if (diff > 0 ) return false;
+				if (*l < *r) return true;
+				else if (*l > *r) return false;
 				// otherwise process the next characters
-				++l;
-				++r;
+				l++;
+				r++;
 			}
 		} else { // mode==NUMBER
 			// get the left number
