@@ -1,7 +1,7 @@
 
-# Reqflow, a Requirements Traceability Tool
+# Reqflow
 
-Req is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.
+Reqflow is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.
 
 ## Supported Formats
 
