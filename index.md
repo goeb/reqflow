@@ -1,5 +1,5 @@
 
-# Requirements Traceability Tool
+# Reqflow, a Requirements Traceability Tool
 
 Req is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.
 
@@ -27,7 +27,7 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 ### Linux
 
-    git clone https://github.com/goeb/req.git
+    git clone https://github.com/goeb/reqflow.git
     make
     cd test && ../req stat -s
 
