@@ -1,13 +1,13 @@
 Error(s): 2
-SYS_155: Undefined requirement, referenced by: REQ_01 (SPEC.docx)
-REQ_333: Undefined requirement, referenced by: T_01 (TEST.txt)
+SYS_155: Undefined requirement, referenced by: PRINTF_01 (SPEC.docx)
+PRINTF_333: Undefined requirement, referenced by: T_01 (TEST.txt)
 
 Requirements of SPEC                               Requirements Downstream                           
 --------------------------------------------------------------------------------------------------------------------
-REQ_01                                             T_01                                              
-REQ_01                                             T_02                                              
-REQ_02                                             T_01                                              
-REQ_03                                             T_05                                              
+PRINTF_01                                          T_01                                              
+PRINTF_02                                          T_02                                              
+PRINTF_03                                          T_02                                              
+PRINTF_03                                          T_05                                              
 
 Requirements of TEST                               Requirements Downstream                           
 --------------------------------------------------------------------------------------------------------------------

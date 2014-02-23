@@ -4,32 +4,28 @@
 ## Tests cases
 
 T_01
-    do this 01
-    do that 01
-    check this 01
-    check that 01
-Ref: REQ_01
-Ref: REQ_02
-Ref: REQ_333
+    Send command printf --help
+    Check that the result is a help message.
+Ref: PRINTF_01
+Ref: PRINTF_333
 
 
 T_02
-    do this 02
-    do that 02
-    check this 02
-    check that 02
-Ref: REQ_01
+    Send command `printf "(%04d%-4s)\n" 33 aa`
+    Check that the result is: (0033aa  )
+    Check that the exit code is zero.
+Ref: PRINTF_02
+Ref: PRINTF_03
+
 
 T_05
-    do this 05
-    do that 05
-    check this 05
-    check that 05
-Ref: REQ_03
+    Send command printf x%r
+    Check that an error is raised and that the exit code is 1
+Ref: PRINTF_03
 
 T_21
-    this test is an extra test...
-    yyy
+    Send command `which printf`
+    Check that printf is installed in /usr/bin/printf
 
 
 ## Annex: summary of tests
@@ -37,5 +33,6 @@ T_21
 	T_01
 	T_02
 	T_05
+    T_21
 
 

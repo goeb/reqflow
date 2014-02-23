@@ -1,6 +1,6 @@
 Error(s): 2
-SYS_155: Undefined requirement, referenced by: REQ_01 (SPEC.docx)
-REQ_333: Undefined requirement, referenced by: T_01 (TEST.txt)
+SYS_155: Undefined requirement, referenced by: PRINTF_01 (SPEC.docx)
+PRINTF_333: Undefined requirement, referenced by: T_01 (TEST.txt)
 Document                          % covered / total
 ----------------------------------------------------------------------
 SPEC                           100%       3 /     3 SPEC.docx
