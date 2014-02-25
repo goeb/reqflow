@@ -82,6 +82,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
 
     // check if text covers a requirement
     std::string ref = getMatchingPattern(fileConfig.refRegex, text);
+    getAllPatterns(fileConfig.refRegex, text.c_str()); //TODO
     if (!ref.empty()) {
         if (currentRequirement.empty()) {
             PUSH_ERROR("%s: Reference, but no current requirement, file: %s",
@@ -171,6 +172,51 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
     return matchingText;
 }
 
+std::list<std::string> getAllPatterns(regex_t *regex, const char *text)
+{
+    std::list<std::string> result;
+
+    if (!regex) return result;
+
+    // check if line matches
+    const int N = 5; // max number of groups
+    regmatch_t pmatch[N];
+    std::string localText = text;
+    int reti;
+    while ( !(reti = regexec(regex, localText.c_str(), N, pmatch, 0)) ) {
+        LOG_DEBUG("getAllPatterns: localText=%s", localText.c_str());
+        // match
+        // take the last group
+
+        int i;
+        const int LINE_SIZE_MAX = 4096;
+        char buffer[LINE_SIZE_MAX];
+        for (i=N-1; i>=0; i--) {
+            if (pmatch[i].rm_so != -1) {
+                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
+                if (length <= 0) {
+                    localText.clear();
+                    break;
+                }
+                if (length > LINE_SIZE_MAX-1) {
+                    PUSH_ERROR("Requirement size too big (%d)", length);
+                    localText.clear();
+                    break;
+                }
+                memcpy(buffer, localText.c_str()+pmatch[i].rm_so, length);
+                buffer[length] = 0;
+                result.insert(result.begin(), buffer);
+                LOG_DEBUG("getAllPatterns: got pattern=%s", buffer);
+
+                // modify localText
+                localText.erase(pmatch[i].rm_so, length);
+                break;
+            }
+        }
+    }
+
+    return result;
+}
 
 /** Fulfill .coveredBy tables
   */

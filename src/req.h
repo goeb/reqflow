@@ -25,7 +25,9 @@ struct ReqFileConfig {
 	regex_t *startAfterRegex;
 	std::string stopAfter;
 	regex_t *stopAfterRegex;
-    std::list<std::string> dependencies;
+    std::map<std::string, regex_t *> endReq;
+    std::map<std::string, regex_t *> endReqStyle;
+
 
     // for dependency graph
     std::set<std::string> upstreamDocuments;
@@ -90,6 +92,8 @@ void consolidateCoverage();
 void checkUndefinedRequirements();
 std::string getMatchingPattern(regex_t *regex, const std::string &text);
 std::string getMatchingPattern(regex_t *regex, const char *text);
+std::list<std::string> getAllPatterns(regex_t *regex, const char *text);
+
 void computeGlobalStatistics();
 
 

@@ -21,6 +21,8 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
                 {
                     xmlChar* style = xmlNodeListGetString(currentNode->doc, attribute->children, 1);
                     LOG_DEBUG("style: %s", (char*)style);
+
+
                     xmlFree(style);
                     attribute = attribute->next;
                 }

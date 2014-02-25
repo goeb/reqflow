@@ -35,6 +35,8 @@
 #include "ReqDocumentPdf.h"
 #include "renderingHtml.h"
 
+std::string Cmdline;
+
 void usage()
 {
     printf("Usage: req <command> [<options>] [<args>]\n"
@@ -51,11 +53,11 @@ void usage()
            "\n"
            "    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).\n"
            "         [-r]       Print the reverse traceability matrix (A covers B).\n"
-           "         [-x <fmt>] Select export format: text (default), csv.\n"
+           "         [-x <fmt>] Select export format: text (default), csv, html.\n"
+           "                    If format 'html' is chosen, -r is ignored, as both foward and reverse\n"
+           "                    traceability matrices are displayed.\n"
            "\n"
            "    config          Print the list of configured documents.\n"
-           "\n"
-           "    report [-html]  Generate HTML report\n"
            "\n"
            "    debug <file>    Dump text extracted from file (debug purpose).\n"
            "                    (PDF not supported on Windows)\n"
@@ -77,7 +79,7 @@ enum StatusMode { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL };
 
 int showVersion()
 {
-    printf("Req v%s\n"
+    printf("Reqflow v%s\n"
            "Copyright (C) 2014 Frederic Hoerni\n"
            "\n"
            "This program is free software; you can redistribute it and/or modify\n"
@@ -214,6 +216,36 @@ int loadConfiguration(const char * file)
                         return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
+
+                } else if (arg == "-end-req") {
+                    if (line->empty()) {
+                        PUSH_ERROR("Missing -end-req value for %s", fileConfig.id.c_str());
+                        return -1;
+                    }
+                    std::string endReq = pop(*line);
+                    regex_t *regex = new regex_t();
+                    int reti = regcomp(regex, endReq.c_str(), 0);
+                    if (reti) {
+                        PUSH_ERROR("Cannot compile regex: %s", endReq.c_str());
+                        return -1;
+                    }
+
+                    fileConfig.endReq[endReq] = regex;
+
+                } else if (arg == "-end-req-style") {
+                    if (line->empty()) {
+                        PUSH_ERROR("Missing -end-req-style value for %s", fileConfig.id.c_str());
+                        return -1;
+                    }
+                    std::string endReqStyle = pop(*line);
+                    regex_t *regex = new regex_t();
+                    int reti = regcomp(regex, endReqStyle.c_str(), 0);
+                    if (reti) {
+                        PUSH_ERROR("Cannot compile regex: %s", endReqStyle.c_str());
+                        return -1;
+                    }
+
+                    fileConfig.endReqStyle[endReqStyle] = regex;
 
                 } else {
                     PUSH_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
@@ -600,6 +632,7 @@ int cmdTrac(int argc, const char **argv)
 
     if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_TXT);
     else if (0 == strcmp(exportFormat, "csv")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_CSV);
+    else if (0 == strcmp(exportFormat, "html")) htmlRender(Cmdline, argc-i, argv+i);
     else {
         LOG_ERROR("Invalid export format: %s", exportFormat);
     }
@@ -642,33 +675,6 @@ int cmdConfig(int argc, const char **argv)
     return 0;
 }
 
-int cmdHtml(const std::string &cmdline, int argc, const char **argv)
-{
-    int i = 0;
-    const char *configFile = DEFAULT_CONF;
-    const char *arg = 0;
-    while (i<argc) {
-        arg = argv[i]; i++;
-        if (0 == strcmp(arg, "-c")) {
-            if (i>=argc) usage();
-            configFile = argv[i]; i++;
-        } else {
-            i--; // push back arg into the list
-            break; // leave remaining args for below
-        }
-    }
-
-    int r = loadConfiguration(configFile);
-    if (r != 0) return 1;
-
-    r = loadRequirements(false);
-    if (r != 0) return 1;
-
-    htmlRender(cmdline, argc-i, argv+i);
-
-    return 0;
-}
-
 int cmdDebug(int argc, const char **argv)
 {
     if (argc == 0) usage();
@@ -679,20 +685,6 @@ int cmdDebug(int argc, const char **argv)
     loadRequirementsOfFile(fileConfig, true);
     return 0;
 }
-
-int cmdReport(const std::string &cmdline, int argc, const char **argv)
-{
-    std::string format = "-html"; // default format is HTML
-    if (argc > 0 && 0 == strcmp("-html", argv[0])) {
-        format = argv[0];
-        argc--; argv++;
-    }
-
-    if (format == "-html") return cmdHtml(cmdline, argc, argv);
-    else usage();
-    return 0;
-}
-
 
 int cmdRegex(int argc, const char **argv)
 {
@@ -744,6 +736,10 @@ int cmdRegex(int argc, const char **argv)
 
 int main(int argc, const char **argv)
 {
+    // get command line
+    int i;
+    for(i=0; i<argc; i++) Cmdline += argv[i] + std::string(" ");
+
     if (argc < 2) usage();
 
     std::string command = argv[1];
@@ -753,13 +749,7 @@ int main(int argc, const char **argv)
     else if (command == "version") rc = showVersion();
     else if (command == "trac")    rc = cmdTrac(argc-2, argv+2);
     else if (command == "config")  rc = cmdConfig(argc-2, argv+2);
-    else if (command == "report")  {
-        // get command line
-        std::string cmdline;
-        int i;
-        for(i=0; i<argc; i++) cmdline += argv[i] + std::string(" ");
-        rc = cmdReport(cmdline, argc-2, argv+2);
-    } else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
+    else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
 #ifndef _WIN32
     else if (command == "debug")   rc = cmdDebug(argc-2, argv+2);
 #endif
