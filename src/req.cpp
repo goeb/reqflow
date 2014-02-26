@@ -61,24 +61,27 @@ ReqFileConfig *getDocument(std::string docId)
   *    - requirements
   *    - accumulation of text of the current requirement
   *
+  * Lexical rules:
+  *   - references must be after the requirement and not on the same line
+  *
   * Contextual variables:
   *    acquisitionStarted
   *    currentRequirement
   */
 
-BlockStatus ReqDocument::processBlock(const std::string &text)
+BlockStatus ReqDocument::processBlock(std::string &text)
 {
 	LOG_DEBUG("processBlock: %s", text.c_str());
     // check the startAfter pattern
     if (!acquisitionStarted) {
-        std::string start = getMatchingPattern(fileConfig.startAfterRegex, text);
+        std::string start = extractPattern(fileConfig.startAfterRegex, text);
         if (!start.empty()) acquisitionStarted = true;
     }
 
     if (!acquisitionStarted) return NOT_STARTED;
 
     // check the stopAfter pattern
-    std::string stop = getMatchingPattern(fileConfig.stopAfterRegex, text);
+    std::string stop = extractPattern(fileConfig.stopAfterRegex, text);
     if (!stop.empty()) {
         LOG_DEBUG("stop: %s", stop.c_str());
         LOG_DEBUG("line: %s", text.c_str());
@@ -99,7 +102,7 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
         }
     }
 
-    std::string reqId = getMatchingPattern(fileConfig.reqRegex, text);
+    std::string reqId = extractPattern(fileConfig.reqRegex, text, true);
 
     if (!reqId.empty() && refs.find(reqId) == refs.end()) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
@@ -109,6 +112,13 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
             currentRequirement.clear();
 
         } else {
+
+            // store text of previous requirement, if any
+            if (currentRequirement.size()) {
+                Requirements[currentRequirement].text = textOfCurrentReq;
+            }
+            textOfCurrentReq.clear();
+
             Requirement req;
             req.id = reqId;
             req.parentDocumentId = fileConfig.id;
@@ -117,27 +127,34 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
             currentRequirement = reqId;
         }
     }
+
+    // TODO check for endReq and endReqStyle to know if text of
+    // current requirement is finished
+
+    // accumulate text of current requirement
+    if (currentRequirement.size()) {
+        if (textOfCurrentReq.size()) textOfCurrentReq += "\n";
+        textOfCurrentReq += text;
+    }
+
     return REQ_OK;
 }
 
-
-std::string getMatchingPattern(regex_t *regex, const std::string &text)
+/** Get first matching pattern and erase it from the text.
+  */
+std::string extractPattern(regex_t *regex, std::string &text, bool eraseExtracted)
 {
-    return getMatchingPattern(regex, text.c_str());
-}
+    LOG_DEBUG("extractPattern: textin=%s, erase=%d", text.c_str(), eraseExtracted);
 
-std::string getMatchingPattern(regex_t *regex, const char *text)
-{
     if (!regex) return "";
 
-    std::string matchingText;
-    // check if line matches
+    std::string result;
     const int N = 5; // max number of groups
     regmatch_t pmatch[N];
-    //LOG_DEBUG("regexec(%p, %p)", regex, text);
-    int reti = regexec(regex, text, N, pmatch, 0);
-    if (!reti) {
-        // take the last group, because we want to support the 2 following cases.
+    int reti = regexec(regex, text.c_str(), N, pmatch, 0);
+    if (reti == 0) {
+        // take the last group, but erase (optionally) the first group
+        // we want to support the 2 following cases.
         // Example 1: ./req regex "<\(REQ_[-a-zA-Z_0-9]*\)>" "ex: <REQ_123> (comment)"
         // match[0]: <REQ_123>
         // match[1]: REQ_123
@@ -151,33 +168,39 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
         int i;
         const int LINE_SIZE_MAX = 4096;
         char buffer[LINE_SIZE_MAX];
-        for (i=0; i<N; i++) {
+        for (i=N-1; i>=0; i--) {
             if (pmatch[i].rm_so != -1) {
                 int length = pmatch[i].rm_eo - pmatch[i].rm_so;
+                if (length <= 0) {
+                    break;
+                }
                 if (length > LINE_SIZE_MAX-1) {
                     PUSH_ERROR("Requirement size too big (%d)", length);
                     break;
                 }
-                memcpy(buffer, text+pmatch[i].rm_so, length);
+                memcpy(buffer, text.c_str()+pmatch[i].rm_so, length);
                 buffer[length] = 0;
-                //LOG_DEBUG("match[%d]: %s", i, buffer);
-                matchingText = buffer; // overwrite each time, so that we take the last one
-
-            } else break; // no more groups
+                result = buffer;
+                break;
+            }
         }
 
-    } else if (reti == REG_NOMATCH) {
-        matchingText = "";
+        // erase first group
+        regmatch_t firstGroup = pmatch[0];
+        if (eraseExtracted && firstGroup.rm_so != -1) {
+            int length = firstGroup.rm_eo - firstGroup.rm_so;
+            text.erase(firstGroup.rm_so, length);
+        }
 
-    } else {
-        char msgbuf[1024];
-        regerror(reti, regex, msgbuf, sizeof(msgbuf));
-        PUSH_ERROR("Regex match failed: %s", msgbuf);
-        matchingText = "";
+    } else { // no match
+        result = "";
+        // erase nothing
     }
 
-    return matchingText;
+    LOG_DEBUG("extractPattern: result=%s, textout=%s", result.c_str(), text.c_str());
+    return result;
 }
+
 
 std::set<std::string> getAllPatterns(regex_t *regex, const char *text)
 {

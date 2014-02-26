@@ -28,7 +28,8 @@ int ReqDocumentTxt::loadRequirements(bool debug)
 			printf("%s", line);
 
 		} else {
-	        BlockStatus status = processBlock(line);
+            std::string L = line;
+            BlockStatus status = processBlock(L);
 			if (status == STOP_REACHED) return 0;
 		}
 		linenum++;

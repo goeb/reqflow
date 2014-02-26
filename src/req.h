@@ -52,6 +52,7 @@ struct Requirement {
     std::string parentDocumentPath;
     std::set<std::string> covers;
     std::set<std::string> coveredBy;
+    std::string text;
 };
 
 
@@ -66,7 +67,7 @@ extern int ReqCovered;
 class ReqDocument {
 public:
     virtual int loadRequirements(bool debug) = 0;
-    BlockStatus processBlock(const std::string &text);
+    BlockStatus processBlock(std::string &text);
 protected:
     virtual void init();
     bool acquisitionStarted; // indicate if the parsing passed the point after which requirement may be acquired
@@ -91,8 +92,7 @@ Requirement *getRequirement(std::string id);
 ReqFileConfig *getDocument(std::string docId);
 void consolidateCoverage();
 void checkUndefinedRequirements();
-std::string getMatchingPattern(regex_t *regex, const std::string &text);
-std::string getMatchingPattern(regex_t *regex, const char *text);
+std::string extractPattern(regex_t *regex, std::string &text, bool eraseExtracted = false);
 std::set<std::string> getAllPatterns(regex_t *regex, const char *text);
 
 void computeGlobalStatistics();
