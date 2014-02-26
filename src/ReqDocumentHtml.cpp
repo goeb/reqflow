@@ -7,7 +7,11 @@
 
 BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph, bool debug)
 {
-    BlockStatus s = REQ_OK;;
+    LOG_DEBUG("processParagraph: inParagaph=%d", inParagaph);
+    LOG_DEBUG("processParagraph: text=%s", text.c_str());
+
+    BlockStatus s = REQ_OK;
+
     if (debug) {
          dumpText(text.c_str());
     } else {
@@ -15,6 +19,7 @@ BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph
         if (inParagaph) s = processBlock(text);
         else {
             // process line per line
+            LOG_DEBUG("processParagraph line per line, size=%d", text.size());
             size_t pos0 = 0;
             while (pos0 < text.size()) {
                 std::string line;
@@ -29,7 +34,7 @@ BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph
                 }
 
                 s = processBlock(line);
-                if (s == STOP_REACHED) return s;
+                if (s == STOP_REACHED) break;
             }
         }
     }
@@ -44,11 +49,13 @@ BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph
   */
 BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool inParagraph, bool debug)
 {
+    LOG_FUNC();
     xmlNode *currentNode = NULL;
     BlockStatus s;
 
     static std::string currentText; // text of current paragraph, consolidated over recursive calls
 
+    LOG_DEBUG("loadHtmlNode: inParagraph=%d", inParagraph);
     for (currentNode = a_node; currentNode; currentNode = currentNode->next) {
         std::string nodeName;
         if (currentNode->name) nodeName = (char*)currentNode->name;
@@ -61,7 +68,7 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
             currentText += "\n";
 
         } else if (nodeName == "p") {
-            // process previous text (not in a paragraph)
+            // process previous text (that was not in a paragraph)
             s = processParagraph(currentText, false, debug);
             if (s == STOP_REACHED) return STOP_REACHED;
             inParagraph = true;
@@ -89,11 +96,11 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
             xmlChar *text;
             text = xmlNodeGetContent(currentNode);
             LOG_DEBUG("text size: %d bytes", strlen((char*)text));
-            LOG_DEBUG("text: %s", (char*)text);
+            //LOG_DEBUG("text: %s", (char*)text);
 
             currentText += (char*)text;
 
-            LOG_DEBUG("textInParagraphCurrent: [%s]", currentText.c_str());
+            //LOG_DEBUG("textInParagraphCurrent: [%s]", currentText.c_str());
 
             xmlFree(text);
         }

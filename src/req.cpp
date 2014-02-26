@@ -56,6 +56,11 @@ ReqFileConfig *getDocument(std::string docId)
 
 /** Process a block of text (a line or paragraph)
   *
+  * This block is searched through for:
+  *    - reference to requirements
+  *    - requirements
+  *    - accumulation of text of the current requirement
+  *
   * Contextual variables:
   *    acquisitionStarted
   *    currentRequirement
@@ -81,20 +86,22 @@ BlockStatus ReqDocument::processBlock(const std::string &text)
     }
 
     // check if text covers a requirement
-    std::string ref = getMatchingPattern(fileConfig.refRegex, text);
-    getAllPatterns(fileConfig.refRegex, text.c_str()); //TODO
-    if (!ref.empty()) {
-        if (currentRequirement.empty()) {
-            PUSH_ERROR("%s: Reference, but no current requirement, file: %s",
-					  ref.c_str(), fileConfig.path.c_str());
-        } else {
-            Requirements[currentRequirement].covers.insert(ref);
+    std::set<std::string> refs = getAllPatterns(fileConfig.refRegex, text.c_str());
+    if (!refs.empty()) {
+        std::set<std::string>::iterator ref;
+        FOREACH(ref, refs) {
+            if (currentRequirement.empty()) {
+                PUSH_ERROR("%s: Reference, but no current requirement, file: %s",
+                           ref->c_str(), fileConfig.path.c_str());
+            } else {
+                Requirements[currentRequirement].covers.insert(*ref);
+            }
         }
     }
 
     std::string reqId = getMatchingPattern(fileConfig.reqRegex, text);
 
-    if (!reqId.empty() && reqId != ref) {
+    if (!reqId.empty() && refs.find(reqId) == refs.end()) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
         if (r != Requirements.end()) {
             PUSH_ERROR("%s: Duplicate requirement in documents '%s' and '%s'",
@@ -172,9 +179,9 @@ std::string getMatchingPattern(regex_t *regex, const char *text)
     return matchingText;
 }
 
-std::list<std::string> getAllPatterns(regex_t *regex, const char *text)
+std::set<std::string> getAllPatterns(regex_t *regex, const char *text)
 {
-    std::list<std::string> result;
+    std::set<std::string> result;
 
     if (!regex) return result;
 
@@ -205,7 +212,7 @@ std::list<std::string> getAllPatterns(regex_t *regex, const char *text)
                 }
                 memcpy(buffer, localText.c_str()+pmatch[i].rm_so, length);
                 buffer[length] = 0;
-                result.insert(result.begin(), buffer);
+                result.insert(buffer);
                 LOG_DEBUG("getAllPatterns: got pattern=%s", buffer);
 
                 // modify localText

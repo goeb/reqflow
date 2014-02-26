@@ -1,8 +1,9 @@
+define ALPHANUM [-a-zA-Z0-9_]
 
 document SPEC -path SPEC.pdf -req PRINTF_[-a-zA-Z0-9_]* -stop-after Annex
 
 document TEST -path TEST.txt \
     -req T_[-a-zA-Z0-9_]* \
-    -ref "Ref:  *(.*)" \
+    -ref "Ref:[ ,]*(ALPHANUM+)" \
     -stop-after Annex
 

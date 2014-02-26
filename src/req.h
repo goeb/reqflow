@@ -71,6 +71,7 @@ protected:
     virtual void init();
     bool acquisitionStarted; // indicate if the parsing passed the point after which requirement may be acquired
     std::string currentRequirement;
+    std::string textOfCurrentReq;
     std::string currentText;
     ReqFileConfig fileConfig;
 };
@@ -92,7 +93,7 @@ void consolidateCoverage();
 void checkUndefinedRequirements();
 std::string getMatchingPattern(regex_t *regex, const std::string &text);
 std::string getMatchingPattern(regex_t *regex, const char *text);
-std::list<std::string> getAllPatterns(regex_t *regex, const char *text);
+std::set<std::string> getAllPatterns(regex_t *regex, const char *text);
 
 void computeGlobalStatistics();
 

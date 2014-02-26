@@ -1,11 +1,11 @@
 
-define REQ_PATTERN REQ_[-a-zA-Z0-9_]*
+define ALPHANUM [-a-zA-Z0-9_]
 
-document SPEC -path SPEC.html -req REQ_PATTERN -stop-after Annexe -ref "Ref: +(.*)"
+document SPEC -path SPEC.html -req REQ_ALPHANUM* -stop-after Annexe -ref "Ref: +(.*)"
 
 document TEST -path TEST.html \
-    -req T_[-a-zA-Z0-9_]* \
-    -ref "Ref:  *(.*)" \
+    -req T_ALPHANUM* \
+    -ref "Ref:  *(ALPHANUM*)" \
 	-stop-after "Annex" \
 	-start-after "Tests cases" \
     -nocov
