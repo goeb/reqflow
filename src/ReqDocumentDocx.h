@@ -10,13 +10,13 @@
 
 class ReqDocumentDocx: public ReqDocument {
 public:
-    ReqDocumentDocx(const ReqFileConfig &c) {fileConfig = c;}
+    ReqDocumentDocx(ReqFileConfig &c) {fileConfig = &c;}
     int loadRequirements(bool debug);
 };
 
 class ReqDocumentDocxXml: public ReqDocument {
 public:
-    ReqDocumentDocxXml(const ReqFileConfig &c) {fileConfig = c;}
+    ReqDocumentDocxXml(ReqFileConfig &c) {fileConfig = &c;}
     int loadRequirements(bool debug);
     int loadContents(const char *xml, size_t size, bool debug);
     int loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug);

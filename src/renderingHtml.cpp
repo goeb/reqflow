@@ -217,7 +217,7 @@ void htmlPrintTraceability(const Requirement &r, bool forward)
                 if (!above) {
                     docId = "Undefined";
                     warning = true;
-                } else docId = above->parentDocumentId.c_str();
+                } else docId = above->parentDocument->id.c_str();
 
                 htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, warning);
             }
@@ -230,7 +230,7 @@ void htmlPrintTraceability(const Requirement &r, bool forward)
                 const char* docId = 0;
                 Requirement *ref = getRequirement(c->c_str());
                 if (!ref) docId = "Undefined";
-                else docId = ref->parentDocumentId.c_str();
+                else docId = ref->parentDocument->id.c_str();
 
                 htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, false);
             }
@@ -298,7 +298,7 @@ void htmlPrintMatrix(const ReqFileConfig &f, bool forward)
 
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
-        if (r->second.parentDocumentId == f.id) {
+        if (r->second.parentDocument->id == f.id) {
             htmlPrintTraceability(r->second, forward);
         }
     }

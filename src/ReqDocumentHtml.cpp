@@ -61,7 +61,7 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
         if (currentNode->name) nodeName = (char*)currentNode->name;
 
         if (nodeName == "body") {
-            if (!fileConfig.startAfterRegex) acquisitionStarted = true;
+            if (!fileConfig->startAfterRegex) acquisitionStarted = true;
 
         } else if (nodeName == "br") {
             // add a newline
@@ -114,17 +114,17 @@ int ReqDocumentHtml::loadRequirements(bool debug)
     xmlDocPtr pDoc = 0;
     xmlNodePtr pRoot = 0;
 
-    LOG_DEBUG("htmlParseFile(%s)...", fileConfig.path.c_str());
-    pDoc = htmlParseFile(fileConfig.path.c_str(), (const char*)"utf-8"); // TODO support other than UTF-8
+    LOG_DEBUG("htmlParseFile(%s)...", fileConfig->path.c_str());
+    pDoc = htmlParseFile(fileConfig->path.c_str(), (const char*)"utf-8"); // TODO support other than UTF-8
 
     if (!pDoc) {
-        LOG_ERROR("Cannot open/parse HTML file: %s", fileConfig.path.c_str());
+        LOG_ERROR("Cannot open/parse HTML file: %s", fileConfig->path.c_str());
         return -1;
     }
     pRoot = xmlDocGetRootElement(pDoc);
 
     if (!pRoot) {
-        LOG_ERROR("Cannot get Root of HTML file: %s", fileConfig.path.c_str());
+        LOG_ERROR("Cannot get Root of HTML file: %s", fileConfig->path.c_str());
         return -1;
     }
 

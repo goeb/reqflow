@@ -296,7 +296,7 @@ ReqFileType getFileType(const std::string &path)
     else return RF_UNKNOWN;
 }
 
-int loadRequirementsOfFile(const ReqFileConfig fileConfig, bool debug)
+int loadRequirementsOfFile(ReqFileConfig &fileConfig, bool debug)
 {
     int result = 0;
     ReqFileType fileType = getFileType(fileConfig.path);
@@ -415,7 +415,7 @@ void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat
                 const char* docId = 0;
                 Requirement *ref = getRequirement(c->c_str());
                 if (!ref) docId = "Undefined";
-                else if (verbose) docId = ref->parentDocumentId.c_str();
+                else if (verbose) docId = ref->parentDocument->id.c_str();
 
                 printTracLine(r.id.c_str(), c->c_str(), docId, format);
             }
@@ -431,7 +431,7 @@ void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat
                 const char* docId = 0;
                 Requirement *above = getRequirement(c->c_str());
                 if (!above) docId = "Undefined";
-                else if (verbose) docId = above->parentDocumentId.c_str();
+                else if (verbose) docId = above->parentDocument->id.c_str();
 
                 printTracLine(r.id.c_str(), c->c_str(), docId, format);
             }
@@ -447,7 +447,7 @@ void printTracOfFile(const char *docId, bool reverse, bool verbose, ReqExportFor
 
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
-        if (!docId || r->second.parentDocumentId == docId) {
+        if (!docId || r->second.parentDocument->id == docId) {
             printTrac(r->second, reverse, verbose, format);
         }
     }
@@ -475,6 +475,28 @@ void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExp
     }
 }
 
+/** Print on 2 columns the requirements, and their text
+  */
+void printTextOfReqs(int argc, const char **argv, bool reverse, ReqExportFormat format)
+{
+    // build list of documents
+    std::list<std::string> documents;
+    if (argc) {
+        while (argc) {
+            documents.push_back(argv[0]);
+            argv++; argc--;
+        }
+    } else {
+        // take all documents
+        std::map<std::string, ReqFileConfig>::const_iterator file;
+        FOREACH(file, ReqConfig) documents.push_back(file->first);
+    }
+
+    std::list<std::string>::iterator doc;
+    FOREACH(doc, documents) {
+
+    }
+}
 
 void printSummaryHeader()
 {
@@ -534,7 +556,7 @@ void printRequirementsOfFile(StatusMode status, const char *documentId)
 {
     std::map<std::string, Requirement>::iterator r;
     FOREACH(r, Requirements) {
-        if (!documentId || r->second.parentDocumentId == documentId) {
+        if (!documentId || r->second.parentDocument->id == documentId) {
             bool doPrint = false;
             if (REQ_ALL == status || r->second.coveredBy.empty()) doPrint = true;
 
@@ -543,7 +565,7 @@ void printRequirementsOfFile(StatusMode status, const char *documentId)
                 else printf(" ");
 
                 printf(" %s", r->second.id.c_str());
-                if (REQ_ALL == status) printf(" %s", r->second.parentDocumentId.c_str());
+                if (REQ_ALL == status) printf(" %s", r->second.parentDocument->id.c_str());
                 printf("\n");
             }
         }
@@ -643,6 +665,47 @@ int cmdTrac(int argc, const char **argv)
 
     return 0;
 }
+
+int cmdReview(int argc, const char **argv)
+{
+    int i = 0;
+    const char *configFile = DEFAULT_CONF;
+    const char *arg = 0;
+    const char *exportFormat = "txt";
+    bool reverse = false;
+    bool verbose = false;
+    while (i<argc) {
+        arg = argv[i]; i++;
+        if (0 == strcmp(arg, "-c")) {
+            if (i>=argc) usage();
+            configFile = argv[i]; i++;
+
+        } else if (0 == strcmp(arg, "-x")) {
+            if (i>=argc) usage();
+            exportFormat = argv[i]; i++;
+
+        } else if (0 == strcmp(arg, "-r")) reverse = true;
+        else {
+            i--; // push back arg into the list
+            break; // leave remaining args for below
+        }
+    }
+
+    int r = loadConfiguration(configFile);
+    if (r != 0) return 1;
+
+    r = loadRequirements(false);
+    if (r != 0) return 1;
+
+    if (0 == strcmp(exportFormat, "txt")) printTextOfReqs(argc-i, argv+i, reverse, REQ_X_TXT);
+    else if (0 == strcmp(exportFormat, "csv")) printTextOfReqs(argc-i, argv+i, reverse, REQ_X_CSV);
+    else {
+        LOG_ERROR("Invalid export format: %s", exportFormat);
+    }
+
+    return 0;
+}
+
 
 /** Print configuration documents
   */
@@ -754,9 +817,8 @@ int main(int argc, const char **argv)
     else if (command == "trac")    rc = cmdTrac(argc-2, argv+2);
     else if (command == "config")  rc = cmdConfig(argc-2, argv+2);
     else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
-#ifndef _WIN32
     else if (command == "debug")   rc = cmdDebug(argc-2, argv+2);
-#endif
+    else if (command == "review")  rc = cmdReview(argc-2, argv+2);
     else usage();
 
     printErrors();

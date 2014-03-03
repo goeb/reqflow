@@ -34,7 +34,7 @@ void printErrors()
 void ReqDocument::init()
 {
     acquisitionStarted = true;
-    if (fileConfig.startAfterRegex) acquisitionStarted = false;
+    if (fileConfig->startAfterRegex) acquisitionStarted = false;
     currentRequirement = "";
 }
 
@@ -74,14 +74,14 @@ BlockStatus ReqDocument::processBlock(std::string &text)
 	LOG_DEBUG("processBlock: %s", text.c_str());
     // check the startAfter pattern
     if (!acquisitionStarted) {
-        std::string start = extractPattern(fileConfig.startAfterRegex, text);
+        std::string start = extractPattern(fileConfig->startAfterRegex, text);
         if (!start.empty()) acquisitionStarted = true;
     }
 
     if (!acquisitionStarted) return NOT_STARTED;
 
     // check the stopAfter pattern
-    std::string stop = extractPattern(fileConfig.stopAfterRegex, text);
+    std::string stop = extractPattern(fileConfig->stopAfterRegex, text);
     if (!stop.empty()) {
         LOG_DEBUG("stop: %s", stop.c_str());
         LOG_DEBUG("line: %s", text.c_str());
@@ -89,26 +89,26 @@ BlockStatus ReqDocument::processBlock(std::string &text)
     }
 
     // check if text covers a requirement
-    std::set<std::string> refs = getAllPatterns(fileConfig.refRegex, text.c_str());
+    std::set<std::string> refs = getAllPatterns(fileConfig->refRegex, text.c_str());
     if (!refs.empty()) {
         std::set<std::string>::iterator ref;
         FOREACH(ref, refs) {
             if (currentRequirement.empty()) {
                 PUSH_ERROR("%s: Reference, but no current requirement, file: %s",
-                           ref->c_str(), fileConfig.path.c_str());
+                           ref->c_str(), fileConfig->path.c_str());
             } else {
                 Requirements[currentRequirement].covers.insert(*ref);
             }
         }
     }
 
-    std::string reqId = extractPattern(fileConfig.reqRegex, text, true);
+    std::string reqId = extractPattern(fileConfig->reqRegex, text, true);
 
     if (!reqId.empty() && refs.find(reqId) == refs.end()) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
         if (r != Requirements.end()) {
             PUSH_ERROR("%s: Duplicate requirement in documents '%s' and '%s'",
-                      reqId.c_str(), r->second.parentDocumentPath.c_str(), fileConfig.path.c_str());
+                      reqId.c_str(), r->second.parentDocument->path.c_str(), fileConfig->path.c_str());
             currentRequirement.clear();
 
         } else {
@@ -121,9 +121,9 @@ BlockStatus ReqDocument::processBlock(std::string &text)
 
             Requirement req;
             req.id = reqId;
-            req.parentDocumentId = fileConfig.id;
-            req.parentDocumentPath = fileConfig.path;
+            req.parentDocument = fileConfig;
             Requirements[reqId] = req;
+            fileConfig->requirements.insert(&(Requirements[reqId]));
             currentRequirement = reqId;
         }
     }
@@ -261,10 +261,10 @@ void consolidateCoverage()
                 req->coveredBy.insert(r->second.id);
 
                 // compute documents dependencies
-                ReqFileConfig *fdown = getDocument(r->second.parentDocumentId);
-                ReqFileConfig *fup = getDocument(req->parentDocumentId);
-                if (!fdown) PUSH_ERROR("Cannot find document: %s", r->second.parentDocumentId.c_str());
-                else if (!fup) PUSH_ERROR("Cannot find document: %s", req->parentDocumentId.c_str());
+                ReqFileConfig *fdown = getDocument(r->second.parentDocument->id);
+                ReqFileConfig *fup = getDocument(req->parentDocument->id);
+                if (!fdown) PUSH_ERROR("Cannot find document: %s", r->second.parentDocument->id.c_str());
+                else if (!fup) PUSH_ERROR("Cannot find document: %s", req->parentDocument->id.c_str());
                 else {
                     fdown->upstreamDocuments.insert(fup->id);
                     fup->downstreamDocuments.insert(fdown->id);
@@ -285,7 +285,7 @@ void checkUndefinedRequirements()
         FOREACH(c, r->second.covers) {
             if (!getRequirement(*c)) {
                 PUSH_ERROR("%s: Undefined requirement, referenced by: %s (%s)",
-                          c->c_str(), r->second.id.c_str(), r->second.parentDocumentPath.c_str());
+                          c->c_str(), r->second.id.c_str(), r->second.parentDocument->path.c_str());
             }
         }
     }
@@ -297,7 +297,7 @@ void computeGlobalStatistics()
     std::map<std::string, ReqFileConfig>::iterator file;
     std::map<std::string, Requirement>::iterator req;
     FOREACH(req, Requirements) {
-        file = ReqConfig.find(req->second.parentDocumentId);
+        file = ReqConfig.find(req->second.parentDocument->id);
         if (file == ReqConfig.end()) {
             PUSH_ERROR("%s: Cannot find parent document", req->second.id.c_str());
             continue;

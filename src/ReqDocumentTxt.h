@@ -6,7 +6,7 @@
 
 class ReqDocumentTxt: public ReqDocument {
 public:
-    ReqDocumentTxt(const ReqFileConfig &c) {fileConfig = c;}
+    ReqDocumentTxt(ReqFileConfig &c) {fileConfig = &c;}
     int loadRequirements(bool debug);
 };
 

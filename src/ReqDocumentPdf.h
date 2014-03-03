@@ -5,7 +5,7 @@
 
 class ReqDocumentPdf: public ReqDocument {
 public:
-    ReqDocumentPdf(const ReqFileConfig &c) {fileConfig = c;}
+    ReqDocumentPdf(ReqFileConfig &c) {fileConfig = &c;}
     int loadRequirements(bool debug);
 };
 

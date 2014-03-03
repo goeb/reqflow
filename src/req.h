@@ -14,6 +14,8 @@
 enum Encoding { UTF8, LATIN1 };
 enum BlockStatus { NOT_STARTED, STOP_REACHED, REQ_OK };
 
+struct Requirement;
+
 struct ReqFileConfig {
     std::string id;
     std::string path;
@@ -33,6 +35,7 @@ struct ReqFileConfig {
     std::set<std::string> upstreamDocuments;
     std::set<std::string> downstreamDocuments;
 
+    std::set<Requirement*> requirements;
     int nTotalRequirements;
     int nCoveredRequirements;
 	Encoding encoding;
@@ -48,8 +51,7 @@ struct ReqFileConfig {
 
 struct Requirement {
     std::string id;
-    std::string parentDocumentId;
-    std::string parentDocumentPath;
+    ReqFileConfig *parentDocument;
     std::set<std::string> covers;
     std::set<std::string> coveredBy;
     std::string text;
@@ -74,7 +76,7 @@ protected:
     std::string currentRequirement;
     std::string textOfCurrentReq;
     std::string currentText;
-    ReqFileConfig fileConfig;
+    ReqFileConfig *fileConfig;
 };
 
 #define BF_SZ 1024

@@ -12,12 +12,12 @@ typedef std::vector<char> byte_array;
 
 int ReqDocumentPdf::loadRequirements(bool debug)
 {
-    LOG_DEBUG("ReqDocumentPdf::loadRequirements: %s", fileConfig.path.c_str());
+    LOG_DEBUG("ReqDocumentPdf::loadRequirements: %s", fileConfig->path.c_str());
     init();
 
-	poppler::document *doc = poppler::document::load_from_file(fileConfig.path.c_str());
+    poppler::document *doc = poppler::document::load_from_file(fileConfig->path.c_str());
 	if (!doc) {
-		LOG_ERROR("Cannot open file: %s", fileConfig.path.c_str());
+        LOG_ERROR("Cannot open file: %s", fileConfig->path.c_str());
         return -1;
 	}
 	const int pagesNbr = doc->pages();
@@ -28,7 +28,7 @@ int ReqDocumentPdf::loadRequirements(bool debug)
 		// process the lines
 		std::string pageLines;
 
-		switch(fileConfig.encoding) {
+        switch(fileConfig->encoding) {
 		case LATIN1:
 			pageLines = doc->create_page(i)->text().to_latin1();
 			break;
