@@ -480,21 +480,31 @@ void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExp
 void printTextOfReqs(int argc, const char **argv, bool reverse, ReqExportFormat format)
 {
     // build list of documents
-    std::list<std::string> documents;
+    std::list<ReqFileConfig*> documents;
     if (argc) {
         while (argc) {
-            documents.push_back(argv[0]);
+            std::map<std::string, ReqFileConfig>::iterator rc = ReqConfig.find(argv[0]);
+            if (rc == ReqConfig.end()) {
+                printf("Unknown document: %s\n", argv[0]);
+            } else documents.push_back(&(rc->second));
             argv++; argc--;
         }
     } else {
         // take all documents
-        std::map<std::string, ReqFileConfig>::const_iterator file;
-        FOREACH(file, ReqConfig) documents.push_back(file->first);
+        std::map<std::string, ReqFileConfig>::iterator file;
+        FOREACH(file, ReqConfig) {
+            documents.push_back(&(file->second));
+        }
     }
 
-    std::list<std::string>::iterator doc;
+    std::list<ReqFileConfig*>::iterator doc;
     FOREACH(doc, documents) {
-
+        std::set<Requirement*>::iterator req;
+        FOREACH(req, (*doc)->requirements) {
+            printf("%s\n", (*req)->id.c_str());
+            printf("%s\n", (*req)->text.c_str());
+            printf("\n");
+        }
     }
 }
 
@@ -673,7 +683,6 @@ int cmdReview(int argc, const char **argv)
     const char *arg = 0;
     const char *exportFormat = "txt";
     bool reverse = false;
-    bool verbose = false;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
