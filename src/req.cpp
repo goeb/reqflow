@@ -32,6 +32,14 @@ int getErrorNumber()
     return n;
 }
 
+int hasErrors(const std::string &file)
+{
+    std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator f;
+    f = Errors.find(file);
+    if (f != Errors.end()) return f->second.size();
+    else return 0;
+}
+
 void printErrors()
 {
     if (Errors.empty()) fprintf(stderr, "Ok.\n");

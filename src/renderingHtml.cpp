@@ -51,9 +51,9 @@ void htmlPrintHeader()
            "a[href]:hover { color: blue; text-decoration: underline; }\n"
            ".r_footer { font-size: small; font-family: monospace; color: grey; }\n"
            ".r_document_summary { font-size: small; }\n"
-           ".r_errors { border: 1px solid #BBB; white-space: pre; font-family: monospace; color: red; padding: 0.5em;}\n"
+           ".r_errors { border: 1px solid #BBB; white-space: pre; font-family: monospace; color: red; padding: 0.5em; background-color: #FDD;}\n"
+           ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FDD; border: 1px solid black;}\n"
            ".r_main { position: relative; }\n"
-           ".r_errors_summary { padding: 1em; font-size: 200%%; position: absolute; right: 15px; top: 20px; background-color: #FBB; border: 1px solid black;}\n"
            ".r_warning { background-color: #FBB; }\n"
            ".r_samereq { color: grey; }\n"
            ".r_no_error { color: grey; }\n"
@@ -87,12 +87,12 @@ void htmlPrintErrors()
         printf("No Error.\n");
     } else {
         printf("<div class=\"r_errors\">");
-        printf("Error(s): %d\n", Errors.size());
-        std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file; // errors indexed by file
+        printf("All Error(s): %d\n", getErrorNumber());
+        std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file;
         FOREACH(file, Errors) {
             std::list<std::pair<std::string, std::string> >::iterator e;
             FOREACH(e, file->second) {
-                fprintf(stderr, "%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
+                printf("%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
             }
         }
     }
@@ -317,6 +317,18 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
         else {
             ReqFileConfig f = file->second;
             printf("<h1 id=\"%s\">%s</h1>", hrefEncode(*docId).c_str(), htmlEscape(*docId).c_str());
+
+            std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file;
+            file = Errors.find(*docId);
+            if (file != Errors.end() && file->second.size()) {
+                printf("<div class=\"r_errors\">");
+
+                std::list<std::pair<std::string, std::string> >::iterator e;
+                FOREACH(e, file->second) {
+                    printf("%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
+                }
+                printf("</div>\n");
+            }
 
             printf("<div class=\"r_document_summary\">");
             printf("Path: <a href=\"%s\">%s</a><br>", hrefEncode(f.path).c_str(), htmlEscape(f.path).c_str());

@@ -66,6 +66,7 @@ extern int ReqTotal;
 extern int ReqCovered;
 
 int getErrorNumber();
+int hasErrors(const std::string &file);
 
 class ReqDocument {
 public:
