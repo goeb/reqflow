@@ -78,7 +78,7 @@ void htmlPrintErrors()
 {
     if (Errors.size()) {
         printf("<div class=\"r_errors_summary\">");
-        printf("<a href=\"#r_errors\">Error(s): %d</a></div>\n", Errors.size());
+        printf("<a href=\"#r_errors\">Error(s): %d</a></div>\n", getErrorNumber());
     }
 
     printf("<h1 id=\"r_errors\">Errors</h1>\n");
@@ -88,9 +88,12 @@ void htmlPrintErrors()
     } else {
         printf("<div class=\"r_errors\">");
         printf("Error(s): %d\n", Errors.size());
-        std::list<std::string>::iterator e;
-        FOREACH(e, Errors) {
-            printf("%s\n", htmlEscape(*e).c_str());
+        std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file; // errors indexed by file
+        FOREACH(file, Errors) {
+            std::list<std::pair<std::string, std::string> >::iterator e;
+            FOREACH(e, file->second) {
+                fprintf(stderr, "%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
+            }
         }
     }
     printf("</div>\n");
@@ -147,7 +150,7 @@ void htmlPrintSummaryContents(const std::list<std::string> &documents)
 
     FOREACH(docId, documents) {
         std::map<std::string, ReqFileConfig>::const_iterator file = ReqConfig.find(*docId);
-        if (file == ReqConfig.end()) PUSH_ERROR("Invalid document id: %s", docId->c_str());
+        if (file == ReqConfig.end()) PUSH_ERROR(*docId, "", "Invalid document id");
         else htmlPrintSummaryOfFile(file->second, total, covered);
     }
 
@@ -310,7 +313,7 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
     std::list<std::string>::const_iterator docId;
     FOREACH(docId, documents) {
         std::map<std::string, ReqFileConfig>::const_iterator file = ReqConfig.find(*docId);
-        if (file == ReqConfig.end()) PUSH_ERROR("Invalid document id: %s", docId->c_str());
+        if (file == ReqConfig.end()) PUSH_ERROR(*docId, "", "Invalid document id");
         else {
             ReqFileConfig f = file->second;
             printf("<h1 id=\"%s\">%s</h1>", hrefEncode(*docId).c_str(), htmlEscape(*docId).c_str());

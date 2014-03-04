@@ -21,6 +21,7 @@ struct stringCompare
 {
     bool operator()(const std::string &s1, const std::string &s2);
 };
+std::string escapeCsv(const std::string &input);
 
 
 

@@ -26,8 +26,8 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
                     xmlFree(style);
                     attribute = attribute->next;
                 }
-
-            } // take benefit of styles in the future
+                // TODO take benefit of styles in the future
+            }
             LOG_DEBUG("node: %s", (char*)currentNode->name);
             nodeName = (char*)currentNode->name;
 
@@ -57,6 +57,9 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
 			}
 
             textInParagraphCurrent.clear();
+        } else if (nodeName =="document" || nodeName =="document-content") {
+            // end of document
+            finalizeCurrentReq();
         }
     }
     return 0;

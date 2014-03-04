@@ -35,7 +35,7 @@ struct ReqFileConfig {
     std::set<std::string> upstreamDocuments;
     std::set<std::string> downstreamDocuments;
 
-    std::set<Requirement*> requirements;
+    std::map<std::string, Requirement*, stringCompare> requirements; // use a map to keep them sorted
     int nTotalRequirements;
     int nCoveredRequirements;
 	Encoding encoding;
@@ -61,15 +61,17 @@ struct Requirement {
 
 extern std::map<std::string, ReqFileConfig> ReqConfig;
 extern std::map<std::string, Requirement, stringCompare> Requirements;
-extern std::list<std::string> Errors;
+extern std::map<std::string, std::list<std::pair<std::string, std::string> > > Errors; // errors indexed by file
 extern int ReqTotal;
 extern int ReqCovered;
 
+int getErrorNumber();
 
 class ReqDocument {
 public:
     virtual int loadRequirements(bool debug) = 0;
     BlockStatus processBlock(std::string &text);
+    void finalizeCurrentReq();
 protected:
     virtual void init();
     bool acquisitionStarted; // indicate if the parsing passed the point after which requirement may be acquired
@@ -80,10 +82,10 @@ protected:
 };
 
 #define BF_SZ 1024
-#define PUSH_ERROR(...) do { \
+#define PUSH_ERROR(_file, _req, ...) do { \
     char buffer[BF_SZ]; \
     snprintf(buffer, BF_SZ, __VA_ARGS__); \
-    Errors.push_back(buffer); \
+    Errors[_file].push_back(std::make_pair(_req, buffer)); \
     } while(0)
 
 // exported functions

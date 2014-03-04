@@ -1,10 +1,10 @@
 Error(s): 6
-SYS_155: Undefined requirement, referenced by: PRINTF_01 (SPEC.docx)
-PRINTF_01a: Undefined requirement, referenced by: T_01 (TEST.txt)
-PRINTF_01b: Undefined requirement, referenced by: T_01 (TEST.txt)
-PRINTF_333: Undefined requirement, referenced by: T_01 (TEST.txt)
-PRINTF_03a: Undefined requirement, referenced by: T_02 (TEST.txt)
-PRINTF_03b: Undefined requirement, referenced by: T_02 (TEST.txt)
+SPEC:SYS_155: Undefined requirement, referenced by: PRINTF_01
+TEST:PRINTF_01a: Undefined requirement, referenced by: T_01
+TEST:PRINTF_01b: Undefined requirement, referenced by: T_01
+TEST:PRINTF_333: Undefined requirement, referenced by: T_01
+TEST:PRINTF_03a: Undefined requirement, referenced by: T_02
+TEST:PRINTF_03b: Undefined requirement, referenced by: T_02
 Document                          % covered / total
 ----------------------------------------------------------------------
 SPEC                           100%       3 /     3 SPEC.docx

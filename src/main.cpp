@@ -58,8 +58,8 @@ void usage()
            "                    traceability matrices are displayed.\n"
            "\n"
            "    review          Print the requirements with their text.\n"
-           "         [-r]       TODO\n"
-           "         [-x <fmt>] TODO\n"
+           "         [-f | -r]  Print also traceability (forward or backward)\n"
+           "         [-x <fmt>] Choose format: txt, csv.\n"
            "\n"
            "    config          Print the list of configured documents.\n"
            "\n"
@@ -126,10 +126,10 @@ int loadConfiguration(const char * file)
     const char *config;
     int r = loadFile(file, &config);
     if (r<0) {
-        PUSH_ERROR(_("Cannot load file '%s': %s"), file, strerror(errno));
+        PUSH_ERROR(file, "", _("Cannot load file: %s"), strerror(errno));
         return 1;
     } else if (r == 0) {
-        PUSH_ERROR(_("Empty configuration file '%s'."), file);
+        PUSH_ERROR(file, "", _("Empty configuration"));
         return 1;
     }
     // parse the configuration
@@ -148,42 +148,42 @@ int loadConfiguration(const char * file)
             fileConfig.id = pop(*line);
             LOG_DEBUG("document '%s'...", fileConfig.id.c_str());
             if (fileConfig.id.empty()) {
-                PUSH_ERROR("Missing identifier for file: line %d", lineNum);
+                PUSH_ERROR(file, "", "Missing identifier for file: line %d", lineNum);
             }
 
             while (!line->empty()) {
                 std::string arg = pop(*line);
                 if (arg == "-path") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -path value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "", "Missing -path value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.path = replaceDefinedVariable(defs, pop(*line));
 
                 } else if (arg == "-start-after") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -start-after value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "", "Missing -start-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.startAfter = replaceDefinedVariable(defs, pop(*line));
                     fileConfig.startAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile startAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
+                        PUSH_ERROR(file, "", "Cannot compile startAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
                         return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
 
                 } else if (arg == "-stop-after") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -stop-after value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "", "Missing -stop-after value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.stopAfter = replaceDefinedVariable(defs, pop(*line));
                     fileConfig.stopAfterRegex = new regex_t();
                     int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile stopAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
+                        PUSH_ERROR(file, "", "Cannot compile stopAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
                         return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
@@ -193,7 +193,7 @@ int loadConfiguration(const char * file)
 
                 } else if (arg == "-req") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -req value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "", "Missing -req value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.reqPattern = replaceDefinedVariable(defs, pop(*line));
@@ -201,14 +201,14 @@ int loadConfiguration(const char * file)
                     fileConfig.reqRegex = new regex_t();
                     int reti = regcomp(fileConfig.reqRegex, fileConfig.reqPattern.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile req regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
+                        PUSH_ERROR(file, "", "Cannot compile req regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
                         return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.reqPattern.c_str(), &fileConfig.reqRegex);
 
                 } else if (arg == "-ref") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -ref value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "", "Missing -ref value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     fileConfig.refPattern = replaceDefinedVariable(defs, pop(*line));
@@ -216,21 +216,21 @@ int loadConfiguration(const char * file)
                     fileConfig.refRegex = new regex_t();
                     int reti = regcomp(fileConfig.refRegex, fileConfig.refPattern.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
+                        PUSH_ERROR(file, "", "Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
                         return -1;
                     }
                     LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
 
                 } else if (arg == "-end-req") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -end-req value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "", "Missing -end-req value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     std::string endReq = pop(*line);
                     regex_t *regex = new regex_t();
                     int reti = regcomp(regex, endReq.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile regex: %s", endReq.c_str());
+                        PUSH_ERROR(file, "", "Cannot compile regex: %s", endReq.c_str());
                         return -1;
                     }
 
@@ -238,33 +238,33 @@ int loadConfiguration(const char * file)
 
                 } else if (arg == "-end-req-style") {
                     if (line->empty()) {
-                        PUSH_ERROR("Missing -end-req-style value for %s", fileConfig.id.c_str());
+                        PUSH_ERROR(file, "","Missing -end-req-style value for %s", fileConfig.id.c_str());
                         return -1;
                     }
                     std::string endReqStyle = pop(*line);
                     regex_t *regex = new regex_t();
                     int reti = regcomp(regex, endReqStyle.c_str(), 0);
                     if (reti) {
-                        PUSH_ERROR("Cannot compile regex: %s", endReqStyle.c_str());
+                        PUSH_ERROR(file, "", "Cannot compile regex: %s", endReqStyle.c_str());
                         return -1;
                     }
 
                     fileConfig.endReqStyle[endReqStyle] = regex;
 
                 } else {
-                    PUSH_ERROR("Invalid token '%s': line %d", arg.c_str(), lineNum);
+                    PUSH_ERROR(file, "", "Invalid token '%s': line %d", arg.c_str(), lineNum);
                 }
             }
             std::map<std::string, ReqFileConfig>::iterator c = ReqConfig.find(fileConfig.id);
             if (c != ReqConfig.end()) {
-                PUSH_ERROR("Config error: duplicate id '%s'", fileConfig.id.c_str());
+                PUSH_ERROR(file, "", "Config error: duplicate id '%s'", fileConfig.id.c_str());
                 return 1;
             }
             ReqConfig[fileConfig.id] = fileConfig;
 
         } else if (verb == "define") {
             if (line->size() != 2) {
-                PUSH_ERROR("Invalid defined: missing value, line %d", lineNum);
+                PUSH_ERROR(file, "", "Invalid defined: missing value, line %d", lineNum);
             } else {
                 std::string key = pop(*line);
                 std::string value = pop(*line);
@@ -272,7 +272,7 @@ int loadConfiguration(const char * file)
                 defs.push_back(std::make_pair(key, value));
             }
         } else {
-            PUSH_ERROR("Invalid token '%s': line %d", verb.c_str(), lineNum);
+            PUSH_ERROR(file, "", "Invalid token '%s': line %d", verb.c_str(), lineNum);
         }
     }
     return 0;
@@ -475,9 +475,30 @@ void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExp
     }
 }
 
+void printIndented(const std::string &text)
+{
+    size_t pos0 = 0;
+    while (pos0 < text.size()) {
+        std::string line;
+        size_t pos1 = text.find('\n', pos0);
+        if (pos1 == std::string::npos) {
+            // take last line
+            line = text.substr(pos0);
+            pos0 = text.size(); // stop the loop
+        } else {
+            line = text.substr(pos0, pos1-pos0);
+            pos0 = pos1 + 1;
+        }
+
+        trimBlanks(line);
+        printf("        %s\n", line.c_str());
+    }
+}
+
+enum ReviewMode { RM_RAW, RM_TRACE_FORWARD, RM_TRACE_BACKWARD };
 /** Print on 2 columns the requirements, and their text
   */
-void printTextOfReqs(int argc, const char **argv, bool reverse, ReqExportFormat format)
+void printTextOfReqs(int argc, const char **argv, ReviewMode rm, ReqExportFormat format)
 {
     // build list of documents
     std::list<ReqFileConfig*> documents;
@@ -499,13 +520,19 @@ void printTextOfReqs(int argc, const char **argv, bool reverse, ReqExportFormat 
 
     std::list<ReqFileConfig*>::iterator doc;
     FOREACH(doc, documents) {
-        std::set<Requirement*>::iterator req;
+        std::map<std::string, Requirement*, stringCompare>::iterator req;
         FOREACH(req, (*doc)->requirements) {
-            printf("%s\n", (*req)->id.c_str());
-            printf("%s\n", (*req)->text.c_str());
-            printf("\n");
+            if (format == REQ_X_CSV) {
+                printf("%s,%s\r\n", escapeCsv(req->second->id).c_str(), escapeCsv(req->second->text).c_str());
+            } else {
+                printf("%s\n", req->second->id.c_str());
+                printIndented(req->second->text);
+                printf("\n");
+            }
+
         }
     }
+    if (rm != RM_RAW) printf("Review with traceability not implemented yet.\n");
 }
 
 void printSummaryHeader()
@@ -682,7 +709,7 @@ int cmdReview(int argc, const char **argv)
     const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
     const char *exportFormat = "txt";
-    bool reverse = false;
+    ReviewMode reviewMode = RM_RAW;
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
@@ -693,7 +720,8 @@ int cmdReview(int argc, const char **argv)
             if (i>=argc) usage();
             exportFormat = argv[i]; i++;
 
-        } else if (0 == strcmp(arg, "-r")) reverse = true;
+        } else if (0 == strcmp(arg, "-r")) reviewMode = RM_TRACE_BACKWARD;
+        else if (0 == strcmp(arg, "-f")) reviewMode = RM_TRACE_FORWARD;
         else {
             i--; // push back arg into the list
             break; // leave remaining args for below
@@ -706,8 +734,8 @@ int cmdReview(int argc, const char **argv)
     r = loadRequirements(false);
     if (r != 0) return 1;
 
-    if (0 == strcmp(exportFormat, "txt")) printTextOfReqs(argc-i, argv+i, reverse, REQ_X_TXT);
-    else if (0 == strcmp(exportFormat, "csv")) printTextOfReqs(argc-i, argv+i, reverse, REQ_X_CSV);
+    if (0 == strcmp(exportFormat, "txt")) printTextOfReqs(argc-i, argv+i, reviewMode, REQ_X_TXT);
+    else if (0 == strcmp(exportFormat, "csv")) printTextOfReqs(argc-i, argv+i, reviewMode, REQ_X_CSV);
     else {
         LOG_ERROR("Invalid export format: %s", exportFormat);
     }

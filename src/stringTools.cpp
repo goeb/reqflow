@@ -197,3 +197,23 @@ bool stringCompare::operator()(const std::string &s1, const std::string &s2)
 	return false;
 }
 
+/** Double quoting is needed when the string contains:
+  *    a " character
+  *    \n or \r
+  *    a comma ,
+  */
+std::string escapeCsv(const std::string &input)
+{
+    if (input.find_first_of("\n\r\",") == std::string::npos) return input; // no need for quotes
+
+    size_t n = input.size();
+    std::string result = "\"";
+
+    size_t i;
+    for (i=0; i<n; i++) {
+        if (input[i] == '"') result += "\"\"";
+        else result += input[i];
+    }
+    result += '"';
+    return result;
+}
