@@ -37,5 +37,7 @@ int ReqDocumentTxt::loadRequirements(bool debug)
 	if (!ifs.eof()) {
         LOG_ERROR("Line too long in file '%s': %d (max size=%d)", fileConfig->path.c_str(), linenum, LINE_SIZE_MAX);
 	}
+    finalizeCurrentReq();
+
     return 0;
 }

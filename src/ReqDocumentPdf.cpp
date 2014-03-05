@@ -69,6 +69,8 @@ int ReqDocumentPdf::loadRequirements(bool debug)
 			startOfLine = endOfLine + 1;
 		}
 	}
+    finalizeCurrentReq();
+
 	delete doc;
     return 0;
 }

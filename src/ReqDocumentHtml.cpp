@@ -89,6 +89,7 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
                 // process the text that was in no paragraph
                 s = processParagraph(currentText, false, debug);
                 if (s == STOP_REACHED) return STOP_REACHED;
+                finalizeCurrentReq();
             }
 
         } else if (XML_TEXT_NODE == currentNode->type) {
