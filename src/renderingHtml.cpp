@@ -57,6 +57,7 @@ void htmlPrintHeader()
            ".r_warning { background-color: #FBB; }\n"
            ".r_samereq { color: grey; }\n"
            ".r_no_error { color: grey; }\n"
+           ".r_nocov {color: grey;}\n"
            "table { border-collapse:collapse; }\n"
            "td.r_summary { text-align:right; border-bottom: 1px grey solid; padding-left: 1em; }\n"
            "td.r_summary_l { text-align:left; border-bottom: 1px grey solid; padding-left: 1em; }\n"
@@ -111,16 +112,19 @@ void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, c
     if (strlen(path)) printf("</a>"); // do not print href for the "total" line (no path)
     printf("</td>");
 
+    const char *nocovStyle = "";
 	if (ratio != -1) {
-		printf("<td class=\"r_summary\">%d</td>"
-			"<td class=\"r_summary\">%d</td>",
+        printf("<td class=\"r_summary\">%d</td>"
+            "<td class=\"r_summary\">%d</td>",
 			ratio, covered);
 	} else {
+        nocovStyle = "r_nocov";
 #define NOCOV "<span title=\"Coverage not relevant\r\n(option -nocov)\">nocov</span>"
-		printf("<td class=\"r_summary\">" NOCOV "</td><td class=\"r_summary\">" NOCOV "</td>");
+        printf("<td class=\"r_summary %s\">" NOCOV "</td><td class=\"r_summary %s\">" NOCOV "</td>",
+               nocovStyle, nocovStyle);
 	}
 
-	printf("<td class=\"r_summary\">%d</td>", total);
+    printf("<td class=\"r_summary %s\">%d</td>", nocovStyle, total);
     printf("<td class=\"r_summary_l\">");
     if (strlen(path)) printf("<a href=\"%s\">", hrefEncode(path).c_str()); // do not print href for the "total" line (no path)
     printf("%s", htmlEscape(path).c_str());
