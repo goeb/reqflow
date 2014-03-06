@@ -26,7 +26,13 @@ Ref: PRINTF_03
 T_21
     Send command `which printf`
     Check that printf is installed in /usr/bin/printf
+Ref: PRINTF_06, PRINTF_12
+Ref: PRINTF_15
 
+T_22
+    This is test 22.
+Ref: PRINTF_15
+Ref: PRINTF_20
 
 ## Annex: summary of tests
 

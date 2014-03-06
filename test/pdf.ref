@@ -1,9 +1,14 @@
-Error(s): 5
+Error(s): 10
 TEST:PRINTF_01a: Undefined requirement, referenced by: T_01
 TEST:PRINTF_01b: Undefined requirement, referenced by: T_01
 TEST:PRINTF_333: Undefined requirement, referenced by: T_01
 TEST:PRINTF_03a: Undefined requirement, referenced by: T_02
 TEST:PRINTF_03b: Undefined requirement, referenced by: T_02
+TEST:PRINTF_06: Undefined requirement, referenced by: T_21
+TEST:PRINTF_12: Undefined requirement, referenced by: T_21
+TEST:PRINTF_15: Undefined requirement, referenced by: T_21
+TEST:PRINTF_15: Undefined requirement, referenced by: T_22
+TEST:PRINTF_20: Undefined requirement, referenced by: T_22
 
 Requirements of SPEC                               Requirements Downstream                           
 --------------------------------------------------------------------------------------------------------------------
@@ -18,3 +23,4 @@ T_01
 T_02                                              
 T_05                                              
 T_21                                              
+T_22                                              

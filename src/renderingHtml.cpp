@@ -180,6 +180,8 @@ void htmlPrintSummary(const std::list<std::string> &documents)
     printf("</table>");
 }
 
+/** Print a HTML row of traceability (forward of backward)
+  */
 void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *doc2Id, bool warning)
 {
     const char *warningStyle = "";
@@ -193,18 +195,27 @@ void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *do
 	}
 
 #define CELL_CONTENTS "<span class=\"%s %s\" %s>%s</span>"
+
     printf("<tr class=\"r_matrix %s\">", warningStyle);
     printf("<td class=\"r_matrix %s\">" CELL_CONTENTS "</td>", warningStyle, 
 			warningStyle, styleSameReq, samereqTitle, htmlEscape(req1).c_str());
-    printf("<td class=\"r_matrix %s\">" CELL_CONTENTS "</td>", warningStyle,
-			warningStyle, styleSameReq, samereqTitle, htmlEscape(req2).c_str());
+
+    if (req2) {
+        printf("<td class=\"r_matrix %s\">" CELL_CONTENTS "</td>", warningStyle,
+               warningStyle, styleSameReq, samereqTitle, htmlEscape(req2).c_str());
+    } else {
+        printf("<td class=\"r_matrix %s\"></td>", warningStyle);
+    }
 
     // doc id
-    printf("<td class=\"r_matrix\">");
+    printf("<td class=\"r_matrix %s\">", warningStyle);
     if (doc2Id) {
-        printf("<a href=\"#%s\">" CELL_CONTENTS "</a>",
-				hrefEncode(doc2Id).c_str(), warningStyle, styleSameReq, samereqTitle,
+        printf("<a href=\"#%s\"><span class=\"%s %s\">%s</span></a>",
+                hrefEncode(doc2Id).c_str(), styleSameReq, warningStyle,
 				htmlEscape(doc2Id).c_str());
+    } else if (req2) {
+        // req2 is given but not doc2Id. Therefore req2 is undefined
+        printf("<span class=\"%s\">Undefined</span>", warningStyle);
     }
     printf("</td>");
     printf("\n");
@@ -214,32 +225,31 @@ void htmlPrintTraceabilityRow(const char *req1, const char *req2, const char *do
 void htmlPrintTraceability(const Requirement &r, bool forward)
 {
     if (forward) { // A covered by B
-        if (r.coveredBy.empty()) htmlPrintTraceabilityRow(r.id.c_str(), "", "", true);
+        if (r.coveredBy.empty()) htmlPrintTraceabilityRow(r.id.c_str(), 0, 0, true);
         else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.coveredBy) {
                 const char* docId = 0;
                 bool warning = false;
-                Requirement *above = getRequirement(c->c_str());
-                if (!above) {
-                    docId = "Undefined";
-                    warning = true;
-                } else docId = above->parentDocument->id.c_str();
+                Requirement *forward = getRequirement(c->c_str());
+                if (forward) docId = forward->parentDocument->id.c_str();
+                else warning = true;
 
                 htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, warning);
             }
         }
     } else { // A covering B
-        if (r.covers.empty()) htmlPrintTraceabilityRow(r.id.c_str(), "", "", false);
+        if (r.covers.empty()) htmlPrintTraceabilityRow(r.id.c_str(), 0, 0, false);
         else {
             std::set<std::string>::iterator c;
             FOREACH(c, r.covers) {
                 const char* docId = 0;
+                bool warning = false;
                 Requirement *ref = getRequirement(c->c_str());
-                if (!ref) docId = "Undefined";
-                else docId = ref->parentDocument->id.c_str();
+                if (ref) docId = ref->parentDocument->id.c_str();
+                else warning = true;
 
-                htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, false);
+                htmlPrintTraceabilityRow(r.id.c_str(), c->c_str(), docId, warning);
             }
         }
 
@@ -322,18 +332,6 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
             ReqFileConfig f = file->second;
             printf("<h1 id=\"%s\">%s</h1>", hrefEncode(*docId).c_str(), htmlEscape(*docId).c_str());
 
-            std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file;
-            file = Errors.find(*docId);
-            if (file != Errors.end() && file->second.size()) {
-                printf("<div class=\"r_errors\">");
-
-                std::list<std::pair<std::string, std::string> >::iterator e;
-                FOREACH(e, file->second) {
-                    printf("%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
-                }
-                printf("</div>\n");
-            }
-
             printf("<div class=\"r_document_summary\">");
             printf("Path: <a href=\"%s\">%s</a><br>", hrefEncode(f.path).c_str(), htmlEscape(f.path).c_str());
             printf("Requirements: %d<br>", f.nTotalRequirements);
@@ -344,6 +342,18 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
             }
             printf("</div>\n");
 
+            std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file;
+            file = Errors.find(*docId);
+            if (file != Errors.end() && file->second.size()) {
+                printf("<h2>Errors</h2>\n");
+                printf("<div class=\"r_errors\">");
+
+                std::list<std::pair<std::string, std::string> >::iterator e;
+                FOREACH(e, file->second) {
+                    printf("%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
+                }
+                printf("</div>\n");
+            }
 
             htmlPrintDependencies(f);
             htmlPrintMatrix(f, true);
