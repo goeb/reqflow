@@ -275,7 +275,7 @@ void htmlPrintDependencies(const ReqFileConfig &f)
     }
     printf("</td>");
 
-    printf("<td>-> %s-></td>", htmlEscape(f.id).c_str());
+    printf("<td>-> %s -></td>", htmlEscape(f.id).c_str());
 
     // downstream documents
     printf("<td class=\"r_downstream\">");
