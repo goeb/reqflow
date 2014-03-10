@@ -95,7 +95,7 @@ win:
 	$(MAKE) WIN=1
 	i586-mingw32msvc-strip req.exe
 	set -e; V=`grep "#define VERSION" src/* |sed -e "s/.*VERSION *//" -e 's/"//g'`; \
-		zipname=req-v$$V.zip; \
+		zipname=reqflow-v$$V.zip; \
 		zip $$zipname req.exe; \
 		cd bin; \
 		zip ../$$zipname reqReport.bat
