@@ -115,9 +115,9 @@ document TEST -path TEST.txt \
 The Windows release includes these as static libraries.
 
 
-## License GPLv2
+## License GPLv2+
 
-Req
+Reqflow
 Copyright (C) 2014 Frederic Hoerni
 
 This program is free software; you can redistribute it and/or modify
