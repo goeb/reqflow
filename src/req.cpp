@@ -22,7 +22,7 @@
 #include "logging.h"
 
 // static objects
-std::map<std::string, ReqFileConfig> ReqConfig;
+std::map<std::string, ReqFileConfig*> ReqConfig;
 std::map<std::string, Requirement, stringCompare> Requirements;
 std::map<std::string, std::list<std::pair<std::string, std::string> > > Errors; // errors indexed by file
 int ReqTotal = 0;
@@ -86,9 +86,9 @@ Requirement *getRequirement(std::string id)
 
 ReqFileConfig *getDocument(std::string docId)
 {
-    std::map<std::string, ReqFileConfig>::iterator doc = ReqConfig.find(docId);
+    std::map<std::string, ReqFileConfig*>::iterator doc = ReqConfig.find(docId);
     if (doc == ReqConfig.end()) return 0;
-    else return &(doc->second);
+    else return doc->second;
 }
 
 

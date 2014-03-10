@@ -167,9 +167,9 @@ void htmlPrintSummaryContents(const std::list<std::string> &documents)
     int covered = 0;
 
     FOREACH(docId, documents) {
-        std::map<std::string, ReqFileConfig>::const_iterator file = ReqConfig.find(*docId);
+        std::map<std::string, ReqFileConfig*>::const_iterator file = ReqConfig.find(*docId);
         if (file == ReqConfig.end()) PUSH_ERROR(*docId, "", "Invalid document id");
-        else htmlPrintSummaryOfFile(file->second, total, covered);
+        else htmlPrintSummaryOfFile(*(file->second), total, covered);
     }
 
     int ratio = 0;
@@ -340,10 +340,10 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
 {
     std::list<std::string>::const_iterator docId;
     FOREACH(docId, documents) {
-        std::map<std::string, ReqFileConfig>::const_iterator file = ReqConfig.find(*docId);
+        std::map<std::string, ReqFileConfig*>::const_iterator file = ReqConfig.find(*docId);
         if (file == ReqConfig.end()) PUSH_ERROR(*docId, "", "Invalid document id");
         else {
-            ReqFileConfig f = file->second;
+            ReqFileConfig f = *(file->second);
             printf("<h1 id=\"%s\">%s</h1>", hrefEncode(*docId).c_str(), htmlEscape(*docId).c_str());
 
             printf("<div class=\"r_document_summary\">");
@@ -401,7 +401,7 @@ void htmlRender(const std::string &cmdline, int argc, const char **argv)
         }
     } else {
         // take all documents
-        std::map<std::string, ReqFileConfig>::const_iterator file;
+        std::map<std::string, ReqFileConfig*>::const_iterator file;
         FOREACH(file, ReqConfig) documents.push_back(file->first);
     }
 

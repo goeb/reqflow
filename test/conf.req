@@ -1,14 +1,19 @@
 
 define REQ_PATTERN PRINTF_[-a-zA-Z0-9_]*
 define ALPHANUM [-a-zA-Z0-9_]
-document SPEC -path SPEC.docx -req REQ_PATTERN -stop-after Annexe -ref "Ref: +(.*)" \
+document SPEC 
+    -path SPEC.docx 
+    -req REQ_PATTERN 
+    -stop-after Annexe -ref "Ref: +(.*)" 
     -end-req-style toto -end-req tutu
 
-document TEST -path TEST.txt \
-    -req T_[-a-zA-Z0-9_]* \
-    -ref "Ref:[, ]*(ALPHANUM+)" \
-	-stop-after "Annex" \
-	-start-after "Tests cases" \
+document TEST -path TEST.txt 
+    -req T_[-a-zA-Z0-9_]* 
+    -ref "Ref:[, ]*(ALPHANUM+)" 
+	-stop-after "Annex" 
+	-start-after "Tests cases" 
     -nocov
 
+# -type txt
+# -prefix SPEC-
 

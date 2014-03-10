@@ -73,7 +73,7 @@ struct Requirement {
 
 
 
-extern std::map<std::string, ReqFileConfig> ReqConfig;
+extern std::map<std::string, ReqFileConfig*> ReqConfig;
 extern std::map<std::string, Requirement, stringCompare> Requirements;
 extern std::map<std::string, std::list<std::pair<std::string, std::string> > > Errors; // errors indexed by file
 extern int ReqTotal;

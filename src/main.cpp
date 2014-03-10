@@ -118,7 +118,27 @@ std::string replaceDefinedVariable(const std::list<std::pair<std::string, std::s
     return result;
 }
 
-
+/** Syntax of config file:
+  *
+  *
+  * define <x> <y>
+  *
+  * document <id>
+  *     -path <token>
+  *     -req <token>
+  *     -ref <token>
+  *     -nocov
+  *     -start-after <token>
+  *     -stop-after <token>
+  *
+  * A 'define' instanciates the definition of a variable, that will be used as replacement in the tokens.
+  * A 'document' starts a new definition os document.
+  * The options of a document may be on the same line or on the following lines.
+  * A 'define' interrupts the current document, if any.
+  * Defined variables apply only on the <token> parts mentionned above, and in the order they appear.
+  *
+  *
+  */
 int loadConfiguration(const char * file)
 {
     LOG_DEBUG(_("Loading configuration file: '%s'"), file);
@@ -139,140 +159,160 @@ int loadConfiguration(const char * file)
     std::list<std::pair<std::string, std::string> > defs;
 
     std::list<std::list<std::string> >::iterator line;
+    ReqFileConfig *fileConfig = 0;
     int lineNum = 0;
     FOREACH(line, configTokens) {
         lineNum++;
-        std::string verb = pop(*line);
-        if (verb == "document") {
-            ReqFileConfig fileConfig;
-            fileConfig.id = pop(*line);
-            LOG_DEBUG("document '%s'...", fileConfig.id.c_str());
-            if (fileConfig.id.empty()) {
-                PUSH_ERROR(file, "", "Missing identifier for file: line %d", lineNum);
-            }
 
-            while (!line->empty()) {
-                std::string arg = pop(*line);
-                if (arg == "-path") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "", "Missing -path value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    fileConfig.path = replaceDefinedVariable(defs, pop(*line));
+        // handle primary verbs first
+        if (line->size()) {
+            std::string verb = line->front();
 
-                } else if (arg == "-start-after") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "", "Missing -start-after value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    fileConfig.startAfter = replaceDefinedVariable(defs, pop(*line));
-                    fileConfig.startAfterRegex = new regex_t();
-                    int reti = regcomp(fileConfig.startAfterRegex, fileConfig.startAfter.c_str(), 0);
-                    if (reti) {
-                        PUSH_ERROR(file, "", "Cannot compile startAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.startAfter.c_str());
-                        return -1;
-                    }
-                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.startAfter.c_str(), &fileConfig.startAfterRegex);
+            if (verb == "document") {
+                pop(*line);
+                std::string id = pop(*line);
+                if (id.empty()) {
+                    PUSH_ERROR(file, "", "Missing identifier for file: line %d", lineNum);
+                    return 1;
+                }
 
-                } else if (arg == "-stop-after") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "", "Missing -stop-after value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    fileConfig.stopAfter = replaceDefinedVariable(defs, pop(*line));
-                    fileConfig.stopAfterRegex = new regex_t();
-                    int reti = regcomp(fileConfig.stopAfterRegex, fileConfig.stopAfter.c_str(), 0);
-                    if (reti) {
-                        PUSH_ERROR(file, "", "Cannot compile stopAfter regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.stopAfter.c_str());
-                        return -1;
-                    }
-                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.stopAfter.c_str(), &fileConfig.stopAfterRegex);
+                // check if document id already exists
+                std::map<std::string, ReqFileConfig*>::iterator c = ReqConfig.find(id);
+                if (c != ReqConfig.end()) {
+                    PUSH_ERROR(file, "", "Config error: duplicate id '%s'", id.c_str());
+                    return 1;
+                }
 
-                } else if (arg == "-nocov") {
-                    fileConfig.nocov = true;
+                // initiates a new document
+                fileConfig = new ReqFileConfig;
 
-                } else if (arg == "-req") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "", "Missing -req value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    fileConfig.reqPattern = replaceDefinedVariable(defs, pop(*line));
-                    /* Compile regular expression */
-                    fileConfig.reqRegex = new regex_t();
-                    int reti = regcomp(fileConfig.reqRegex, fileConfig.reqPattern.c_str(), 0);
-                    if (reti) {
-                        PUSH_ERROR(file, "", "Cannot compile req regex for %s: '%s'", fileConfig.id.c_str(), fileConfig.reqPattern.c_str());
-                        return -1;
-                    }
-                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.reqPattern.c_str(), &fileConfig.reqRegex);
+                fileConfig->id = id;
+                LOG_DEBUG("document '%s'...", fileConfig->id.c_str());
+                ReqConfig[id] = fileConfig;
 
-                } else if (arg == "-ref") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "", "Missing -ref value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    fileConfig.refPattern = replaceDefinedVariable(defs, pop(*line));
-                    /* Compile regular expression */
-                    fileConfig.refRegex = new regex_t();
-                    int reti = regcomp(fileConfig.refRegex, fileConfig.refPattern.c_str(), 0);
-                    if (reti) {
-                        PUSH_ERROR(file, "", "Cannot compile ref regex for %s: %s", fileConfig.id.c_str(), fileConfig.refPattern.c_str());
-                        return -1;
-                    }
-                    LOG_DEBUG("regcomp(%s) -> %p", fileConfig.refPattern.c_str(), &fileConfig.refRegex);
-
-                } else if (arg == "-end-req") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "", "Missing -end-req value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    std::string endReq = pop(*line);
-                    regex_t *regex = new regex_t();
-                    int reti = regcomp(regex, endReq.c_str(), 0);
-                    if (reti) {
-                        PUSH_ERROR(file, "", "Cannot compile regex: %s", endReq.c_str());
-                        return -1;
-                    }
-
-                    fileConfig.endReq[endReq] = regex;
-
-                } else if (arg == "-end-req-style") {
-                    if (line->empty()) {
-                        PUSH_ERROR(file, "","Missing -end-req-style value for %s", fileConfig.id.c_str());
-                        return -1;
-                    }
-                    std::string endReqStyle = pop(*line);
-                    regex_t *regex = new regex_t();
-                    int reti = regcomp(regex, endReqStyle.c_str(), 0);
-                    if (reti) {
-                        PUSH_ERROR(file, "", "Cannot compile regex: %s", endReqStyle.c_str());
-                        return -1;
-                    }
-
-                    fileConfig.endReqStyle[endReqStyle] = regex;
+            } else if (verb == "define") {
+                pop(*line);
+                if (line->size() != 2) {
+                    PUSH_ERROR(file, "", "Invalid define: missing value, line %d", lineNum);
+                    return 1;
 
                 } else {
-                    PUSH_ERROR(file, "", "Invalid token '%s': line %d", arg.c_str(), lineNum);
-                }
-            }
-            std::map<std::string, ReqFileConfig>::iterator c = ReqConfig.find(fileConfig.id);
-            if (c != ReqConfig.end()) {
-                PUSH_ERROR(file, "", "Config error: duplicate id '%s'", fileConfig.id.c_str());
-                return 1;
-            }
-            ReqConfig[fileConfig.id] = fileConfig;
+                    fileConfig = 0; // interrupts current document
 
-        } else if (verb == "define") {
-            if (line->size() != 2) {
-                PUSH_ERROR(file, "", "Invalid defined: missing value, line %d", lineNum);
+                    std::string key = pop(*line);
+                    std::string value = pop(*line);
+                    LOG_DEBUG("Add variable '%s'='%s'", key.c_str(), value.c_str());
+                    defs.push_back(std::make_pair(key, value));
+                }
+            } // else, parse arguments below...
+        }
+
+        while (!line->empty()) {
+            std::string arg = pop(*line);
+            if (fileConfig && arg == "-path") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "", "Missing -path value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->path = replaceDefinedVariable(defs, pop(*line));
+
+            } else if (fileConfig && arg == "-start-after") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "", "Missing -start-after value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->startAfter = replaceDefinedVariable(defs, pop(*line));
+                fileConfig->startAfterRegex = new regex_t();
+                int reti = regcomp(fileConfig->startAfterRegex, fileConfig->startAfter.c_str(), 0);
+                if (reti) {
+                    PUSH_ERROR(file, "", "Cannot compile startAfter regex for %s: '%s'", fileConfig->id.c_str(), fileConfig->startAfter.c_str());
+                    return -1;
+                }
+                LOG_DEBUG("regcomp(%s) -> %p", fileConfig->startAfter.c_str(), &fileConfig->startAfterRegex);
+
+            } else if (fileConfig && arg == "-stop-after") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "", "Missing -stop-after value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->stopAfter = replaceDefinedVariable(defs, pop(*line));
+                fileConfig->stopAfterRegex = new regex_t();
+                int reti = regcomp(fileConfig->stopAfterRegex, fileConfig->stopAfter.c_str(), 0);
+                if (reti) {
+                    PUSH_ERROR(file, "", "Cannot compile stopAfter regex for %s: '%s'", fileConfig->id.c_str(), fileConfig->stopAfter.c_str());
+                    return -1;
+                }
+                LOG_DEBUG("regcomp(%s) -> %p", fileConfig->stopAfter.c_str(), &fileConfig->stopAfterRegex);
+
+            } else if (fileConfig && arg == "-nocov") {
+                fileConfig->nocov = true;
+
+            } else if (fileConfig && arg == "-req") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "", "Missing -req value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->reqPattern = replaceDefinedVariable(defs, pop(*line));
+                /* Compile regular expression */
+                fileConfig->reqRegex = new regex_t();
+                int reti = regcomp(fileConfig->reqRegex, fileConfig->reqPattern.c_str(), 0);
+                if (reti) {
+                    PUSH_ERROR(file, "", "Cannot compile req regex for %s: '%s'", fileConfig->id.c_str(), fileConfig->reqPattern.c_str());
+                    return -1;
+                }
+                LOG_DEBUG("regcomp(%s) -> %p", fileConfig->reqPattern.c_str(), &fileConfig->reqRegex);
+
+            } else if (fileConfig && arg == "-ref") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "", "Missing -ref value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->refPattern = replaceDefinedVariable(defs, pop(*line));
+                /* Compile regular expression */
+                fileConfig->refRegex = new regex_t();
+                int reti = regcomp(fileConfig->refRegex, fileConfig->refPattern.c_str(), 0);
+                if (reti) {
+                    PUSH_ERROR(file, "", "Cannot compile ref regex for %s: %s", fileConfig->id.c_str(), fileConfig->refPattern.c_str());
+                    return -1;
+                }
+                LOG_DEBUG("regcomp(%s) -> %p", fileConfig->refPattern.c_str(), &fileConfig->refRegex);
+
+            } else if (fileConfig && arg == "-end-req") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "", "Missing -end-req value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                std::string endReq = pop(*line);
+                regex_t *regex = new regex_t();
+                int reti = regcomp(regex, endReq.c_str(), 0);
+                if (reti) {
+                    PUSH_ERROR(file, "", "Cannot compile regex: %s", endReq.c_str());
+                    return -1;
+                }
+
+                fileConfig->endReq[endReq] = regex;
+
+            } else if (fileConfig && arg == "-end-req-style") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "","Missing -end-req-style value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                std::string endReqStyle = pop(*line);
+                regex_t *regex = new regex_t();
+                int reti = regcomp(regex, endReqStyle.c_str(), 0);
+                if (reti) {
+                    PUSH_ERROR(file, "", "Cannot compile regex: %s", endReqStyle.c_str());
+                    return -1;
+                }
+
+                fileConfig->endReqStyle[endReqStyle] = regex;
+
+            } else if (!fileConfig) {
+                PUSH_ERROR(file, "", "Invalid token '%s' within no document: line %d", arg.c_str(), lineNum);
+                return 1;
             } else {
-                std::string key = pop(*line);
-                std::string value = pop(*line);
-                LOG_DEBUG("Add variable '%s'='%s'", key.c_str(), value.c_str());
-                defs.push_back(std::make_pair(key, value));
+                PUSH_ERROR(file, "", "Invalid token '%s': line %d", arg.c_str(), lineNum);
             }
-        } else {
-            PUSH_ERROR(file, "", "Invalid token '%s': line %d", verb.c_str(), lineNum);
         }
     }
     return 0;
@@ -342,10 +382,10 @@ int loadRequirementsOfFile(ReqFileConfig &fileConfig, bool debug)
 int loadRequirements(bool debug)
 {
     int result = 0;
-    std::map<std::string, ReqFileConfig>::iterator c;
+    std::map<std::string, ReqFileConfig*>::iterator c;
     FOREACH(c, ReqConfig) {
-        ReqFileConfig &fileConfig = c->second;
-        result = loadRequirementsOfFile(fileConfig, debug);
+        ReqFileConfig *fileConfig = c->second;
+        result = loadRequirementsOfFile(*fileConfig, debug);
     }
     checkUndefinedRequirements();
     consolidateCoverage();
@@ -459,17 +499,17 @@ void printTracOfFile(const char *docId, bool reverse, bool verbose, ReqExportFor
   */
 void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExportFormat format)
 {
-    std::map<std::string, ReqFileConfig>::iterator file;
+    std::map<std::string, ReqFileConfig*>::iterator file;
     if (!argc) {
         FOREACH(file, ReqConfig) {
-            printTracOfFile(file->second.id.c_str(), reverse, verbose, format);
+            printTracOfFile(file->second->id.c_str(), reverse, verbose, format);
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) {
             LOG_ERROR("Invalid document id: %s", docId);
-        } else printTracOfFile(file->second.id.c_str(), reverse, verbose, format);
+        } else printTracOfFile(file->second->id.c_str(), reverse, verbose, format);
         argc--;
         argv++;
     }
@@ -504,17 +544,17 @@ void printTextOfReqs(int argc, const char **argv, ReviewMode rm, ReqExportFormat
     std::list<ReqFileConfig*> documents;
     if (argc) {
         while (argc) {
-            std::map<std::string, ReqFileConfig>::iterator rc = ReqConfig.find(argv[0]);
+            std::map<std::string, ReqFileConfig*>::iterator rc = ReqConfig.find(argv[0]);
             if (rc == ReqConfig.end()) {
                 printf("Unknown document: %s\n", argv[0]);
-            } else documents.push_back(&(rc->second));
+            } else documents.push_back(rc->second);
             argv++; argc--;
         }
     } else {
         // take all documents
-        std::map<std::string, ReqFileConfig>::iterator file;
+        std::map<std::string, ReqFileConfig*>::iterator file;
         FOREACH(file, ReqConfig) {
-            documents.push_back(&(file->second));
+            documents.push_back(file->second);
         }
     }
 
@@ -571,17 +611,17 @@ void printSummary(int argc, const char **argv)
 
     printSummaryHeader();
 
-    std::map<std::string, ReqFileConfig>::iterator file;
+    std::map<std::string, ReqFileConfig*>::iterator file;
 
     if (!argc) {
         FOREACH(file, ReqConfig) {
-            printSummaryOfFile(file->second);
+            printSummaryOfFile(*(file->second));
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
-        std::map<std::string, ReqFileConfig>::iterator file = ReqConfig.find(docId);
+        std::map<std::string, ReqFileConfig*>::iterator file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) LOG_ERROR("Invalid document id: %s", docId);
-        else printSummaryOfFile(file->second);
+        else printSummaryOfFile(*(file->second));
         argc--;
         argv++;
     }
@@ -610,7 +650,7 @@ void printRequirementsOfFile(StatusMode status, const char *documentId)
 }
 void printRequirements(StatusMode status, int argc, const char **argv)
 {
-    std::map<std::string, ReqFileConfig>::iterator file;
+    std::map<std::string, ReqFileConfig*>::iterator file;
     if (!argc) {
         // print requirements of all files
         FOREACH(file, ReqConfig) {
@@ -764,9 +804,9 @@ int cmdConfig(int argc, const char **argv)
     if (r != 0) return 1;
 
     // display a summary of the configuration
-    std::map<std::string, ReqFileConfig>::iterator c;
+    std::map<std::string, ReqFileConfig*>::iterator c;
     FOREACH(c, ReqConfig) {
-        ReqFileConfig f = c->second;
+        ReqFileConfig f = *(c->second);
         printf("%s: -path '%s'\n", c->first.c_str(), f.path.c_str());
         printf("%s: -req '%s'", c->first.c_str(), f.reqPattern.c_str());
         if (!f.refPattern.empty()) printf(" -ref '%s'", f.refPattern.c_str());
