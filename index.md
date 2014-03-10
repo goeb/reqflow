@@ -33,7 +33,7 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 ### Windows
 
-[req-v1.2.0.zip](download/req-v1.2.0.zip)
+[reqflow-v1.2.1.zip](download/reqflow-v1.2.1.zip)
 
 ## Usage
 
