@@ -68,14 +68,18 @@ Commands:
 
     trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).
          [-r]       Print the reverse traceability matrix (A covers B).
-         [-x &lt;fmt&gt;] Select export format: text (default), csv.
+         [-x &lt;fmt&gt;] Select export format: text (default), csv, html.
+                    If format &#39;html&#39; is chosen, -r is ignored, as both foward and reverse
+                    traceability matrices are displayed.
+
+    review          Print the requirements with their text (experimental).
+         [-f | -r]  Print also traceability (forward or backward) (not implemented yet)
+         [-x &lt;fmt&gt;] Choose format: txt, csv.
 
     config          Print the list of configured documents.
-                    (useful for debugging defines)
-
-    report [-html]  Generate HTML report
 
     debug &lt;file&gt;    Dump text extracted from file (debug purpose).
+                    (PDF not supported on Windows)
 
     regex &lt;pattern&gt; &lt;text&gt;
                     Test regex given by &lt;pattern&gt; applied on &lt;text&gt;.
@@ -131,7 +135,7 @@ document TEST -path TEST.txt \
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on 10 Mar 2014
+            Page updated on 12 Mar 2014
         </div>
     </body>
 </html>

@@ -52,14 +52,18 @@ Commands:
 
     trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).
          [-r]       Print the reverse traceability matrix (A covers B).
-         [-x <fmt>] Select export format: text (default), csv.
+         [-x <fmt>] Select export format: text (default), csv, html.
+                    If format 'html' is chosen, -r is ignored, as both foward and reverse
+                    traceability matrices are displayed.
+
+    review          Print the requirements with their text (experimental).
+         [-f | -r]  Print also traceability (forward or backward) (not implemented yet)
+         [-x <fmt>] Choose format: txt, csv.
 
     config          Print the list of configured documents.
-                    (useful for debugging defines)
-
-    report [-html]  Generate HTML report
 
     debug <file>    Dump text extracted from file (debug purpose).
+                    (PDF not supported on Windows)
 
     regex <pattern> <text>
                     Test regex given by <pattern> applied on <text>.
