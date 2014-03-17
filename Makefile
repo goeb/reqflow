@@ -66,6 +66,10 @@ endif
 
 all: $(EXE)
 
+.PHONY: test
+test:
+	$(MAKE) -C test
+
 print:
 	@echo SRCS=$(SRCS)
 	@echo OBJS=$(OBJS)
