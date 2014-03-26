@@ -69,6 +69,30 @@ void printErrors()
     }
 }
 
+ReqFileType ReqFileConfig::getFileType(const std::string &extension)
+{
+    if (0 == strcasecmp(extension.c_str(), "txt")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "odt")) return RF_ODT;
+    else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
+    else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
+    else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
+    else if (0 == strcasecmp(extension.c_str(), "htm")) return RF_HTML;
+    else if (0 == strcasecmp(extension.c_str(), "html")) return RF_HTML;
+    else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
+    else return RF_UNKNOWN;
+}
+
+ReqFileType ReqFileConfig::getFileType()
+{
+    if (type != RF_UNKNOWN) return type;
+
+    size_t i = path.find_last_of('.');
+    if (i == std::string::npos) return RF_UNKNOWN;
+    if (i == path.size()-1) return RF_UNKNOWN;
+    std::string extension = path.substr(i+1);
+    return getFileType(extension);
+}
+
 void ReqDocument::init()
 {
     acquisitionStarted = true;

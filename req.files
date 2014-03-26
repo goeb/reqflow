@@ -23,4 +23,7 @@
 src/ReqDocumentHtml.h
 src/ReqDocumentHtml.cpp
 src/stringTools.h
+src/stringIt.h
 src/stringTools.cpp
+src/StringIt.h
+src/StringIt.cpp

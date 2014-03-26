@@ -30,6 +30,8 @@ enum BlockStatus { NOT_STARTED, STOP_REACHED, REQ_OK };
 
 struct Requirement;
 
+enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_HTML, RF_PDF, RF_UNKNOWN };
+
 struct ReqFileConfig {
     std::string id;
     std::string path;
@@ -43,6 +45,7 @@ struct ReqFileConfig {
 	regex_t *stopAfterRegex;
     std::map<std::string, regex_t *> endReq;
     std::map<std::string, regex_t *> endReqStyle;
+    ReqFileType type;
 
 
     // for dependency graph
@@ -59,8 +62,10 @@ struct ReqFileConfig {
 	bool nocov;
 
 
-    ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0),
-		nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false) {}
+    ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0), type(RF_UNKNOWN),
+        nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false) {}
+    static ReqFileType getFileType(const std::string &extension);
+    ReqFileType getFileType();
 };
 
 struct Requirement {

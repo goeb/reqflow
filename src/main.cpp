@@ -130,6 +130,7 @@ std::string replaceDefinedVariable(const std::list<std::pair<std::string, std::s
   *     -nocov
   *     -start-after <token>
   *     -stop-after <token>
+  *     -type <type>
   *
   * A 'define' instanciates the definition of a variable, that will be used as replacement in the tokens.
   * A 'document' starts a new definition os document.
@@ -307,6 +308,19 @@ int loadConfiguration(const char * file)
 
                 fileConfig->endReqStyle[endReqStyle] = regex;
 
+            } else if (fileConfig && arg == "-type") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "","Missing -type value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                std::string t = pop(*line);
+                ReqFileType type = fileConfig->getFileType(t);
+                if (type == RF_UNKNOWN) {
+                    PUSH_ERROR(file, "","Unknown file type '%s' for %s", t.c_str(), fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->type = type;
+
             } else if (!fileConfig) {
                 PUSH_ERROR(file, "", "Invalid token '%s' within no document: line %d", arg.c_str(), lineNum);
                 return 1;
@@ -318,28 +332,11 @@ int loadConfiguration(const char * file)
     return 0;
 }
 
-enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_HTML, RF_PDF, RF_UNKNOWN };
-ReqFileType getFileType(const std::string &path)
-{
-    size_t i = path.find_last_of('.');
-    if (i == std::string::npos) return RF_UNKNOWN;
-    if (i == path.size()-1) return RF_UNKNOWN;
-    std::string extension = path.substr(i+1);
-    if (0 == strcasecmp(extension.c_str(), "txt")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "odt")) return RF_ODT;
-    else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
-    else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
-    else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
-    else if (0 == strcasecmp(extension.c_str(), "htm")) return RF_HTML;
-    else if (0 == strcasecmp(extension.c_str(), "html")) return RF_HTML;
-    else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
-    else return RF_UNKNOWN;
-}
 
 int loadRequirementsOfFile(ReqFileConfig &fileConfig, bool debug)
 {
     int result = 0;
-    ReqFileType fileType = getFileType(fileConfig.path);
+    ReqFileType fileType = fileConfig.getFileType();
     switch(fileType) {
     case RF_TEXT:
     {

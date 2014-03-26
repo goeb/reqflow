@@ -1,4 +1,4 @@
-/*   Reqflow
+/*   Reqflw
  *   Copyright (C) 2014 Frederic Hoerni
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -12,27 +12,19 @@
  *   GNU General Public License for more details.
  */
 
-#ifndef _global_h
-#define _global_h
+#include <string.h>
+
+#include "StringIt.h"
 
 
-#define VERSION "1.3.0-rc2"
-
-// prepare for gettext
-#define _(String) (String)
-
-#define FOREACH(var, container) for (var=container.begin(); var!= container.end(); var++)
-
-
-#ifdef _WIN32
-inline struct tm *localtime_r(const time_t *timep, struct tm *result)
+StringIt::StringIt(const std::string &str, const char *separator, int opts = 0) : currentString(str)
 {
-    struct tm *lt = localtime(timep);
-    *result = *lt;
-    return result;
+    options(opts);
+    currentPosition = 0;
+
 }
-#endif
 
+std::string StringIt::next(const char *alternateSeparator)
+{
 
-
-#endif
+}
