@@ -39,42 +39,54 @@ std::string Cmdline;
 
 void usage()
 {
-    printf("Usage: req <command> [<options>] [<args>]\n"
+    printf("Usage: 1. req <command> [<options>] [<args>]\n"
+           "       2. req <config-file>\n"
+           "\n"
+           "\n"
+           "1. req <command> [<options>] [<args>]\n"
            "\n"
            "Commands:\n"
            "\n"
-           "    stat [doc ...]  Print the status of requirements in all documents or the given documents.\n"
-           "                    Without additionnal option, only unresolved coverage issues are reported.\n"
-           "         -s         Print a one-line summary for each document.\n"
-           "         -v         Print the status of all requirements.\n"
-           "                    Status codes:\n"
+           "  stat [doc ...]  Print the status of requirements in all documents or the given documents.\n"
+           "                  Without additionnal option, only unresolved coverage issues are reported.\n"
+           "       -s         Print a one-line summary for each document.\n"
+           "       -v         Print the status of all requirements.\n"
+           "                  Status codes:\n"
            "\n"
-           "                        'U'  Uncovered\n"
+           "                      'U'  Uncovered\n"
            "\n"
-           "    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).\n"
-           "         [-r]       Print the reverse traceability matrix (A covers B).\n"
-           "         [-x <fmt>] Select export format: text (default), csv, html.\n"
-           "                    If format 'html' is chosen, -r is ignored, as both foward and reverse\n"
-           "                    traceability matrices are displayed.\n"
+           "  trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).\n"
+           "       [-r]       Print the reverse traceability matrix (A covers B).\n"
+           "       [-x <fmt>] Select export format: text (default), csv, html.\n"
+           "                  If format 'html' is chosen, -r is ignored, as both foward and reverse\n"
+           "                  traceability matrices are displayed.\n"
            "\n"
-           "    review          Print the requirements with their text.\n"
-           "         [-f | -r]  Print also traceability (forward or backward)\n"
-           "         [-x <fmt>] Choose format: txt, csv.\n"
+           "  review          Print the requirements with their text.\n"
+           "       [-f | -r]  Print also traceability (forward or backward)\n"
+           "       [-x <fmt>] Choose format: txt, csv.\n"
            "\n"
-           "    config          Print the list of configured documents.\n"
+           "  config          Print the list of configured documents.\n"
            "\n"
-           "    debug <file>    Dump text extracted from file (debug purpose).\n"
-           "                    (PDF not supported on Windows)\n"
+           "  debug <file>    Dump text extracted from file (debug purpose).\n"
            "\n"
-           "    regex <pattern> <text>\n"
-           "                    Test regex given by <pattern> applied on <text>.\n"
+           "  regex <pattern> <text>\n"
+           "                  Test regex given by <pattern> applied on <text>.\n"
            "\n"
-           "    version\n"
-           "    help\n"
+           "  version\n"
+           "  help\n"
            "\n"
            "Options:\n"
-           "    -c <config> Select configuration file. Defaults to 'conf.req'.\n"
+           "  -c <config>  Select configuration file. Defaults to 'conf.req'.\n"
+           "  -o <file>    Output to file instead of stdout.\n"
+           "               Not supported for commands 'config', debug' and 'regex'."
            "\n"
+           "\n"
+           "2. req <config>\n"
+           "This is equivalent to:\n"
+           "  req trac -c <config> -x html -o <outfile> && start <outfile>\n"
+           "\n"
+           "Purpose: This usage is suitable for double-cliking on the config file.\n"
+           "Note: <config> must be different from the commands of use case 1.\n"
            "\n");
     exit(1);
 }
@@ -397,26 +409,26 @@ enum ReqExportFormat { REQ_X_TXT, REQ_X_CSV };
 void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (format == REQ_X_CSV) {
-        printf(",,"CRLF);
-        printf("Requirements of %s,", docId);
+        OUTPUT(",,"CRLF);
+        OUTPUT("Requirements of %s,", docId);
         if (reverse) {
-            printf("Requirements Upstream");
+            OUTPUT("Requirements Upstream");
         } else {
-            printf("Requirements Downstream");
+            OUTPUT("Requirements Downstream");
         }
-        if (verbose) printf(",Document");
-        else printf(","); // always 3 columns
-        printf(CRLF);
+        if (verbose) OUTPUT(",Document");
+        else OUTPUT(","); // always 3 columns
+        OUTPUT(CRLF);
 
     } else {
-        printf("\n");
-        printf("Requirements of %-34s ", docId);
-        if (reverse) printf(ALIGN, "Requirements Upstream");
-        else printf(ALIGN, "Requirements Downstream");
-        if (verbose) printf(" Document");
-        printf("\n");
-        printf("----------------------------------------------");
-        printf("----------------------------------------------------------------------\n");
+        OUTPUT("\n");
+        OUTPUT("Requirements of %-34s ", docId);
+        if (reverse) OUTPUT(ALIGN, "Requirements Upstream");
+        else OUTPUT(ALIGN, "Requirements Downstream");
+        if (verbose) OUTPUT(" Document");
+        OUTPUT("\n");
+        OUTPUT("----------------------------------------------");
+        OUTPUT("----------------------------------------------------------------------\n");
 
     }
 }
@@ -426,17 +438,17 @@ void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFor
 void printTracLine(const char *req1, const char *req2, const char *doc2Id, ReqExportFormat format)
 {
     if (format == REQ_X_CSV) {
-        printf("%s,", req1);
-        if (req2) printf("%s", req2);
-        if (doc2Id) printf(",%s", doc2Id);
-        else printf(","); // always 3 columns
-        printf(CRLF);
+        OUTPUT("%s,", req1);
+        if (req2) OUTPUT("%s", req2);
+        if (doc2Id) OUTPUT(",%s", doc2Id);
+        else OUTPUT(","); // always 3 columns
+        OUTPUT(CRLF);
 
     } else { // text format
-        printf(ALIGN, req1);
-        if (req2) printf(" " ALIGN, req2);
-        if (doc2Id) printf(" %s", doc2Id);
-        printf("\n");
+        OUTPUT(ALIGN, req1);
+        if (req2) OUTPUT(" " ALIGN, req2);
+        if (doc2Id) OUTPUT(" %s", doc2Id);
+        OUTPUT("\n");
     }
 }
 
@@ -528,7 +540,7 @@ void printIndented(const std::string &text)
         }
 
         trimBlanks(line);
-        printf("        %s\n", line.c_str());
+        OUTPUT("        %s\n", line.c_str());
     }
 }
 
@@ -543,7 +555,7 @@ void printTextOfReqs(int argc, const char **argv, ReviewMode rm, ReqExportFormat
         while (argc) {
             std::map<std::string, ReqFileConfig*>::iterator rc = ReqConfig.find(argv[0]);
             if (rc == ReqConfig.end()) {
-                printf("Unknown document: %s\n", argv[0]);
+                OUTPUT("Unknown document: %s\n", argv[0]);
             } else documents.push_back(rc->second);
             argv++; argc--;
         }
@@ -560,33 +572,33 @@ void printTextOfReqs(int argc, const char **argv, ReviewMode rm, ReqExportFormat
         std::map<std::string, Requirement*, stringCompare>::iterator req;
         FOREACH(req, (*doc)->requirements) {
             if (format == REQ_X_CSV) {
-                printf("%s,%s\r\n", escapeCsv(req->second->id).c_str(), escapeCsv(req->second->text).c_str());
+                OUTPUT("%s,%s\r\n", escapeCsv(req->second->id).c_str(), escapeCsv(req->second->text).c_str());
             } else {
-                printf("%s\n", req->second->id.c_str());
+                OUTPUT("%s\n", req->second->id.c_str());
                 printIndented(req->second->text);
-                printf("\n");
+                OUTPUT("\n");
             }
 
         }
     }
-    if (rm != RM_RAW) printf("Review with traceability not implemented yet.\n");
+    if (rm != RM_RAW) OUTPUT("Review with traceability not implemented yet.\n");
 }
 
 void printSummaryHeader()
 {
-    printf("%-30s    %% covered / total\n", "Document");
-    printf("----------------------------------------------------------------------\n");
+    OUTPUT("%-30s    %% covered / total\n", "Document");
+    OUTPUT("----------------------------------------------------------------------\n");
 }
 
 /** Option 'nocov' indicates if coverage is relevant for this document
  */
 void printPercent(int total, int covered, const char *docId, const char *path, bool nocov)
 {
-    if (nocov) printf("%-30s nocov  nocov / %5d %s\n", docId, total, path);
+    if (nocov) OUTPUT("%-30s nocov  nocov / %5d %s\n", docId, total, path);
     else {
         int ratio = 0;
         if (total > 0) ratio = 100*covered/total;
-        printf("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
+        OUTPUT("%-30s %3d%% %7d / %5d %s\n", docId, ratio, covered, total, path);
     }
 }
 
@@ -635,12 +647,12 @@ void printRequirementsOfFile(StatusMode status, const char *documentId)
             if (REQ_ALL == status || r->second.coveredBy.empty()) doPrint = true;
 
             if (doPrint) {
-                if (r->second.coveredBy.empty()) printf("U");
-                else printf(" ");
+                if (r->second.coveredBy.empty()) OUTPUT("U");
+                else OUTPUT(" ");
 
-                printf(" %s", r->second.id.c_str());
-                if (REQ_ALL == status) printf(" %s", r->second.parentDocument->id.c_str());
-                printf("\n");
+                OUTPUT(" %s", r->second.id.c_str());
+                if (REQ_ALL == status) OUTPUT(" %s", r->second.parentDocument->id.c_str());
+                OUTPUT("\n");
             }
         }
     }
@@ -668,6 +680,7 @@ int cmdStat(int argc, const char **argv)
 {
     int i = 0;
     const char *configFile = DEFAULT_CONF;
+    const char *output = 0;
     const char *arg = 0;
     StatusMode statusMode = REQ_UNRESOLVED;
     while (i<argc) {
@@ -675,6 +688,9 @@ int cmdStat(int argc, const char **argv)
         if (0 == strcmp(arg, "-c")) {
             if (i>=argc) usage();
             configFile = argv[i]; i++;
+        } else if (0 == strcmp(arg, "-o")) {
+            if (i>=argc) usage();
+            output = argv[i]; i++;
         } else if (0 == strcmp(arg, "-s")) {
             statusMode = REQ_SUMMARY;
         } else if (0 == strcmp(arg, "-v")) {
@@ -691,6 +707,8 @@ int cmdStat(int argc, const char **argv)
     r = loadRequirements(false);
     if (r != 0) return 1;
 
+    if (output) initOutputFd(output);
+
     if (REQ_SUMMARY == statusMode) {
         printSummary(argc-i, argv+i);
     } else printRequirements(statusMode, argc-i, argv+i);
@@ -706,11 +724,17 @@ int cmdTrac(int argc, const char **argv)
     const char *exportFormat = "txt";
     bool reverse = false;
     bool verbose = false;
+    const char *output = 0;
+
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
             if (i>=argc) usage();
             configFile = argv[i]; i++;
+
+        } else if (0 == strcmp(arg, "-o")) {
+            if (i>=argc) usage();
+            output = argv[i]; i++;
 
         } else if (0 == strcmp(arg, "-x")) {
             if (i>=argc) usage();
@@ -730,6 +754,8 @@ int cmdTrac(int argc, const char **argv)
     r = loadRequirements(false);
     if (r != 0) return 1;
 
+    if (output) initOutputFd(output);
+
     if (0 == strcmp(exportFormat, "txt")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_TXT);
     else if (0 == strcmp(exportFormat, "csv")) printMatrix(argc-i, argv+i, reverse, verbose, REQ_X_CSV);
     else if (0 == strcmp(exportFormat, "html")) htmlRender(Cmdline, argc-i, argv+i);
@@ -747,11 +773,17 @@ int cmdReview(int argc, const char **argv)
     const char *arg = 0;
     const char *exportFormat = "txt";
     ReviewMode reviewMode = RM_RAW;
+    const char *output = 0;
+
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
             if (i>=argc) usage();
             configFile = argv[i]; i++;
+
+        } else if (0 == strcmp(arg, "-o")) {
+            if (i>=argc) usage();
+            output = argv[i]; i++;
 
         } else if (0 == strcmp(arg, "-x")) {
             if (i>=argc) usage();
@@ -771,6 +803,8 @@ int cmdReview(int argc, const char **argv)
     r = loadRequirements(false);
     if (r != 0) return 1;
 
+    if (output) initOutputFd(output);
+
     if (0 == strcmp(exportFormat, "txt")) printTextOfReqs(argc-i, argv+i, reviewMode, REQ_X_TXT);
     else if (0 == strcmp(exportFormat, "csv")) printTextOfReqs(argc-i, argv+i, reviewMode, REQ_X_CSV);
     else {
@@ -778,6 +812,22 @@ int cmdReview(int argc, const char **argv)
     }
 
     return 0;
+}
+
+/** cmdOpen is suitable for opening by double-click in Windows
+  *
+  * It is equivalent to "req trac -c <config> -x html -o <config>-yyyymmdd-HHMMSS.html"
+  * and opening the resulting file.
+  *
+  */
+int cmdOpen(const char *file)
+{
+    std::string outputFile = file;
+    trimExtension(outputFile);
+    // add timestamp and ".html"
+    outputFile += "-" + getDatetimePath() + ".html";
+    const char *argv[6] = { "-c", file, "-x", "html", "-o", outputFile.c_str() };
+    return cmdTrac(6, argv);
 }
 
 
@@ -788,6 +838,7 @@ int cmdConfig(int argc, const char **argv)
     int i = 0;
     const char *configFile = DEFAULT_CONF;
     const char *arg = 0;
+
     while (i<argc) {
         arg = argv[i]; i++;
         if (0 == strcmp(arg, "-c")) {
@@ -795,7 +846,8 @@ int cmdConfig(int argc, const char **argv)
             configFile = argv[i]; i++;
         }
     }
-    printf("Config file: %s\n", configFile);
+
+    OUTPUT("Config file: %s\n", configFile);
 
     int r = loadConfiguration(configFile);
     if (r != 0) return 1;
@@ -804,13 +856,13 @@ int cmdConfig(int argc, const char **argv)
     std::map<std::string, ReqFileConfig*>::iterator c;
     FOREACH(c, ReqConfig) {
         ReqFileConfig f = *(c->second);
-        printf("%s: -path '%s'\n", c->first.c_str(), f.path.c_str());
-        printf("%s: -req '%s'", c->first.c_str(), f.reqPattern.c_str());
-        if (!f.refPattern.empty()) printf(" -ref '%s'", f.refPattern.c_str());
-        if (!f.startAfter.empty()) printf(" -start '%s'", f.startAfter.c_str());
-        if (!f.stopAfter.empty()) printf(" -stop '%s'", f.stopAfter.c_str());
-        if (f.nocov) printf(" -nocov");
-        printf("\n");
+        OUTPUT("%s: -path '%s'\n", c->first.c_str(), f.path.c_str());
+        OUTPUT("%s: -req '%s'", c->first.c_str(), f.reqPattern.c_str());
+        if (!f.refPattern.empty()) OUTPUT(" -ref '%s'", f.refPattern.c_str());
+        if (!f.startAfter.empty()) OUTPUT(" -start '%s'", f.startAfter.c_str());
+        if (!f.stopAfter.empty()) OUTPUT(" -stop '%s'", f.stopAfter.c_str());
+        if (f.nocov) OUTPUT(" -nocov");
+        OUTPUT("\n");
     }
 
     return 0;
@@ -850,18 +902,18 @@ int cmdRegex(int argc, const char **argv)
     regmatch_t pmatch[N];
     reti = regexec(&regex, text, N, pmatch, 0);
     if (!reti) {
-        printf("Match: \n");
+        OUTPUT("Match: \n");
         int i;
         for (i=0; i<N; i++) {
             if (pmatch[i].rm_so != -1) {
                 int length = pmatch[i].rm_eo - pmatch[i].rm_so;
                 memcpy(buffer, text+pmatch[i].rm_so, length);
                 buffer[length] = 0;
-                printf("match[%d]: %s\n", i, buffer);
-            } else printf("match[%d]:\n", i);
+                OUTPUT("match[%d]: %s\n", i, buffer);
+            } else OUTPUT("match[%d]:\n", i);
         }
     } else if (reti == REG_NOMATCH) {
-        printf("No match\n");
+        OUTPUT("No match\n");
 
     } else {
         char msgbuf[100];
@@ -893,6 +945,7 @@ int main(int argc, const char **argv)
     else if (command == "regex")   rc = cmdRegex(argc-2, argv+2);
     else if (command == "debug")   rc = cmdDebug(argc-2, argv+2);
     else if (command == "review")  rc = cmdReview(argc-2, argv+2);
+    else if (argc == 2)            rc = cmdOpen(argv[1]);
     else usage();
 
     printErrors();

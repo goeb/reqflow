@@ -13,6 +13,8 @@
  */
 
 #include <string.h>
+#include <stdio.h>
+#include <errno.h>
 
 #include "logging.h"
 
@@ -29,4 +31,16 @@ bool doPrint(enum LogLevel msgLevel)
     }
     return (policy >= msgLevel);
 }
+
+FILE *FD_OUT = stdout; // default is stdout
+
+void initOutputFd(const char *file)
+{
+    FD_OUT = fopen(file, "wb");
+    if (NULL == FD_OUT) {
+        LOG_DEBUG("Could not open file '%s', %s", file, strerror(errno));
+        exit(1);
+    }
+}
+
 

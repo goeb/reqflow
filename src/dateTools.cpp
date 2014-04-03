@@ -61,3 +61,18 @@ std::string getDatetime()
     return buffer;
 }
 
+/** Return timestamp suitable for a file path
+  * Format: 20141231-235959
+  */
+std::string getDatetimePath()
+{
+    struct tm date;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    localtime_r(&tv.tv_sec, &date);
+    //int milliseconds = tv.tv_usec / 1000;
+    char buffer[100];
+    sprintf(buffer, "%.4d%.2d%.2d-%.2d%.2d%.2d", date.tm_year + 1900,
+            date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
+    return buffer;
+}

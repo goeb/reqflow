@@ -24,6 +24,8 @@ void trimLeft(std::string & s, const char *c);
 void trimRight(std::string &s, const char *c);
 void trim(std::string &s, const char *c);
 void trimBlanks(std::string &s);
+void trimExtension(std::string &s);
+
 std::string pop(std::list<std::string> & L);
 std::vector<std::string> split(const std::string &s, const char *c, int limit = -1);
 

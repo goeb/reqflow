@@ -1,3 +1,3 @@
 
-req trac -x html > reqReport.html
+req trac -x html -c conf.req > reqReport.html
 start reqReport.html

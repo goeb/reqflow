@@ -32,6 +32,10 @@ enum LogLevel {
     LL_DEBUG
 };
 
+extern FILE *FD_OUT;
+#define OUTPUT(...) fprintf(FD_OUT, __VA_ARGS__)
+
+void initOutputFd(const char *file);
 bool doPrint(enum LogLevel msgLevel);
 
 #define LOG_ERROR(...) do { if (doPrint(LL_ERROR)) { LOG("ERROR", __VA_ARGS__); } } while (0)

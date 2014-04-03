@@ -55,6 +55,12 @@ void trimBlanks(std::string &s)
     trimRight(s, "\n\t\r ");
 }
 
+void trimExtension(std::string &s)
+{
+    size_t i = s.find_last_of('.');
+    if (i != std::string::npos) s = s.substr(0, i);
+}
+
 std::string pop(std::list<std::string> & L)
 {
     std::string token = "";
@@ -217,3 +223,5 @@ std::string escapeCsv(const std::string &input)
     result += '"';
     return result;
 }
+
+
