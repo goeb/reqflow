@@ -839,7 +839,7 @@ int cmdOpen(const char *file)
          * Who knows why - this is just the way windows works.
          */
 
-        cmd = "\"start " + outputFile + "\"";
+        cmd = "\"start \"" + outputFile + "\"\"";
 
 #else
         cmd = "echo \"Output file: " + outputFile + "\"";
