@@ -827,7 +827,28 @@ int cmdOpen(const char *file)
     // add timestamp and ".html"
     outputFile += "-" + getDatetimePath() + ".html";
     const char *argv[6] = { "-c", file, "-x", "html", "-o", outputFile.c_str() };
-    return cmdTrac(6, argv);
+    int r = cmdTrac(6, argv);
+
+    // close output file
+    closeOutputFd();
+    if (r == 0) {
+        // open in a web browser
+        std::string cmd;
+#ifdef _WIN32
+        /* On windows, we have to put double-quotes around the entire command.
+         * Who knows why - this is just the way windows works.
+         */
+
+        cmd = "\"start " + outputFile + "\"";
+
+#else
+        cmd = "echo \"Output file: " + outputFile + "\"";
+#endif
+        printf("DEBUG: system(%s)\n", cmd.c_str());
+        r = system(cmd.c_str());
+        printf("DEBUG: system(%s)=%d\n", cmd.c_str(), r);
+    }
+    return r;
 }
 
 

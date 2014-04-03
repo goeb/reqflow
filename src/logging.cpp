@@ -43,4 +43,8 @@ void initOutputFd(const char *file)
     }
 }
 
+void closeOutputFd()
+{
+    fclose(FD_OUT);
+}
 

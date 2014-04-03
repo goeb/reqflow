@@ -36,7 +36,9 @@ extern FILE *FD_OUT;
 #define OUTPUT(...) fprintf(FD_OUT, __VA_ARGS__)
 
 void initOutputFd(const char *file);
+void closeOutputFd();
 bool doPrint(enum LogLevel msgLevel);
+
 
 #define LOG_ERROR(...) do { if (doPrint(LL_ERROR)) { LOG("ERROR", __VA_ARGS__); } } while (0)
 #define LOG_INFO(...)  do { if (doPrint(LL_INFO)) { LOG("INFO ", __VA_ARGS__); } } while (0)
