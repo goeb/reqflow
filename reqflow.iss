@@ -32,13 +32,14 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "req.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "README-win.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\README-win.txt"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 
 
 [Registry]

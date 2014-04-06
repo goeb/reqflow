@@ -215,7 +215,7 @@ int loadConfiguration(const char * file)
                     std::string key = pop(*line);
                     std::string value = pop(*line);
                     LOG_DEBUG("Add variable '%s'='%s'", key.c_str(), value.c_str());
-                    defs.push_back(std::make_pair(key, value));
+                    defs.push_front(std::make_pair(key, value));
                 }
             } // else, parse arguments below...
         }

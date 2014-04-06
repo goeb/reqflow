@@ -16,7 +16,7 @@
 #define _global_h
 
 
-#define VERSION "1.3.0-rc2"
+#define VERSION "1.3.0"
 
 // prepare for gettext
 #define _(String) (String)
