@@ -99,10 +99,6 @@ win:
 	$(MAKE) WIN=1
 	i586-mingw32msvc-strip req.exe
 	set -e; V=`grep "#define VERSION" src/* |sed -e "s/.*VERSION *//" -e 's/"//g'`; \
-		zipname=reqflow-v$$V.zip; \
-		zip $$zipname req.exe; \
-		cd bin; \
-		zip ../$$zipname reqReport.bat
-
+		wine $(HOME)/.wine/drive_c/Program\ Files/Inno\ Setup\ 5/ISCC.exe /q /F"reqflow-$$V-setup" /O"build_win" reqflow.iss
 
 include $(DEPENDS)

@@ -835,18 +835,13 @@ int cmdOpen(const char *file)
         // open in a web browser
         std::string cmd;
 #ifdef _WIN32
-        /* On windows, we have to put double-quotes around the entire command.
-         * Who knows why - this is just the way windows works.
-         */
+        // On windows, we have to put double-quotes around the entire command
 
-        cmd = "\"start \"" + outputFile + "\"\"";
-
+        cmd = "\"start \"\" \"" + outputFile + "\"\"";
 #else
         cmd = "echo \"Output file: " + outputFile + "\"";
 #endif
-        printf("DEBUG: system(%s)\n", cmd.c_str());
         r = system(cmd.c_str());
-        printf("DEBUG: system(%s)=%d\n", cmd.c_str(), r);
     }
     return r;
 }

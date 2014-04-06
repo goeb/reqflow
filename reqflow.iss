@@ -22,7 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=C:\LICENSE
+LicenseFile=LICENSE
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
@@ -31,7 +31,7 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "C:\req.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "req.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -42,12 +42,11 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 
 [Registry]
-Root: HKCR; Subkey: ".rqf"; ValueType: string; ValueName: ""; ValueData: "Reqflow"; Flags: uninsdeletevalue
-
+; associate .req files with reqflow
+Root: HKCR; Subkey: ".req"; ValueType: string; ValueName: ""; ValueData: "Reqflow"; Flags: uninsdeletevalue
 Root: HKCR; Subkey: "Reqflow"; ValueType: string; ValueName: ""; ValueData: "Reqflow File"; Flags: uninsdeletekey
-
 Root: HKCR; Subkey: "Reqflow\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\REQ.EXE,0"
-
 Root: HKCR; Subkey: "Reqflow\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\REQ.EXE"" ""%1""" 
 
+; set reqflow in the PATH
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"
