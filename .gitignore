@@ -6,10 +6,13 @@
 *.o
 *.gcno
 *.gcda
+
+# ignore binaries
 /req
+/main_*
 
 # ignore ./configure generated files
-/config.h
+/src/config.h
 Makefile
 /.deps/
 /stamp-h1

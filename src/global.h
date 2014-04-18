@@ -20,16 +20,4 @@
 
 #define FOREACH(var, container) for (var=container.begin(); var!= container.end(); var++)
 
-
-#ifdef _WIN32
-inline struct tm *localtime_r(const time_t *timep, struct tm *result)
-{
-    struct tm *lt = localtime(timep);
-    *result = *lt;
-    return result;
-}
-#endif
-
-
-
 #endif

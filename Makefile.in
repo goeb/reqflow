@@ -86,16 +86,22 @@ target_triplet = @target@
 @GPROF_ENABLED_TRUE@am__append_4 = -pg -fprofile-arcs
 @GPROF_ENABLED_TRUE@am__append_5 = -pg -fprofile-arcs
 @GPROF_ENABLED_TRUE@am__append_6 = -pg -lgcov
-@WINDOWS_TRUE@am__append_7 = -DHAVE_STDINT -DLIBXML_STATIC \
-@WINDOWS_TRUE@	-DPCRE_STATIC -DZIP_EXTERN= -DZLIB_INTERNAL \
+@WINDOWS_TRUE@am__append_7 = -Wl,-Bstatic -DZIP_EXTERN= \
+@WINDOWS_TRUE@	-DZLIB_INTERNAL -DLIBXML_STATIC -DPCRE_STATIC \
 @WINDOWS_TRUE@	-Dpoppler_cpp_EXPORTS
-@WINDOWS_TRUE@am__append_8 = -lws2_32 -lgdi32 -Wl,-Bstatic
+@WINDOWS_TRUE@am__append_8 = -Wl,-Bstatic -DZIP_EXTERN= \
+@WINDOWS_TRUE@	-DZLIB_INTERNAL -DLIBXML_STATIC -DPCRE_STATIC \
+@WINDOWS_TRUE@	-Dpoppler_cpp_EXPORTS
 bin_PROGRAMS = req$(EXEEXT)
+noinst_PROGRAMS = main_pdf$(EXEEXT) main_regex$(EXEEXT) \
+	main_unzip$(EXEEXT) main_xml$(EXEEXT) \
+	main_testStringCompare$(EXEEXT)
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(top_srcdir)/src/config.h.in depcomp $(dist_pkgdata_DATA) \
-	COPYING INSTALL config.guess config.sub install-sh missing
+	COPYING INSTALL compile config.guess config.sub install-sh \
+	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -107,8 +113,26 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgdatadir)"
-PROGRAMS = $(bin_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
+am_main_pdf_OBJECTS = src/main_pdf-main_pdf.$(OBJEXT)
+main_pdf_OBJECTS = $(am_main_pdf_OBJECTS)
+am__DEPENDENCIES_1 =
+main_pdf_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_main_regex_OBJECTS = src/main_regex-main_regex.$(OBJEXT)
+main_regex_OBJECTS = $(am_main_regex_OBJECTS)
+main_regex_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_main_testStringCompare_OBJECTS =  \
+	src/main_testStringCompare-main_testStringCompare.$(OBJEXT) \
+	src/main_testStringCompare-stringTools.$(OBJEXT)
+main_testStringCompare_OBJECTS = $(am_main_testStringCompare_OBJECTS)
+main_testStringCompare_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_main_unzip_OBJECTS = src/main_unzip-main_unzip.$(OBJEXT)
+main_unzip_OBJECTS = $(am_main_unzip_OBJECTS)
+main_unzip_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_main_xml_OBJECTS = src/main_xml-main_xml.$(OBJEXT)
+main_xml_OBJECTS = $(am_main_xml_OBJECTS)
+main_xml_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_req_OBJECTS = src/req-main.$(OBJEXT) src/req-logging.$(OBJEXT) \
 	src/req-dateTools.$(OBJEXT) src/req-parseConfig.$(OBJEXT) \
 	src/req-req.$(OBJEXT) src/req-ReqDocumentTxt.$(OBJEXT) \
@@ -117,9 +141,8 @@ am_req_OBJECTS = src/req-main.$(OBJEXT) src/req-logging.$(OBJEXT) \
 	src/req-stringTools.$(OBJEXT) src/req-renderingHtml.$(OBJEXT) \
 	src/req-ReqDocumentPdf.$(OBJEXT)
 req_OBJECTS = $(am_req_OBJECTS)
-req_LDADD = $(LDADD)
-req_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(req_LDFLAGS) \
-	$(LDFLAGS) -o $@
+req_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -140,6 +163,18 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 AM_V_CXX = $(am__v_CXX_@AM_V@)
@@ -153,8 +188,12 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(req_SOURCES)
-DIST_SOURCES = $(req_SOURCES)
+SOURCES = $(main_pdf_SOURCES) $(main_regex_SOURCES) \
+	$(main_testStringCompare_SOURCES) $(main_unzip_SOURCES) \
+	$(main_xml_SOURCES) $(req_SOURCES)
+DIST_SOURCES = $(main_pdf_SOURCES) $(main_regex_SOURCES) \
+	$(main_testStringCompare_SOURCES) $(main_unzip_SOURCES) \
+	$(main_xml_SOURCES) $(req_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -383,34 +422,53 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Manage configure options
-AM_CPPFLAGS = -Wall $(am__append_7)
-AM_CFLAGS = -Wall $(am__append_1) $(am__append_4)
-AM_CXXFLAGS = -Wall $(am__append_2) $(am__append_5)
-AM_LDFLAGS = $(am__append_3) $(am__append_6) $(am__append_8)
+AM_CPPFLAGS = -Wall
+AM_CFLAGS = -Wall $(am__append_1) $(am__append_4) $(am__append_7)
+AM_CXXFLAGS = -Wall $(am__append_2) $(am__append_5) $(am__append_8)
+AM_LDFLAGS = $(am__append_3) $(am__append_6)
 req_SOURCES = src/main.cpp \
-src/logging.cpp \
-src/dateTools.cpp \
-src/parseConfig.cpp \
-src/req.cpp \
-src/ReqDocumentTxt.cpp \
-src/ReqDocumentDocx.cpp \
-src/ReqDocumentHtml.cpp \
-src/stringTools.cpp \
-src/renderingHtml.cpp \
-src/ReqDocumentPdf.cpp
+    src/logging.cpp \
+    src/dateTools.cpp \
+    src/parseConfig.cpp \
+    src/req.cpp \
+    src/ReqDocumentTxt.cpp \
+    src/ReqDocumentDocx.cpp \
+    src/ReqDocumentHtml.cpp \
+    src/stringTools.cpp \
+    src/renderingHtml.cpp \
+    src/ReqDocumentPdf.cpp
 
 req_CPPFLAGS = $(ZIP_CFLAGS) $(XML_CFLAGS) $(POPPLER_CFLAGS) $(PCRE_CFLAGS)
-req_LDFLAGS = $(ZIP_LIBS) $(XML_LIBS) $(POPPLER_LIBS) $(PCRE_LIBS)
+req_LDADD = $(ZIP_LIBS) $(XML_LIBS) $(POPPLER_LIBS) $(PCRE_LIBS) 
 
 # specific subdirs
 SUBDIRS = test
 
 # data
 dist_pkgdata_DATA = README.md COPYING CHANGES
+
+# Test sub-programs (will not be packaged)
+main_pdf_SOURCES = src/main_pdf.cpp
+main_pdf_CPPFLAGS = $(POPPLER_CFLAGS)
+main_pdf_LDADD = $(POPPLER_LIBS) $(JPEG_LIBS)
+main_regex_SOURCES = src/main_regex.c
+main_regex_CPPFLAGS = $(PCRE_CFLAGS)
+main_regex_LDADD = $(PCRE_LIBS)
+main_unzip_SOURCES = src/main_unzip.c
+main_unzip_CPPFLAGS = $(ZIP_CFLAGS)
+main_unzip_LDADD = $(ZIP_LIBS)
+main_xml_SOURCES = src/main_xml.c
+main_xml_CPPFLAGS = $(XML_CFLAGS)
+main_xml_LDADD = $(XML_LIBS)
+main_testStringCompare_SOURCES = src/main_testStringCompare.cpp \
+    src/stringTools.cpp
+
+main_testStringCompare_CPPFLAGS = $(PCRE_CFLAGS)
+main_testStringCompare_LDADD = $(PCRE_LIBS)
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .cpp .o .obj
+.SUFFIXES: .c .cpp .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -502,12 +560,47 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 src/$(am__dirstamp):
 	@$(MKDIR_P) src
 	@: > src/$(am__dirstamp)
 src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/$(DEPDIR)
 	@: > src/$(DEPDIR)/$(am__dirstamp)
+src/main_pdf-main_pdf.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+main_pdf$(EXEEXT): $(main_pdf_OBJECTS) $(main_pdf_DEPENDENCIES) $(EXTRA_main_pdf_DEPENDENCIES) 
+	@rm -f main_pdf$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(main_pdf_OBJECTS) $(main_pdf_LDADD) $(LIBS)
+src/main_regex-main_regex.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+main_regex$(EXEEXT): $(main_regex_OBJECTS) $(main_regex_DEPENDENCIES) $(EXTRA_main_regex_DEPENDENCIES) 
+	@rm -f main_regex$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(main_regex_OBJECTS) $(main_regex_LDADD) $(LIBS)
+src/main_testStringCompare-main_testStringCompare.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/main_testStringCompare-stringTools.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+main_testStringCompare$(EXEEXT): $(main_testStringCompare_OBJECTS) $(main_testStringCompare_DEPENDENCIES) $(EXTRA_main_testStringCompare_DEPENDENCIES) 
+	@rm -f main_testStringCompare$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(main_testStringCompare_OBJECTS) $(main_testStringCompare_LDADD) $(LIBS)
+src/main_unzip-main_unzip.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+main_unzip$(EXEEXT): $(main_unzip_OBJECTS) $(main_unzip_DEPENDENCIES) $(EXTRA_main_unzip_DEPENDENCIES) 
+	@rm -f main_unzip$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(main_unzip_OBJECTS) $(main_unzip_LDADD) $(LIBS)
+src/main_xml-main_xml.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+main_xml$(EXEEXT): $(main_xml_OBJECTS) $(main_xml_DEPENDENCIES) $(EXTRA_main_xml_DEPENDENCIES) 
+	@rm -f main_xml$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(main_xml_OBJECTS) $(main_xml_LDADD) $(LIBS)
 src/req-main.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/req-logging.$(OBJEXT): src/$(am__dirstamp) \
@@ -533,7 +626,7 @@ src/req-ReqDocumentPdf.$(OBJEXT): src/$(am__dirstamp) \
 
 req$(EXEEXT): $(req_OBJECTS) $(req_DEPENDENCIES) $(EXTRA_req_DEPENDENCIES) 
 	@rm -f req$(EXEEXT)
-	$(AM_V_CXXLD)$(req_LINK) $(req_OBJECTS) $(req_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(req_OBJECTS) $(req_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -542,6 +635,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_pdf-main_pdf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_regex-main_regex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_testStringCompare-stringTools.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_unzip-main_unzip.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_xml-main_xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentDocx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentHtml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentPdf.Po@am__quote@
@@ -553,6 +652,64 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-renderingHtml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-req.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-stringTools.Po@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+src/main_regex-main_regex.o: src/main_regex.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_regex_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main_regex-main_regex.o -MD -MP -MF src/$(DEPDIR)/main_regex-main_regex.Tpo -c -o src/main_regex-main_regex.o `test -f 'src/main_regex.c' || echo '$(srcdir)/'`src/main_regex.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_regex-main_regex.Tpo src/$(DEPDIR)/main_regex-main_regex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/main_regex.c' object='src/main_regex-main_regex.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_regex_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main_regex-main_regex.o `test -f 'src/main_regex.c' || echo '$(srcdir)/'`src/main_regex.c
+
+src/main_regex-main_regex.obj: src/main_regex.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_regex_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main_regex-main_regex.obj -MD -MP -MF src/$(DEPDIR)/main_regex-main_regex.Tpo -c -o src/main_regex-main_regex.obj `if test -f 'src/main_regex.c'; then $(CYGPATH_W) 'src/main_regex.c'; else $(CYGPATH_W) '$(srcdir)/src/main_regex.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_regex-main_regex.Tpo src/$(DEPDIR)/main_regex-main_regex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/main_regex.c' object='src/main_regex-main_regex.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_regex_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main_regex-main_regex.obj `if test -f 'src/main_regex.c'; then $(CYGPATH_W) 'src/main_regex.c'; else $(CYGPATH_W) '$(srcdir)/src/main_regex.c'; fi`
+
+src/main_unzip-main_unzip.o: src/main_unzip.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_unzip_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main_unzip-main_unzip.o -MD -MP -MF src/$(DEPDIR)/main_unzip-main_unzip.Tpo -c -o src/main_unzip-main_unzip.o `test -f 'src/main_unzip.c' || echo '$(srcdir)/'`src/main_unzip.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_unzip-main_unzip.Tpo src/$(DEPDIR)/main_unzip-main_unzip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/main_unzip.c' object='src/main_unzip-main_unzip.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_unzip_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main_unzip-main_unzip.o `test -f 'src/main_unzip.c' || echo '$(srcdir)/'`src/main_unzip.c
+
+src/main_unzip-main_unzip.obj: src/main_unzip.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_unzip_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main_unzip-main_unzip.obj -MD -MP -MF src/$(DEPDIR)/main_unzip-main_unzip.Tpo -c -o src/main_unzip-main_unzip.obj `if test -f 'src/main_unzip.c'; then $(CYGPATH_W) 'src/main_unzip.c'; else $(CYGPATH_W) '$(srcdir)/src/main_unzip.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_unzip-main_unzip.Tpo src/$(DEPDIR)/main_unzip-main_unzip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/main_unzip.c' object='src/main_unzip-main_unzip.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_unzip_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main_unzip-main_unzip.obj `if test -f 'src/main_unzip.c'; then $(CYGPATH_W) 'src/main_unzip.c'; else $(CYGPATH_W) '$(srcdir)/src/main_unzip.c'; fi`
+
+src/main_xml-main_xml.o: src/main_xml.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_xml_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main_xml-main_xml.o -MD -MP -MF src/$(DEPDIR)/main_xml-main_xml.Tpo -c -o src/main_xml-main_xml.o `test -f 'src/main_xml.c' || echo '$(srcdir)/'`src/main_xml.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_xml-main_xml.Tpo src/$(DEPDIR)/main_xml-main_xml.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/main_xml.c' object='src/main_xml-main_xml.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_xml_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main_xml-main_xml.o `test -f 'src/main_xml.c' || echo '$(srcdir)/'`src/main_xml.c
+
+src/main_xml-main_xml.obj: src/main_xml.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_xml_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main_xml-main_xml.obj -MD -MP -MF src/$(DEPDIR)/main_xml-main_xml.Tpo -c -o src/main_xml-main_xml.obj `if test -f 'src/main_xml.c'; then $(CYGPATH_W) 'src/main_xml.c'; else $(CYGPATH_W) '$(srcdir)/src/main_xml.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_xml-main_xml.Tpo src/$(DEPDIR)/main_xml-main_xml.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/main_xml.c' object='src/main_xml-main_xml.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_xml_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main_xml-main_xml.obj `if test -f 'src/main_xml.c'; then $(CYGPATH_W) 'src/main_xml.c'; else $(CYGPATH_W) '$(srcdir)/src/main_xml.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -569,6 +726,48 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+src/main_pdf-main_pdf.o: src/main_pdf.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_pdf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/main_pdf-main_pdf.o -MD -MP -MF src/$(DEPDIR)/main_pdf-main_pdf.Tpo -c -o src/main_pdf-main_pdf.o `test -f 'src/main_pdf.cpp' || echo '$(srcdir)/'`src/main_pdf.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_pdf-main_pdf.Tpo src/$(DEPDIR)/main_pdf-main_pdf.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/main_pdf.cpp' object='src/main_pdf-main_pdf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_pdf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_pdf-main_pdf.o `test -f 'src/main_pdf.cpp' || echo '$(srcdir)/'`src/main_pdf.cpp
+
+src/main_pdf-main_pdf.obj: src/main_pdf.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_pdf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/main_pdf-main_pdf.obj -MD -MP -MF src/$(DEPDIR)/main_pdf-main_pdf.Tpo -c -o src/main_pdf-main_pdf.obj `if test -f 'src/main_pdf.cpp'; then $(CYGPATH_W) 'src/main_pdf.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main_pdf.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_pdf-main_pdf.Tpo src/$(DEPDIR)/main_pdf-main_pdf.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/main_pdf.cpp' object='src/main_pdf-main_pdf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_pdf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_pdf-main_pdf.obj `if test -f 'src/main_pdf.cpp'; then $(CYGPATH_W) 'src/main_pdf.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main_pdf.cpp'; fi`
+
+src/main_testStringCompare-main_testStringCompare.o: src/main_testStringCompare.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/main_testStringCompare-main_testStringCompare.o -MD -MP -MF src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Tpo -c -o src/main_testStringCompare-main_testStringCompare.o `test -f 'src/main_testStringCompare.cpp' || echo '$(srcdir)/'`src/main_testStringCompare.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Tpo src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/main_testStringCompare.cpp' object='src/main_testStringCompare-main_testStringCompare.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_testStringCompare-main_testStringCompare.o `test -f 'src/main_testStringCompare.cpp' || echo '$(srcdir)/'`src/main_testStringCompare.cpp
+
+src/main_testStringCompare-main_testStringCompare.obj: src/main_testStringCompare.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/main_testStringCompare-main_testStringCompare.obj -MD -MP -MF src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Tpo -c -o src/main_testStringCompare-main_testStringCompare.obj `if test -f 'src/main_testStringCompare.cpp'; then $(CYGPATH_W) 'src/main_testStringCompare.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main_testStringCompare.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Tpo src/$(DEPDIR)/main_testStringCompare-main_testStringCompare.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/main_testStringCompare.cpp' object='src/main_testStringCompare-main_testStringCompare.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_testStringCompare-main_testStringCompare.obj `if test -f 'src/main_testStringCompare.cpp'; then $(CYGPATH_W) 'src/main_testStringCompare.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main_testStringCompare.cpp'; fi`
+
+src/main_testStringCompare-stringTools.o: src/stringTools.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/main_testStringCompare-stringTools.o -MD -MP -MF src/$(DEPDIR)/main_testStringCompare-stringTools.Tpo -c -o src/main_testStringCompare-stringTools.o `test -f 'src/stringTools.cpp' || echo '$(srcdir)/'`src/stringTools.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_testStringCompare-stringTools.Tpo src/$(DEPDIR)/main_testStringCompare-stringTools.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/stringTools.cpp' object='src/main_testStringCompare-stringTools.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_testStringCompare-stringTools.o `test -f 'src/stringTools.cpp' || echo '$(srcdir)/'`src/stringTools.cpp
+
+src/main_testStringCompare-stringTools.obj: src/stringTools.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/main_testStringCompare-stringTools.obj -MD -MP -MF src/$(DEPDIR)/main_testStringCompare-stringTools.Tpo -c -o src/main_testStringCompare-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/main_testStringCompare-stringTools.Tpo src/$(DEPDIR)/main_testStringCompare-stringTools.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/stringTools.cpp' object='src/main_testStringCompare-stringTools.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_testStringCompare-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
 
 src/req-main.o: src/main.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-main.o -MD -MP -MF src/$(DEPDIR)/req-main.Tpo -c -o src/req-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
@@ -1074,7 +1273,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-noinstPROGRAMS \
+	mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -1148,22 +1348,22 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_pkgdataDATA
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-binPROGRAMS \
-	clean-cscope clean-generic cscope cscopelist-am ctags ctags-am \
-	dist dist-all dist-bzip2 dist-gzip dist-lzip dist-shar \
-	dist-tarZ dist-xz dist-zip distcheck distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am \
-	install-dist_pkgdataDATA install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-dist_pkgdataDATA
+	clean-cscope clean-generic clean-noinstPROGRAMS cscope \
+	cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
+	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
+	distcheck distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dist_pkgdataDATA install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
+	ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-dist_pkgdataDATA
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Reqflow], [1.3.0], [], [reqflow], [http://github.com/goeb/reqflow/issues])
+AC_INIT([Reqflow], [1.3.0], [], [reqflow], [http://goeb.github.io/reqflow])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
@@ -36,12 +36,17 @@ AM_CONDITIONAL(MINGW, test x$MINGW = xyes)
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AM_PROG_CC_C_O
 
-# Checks for libraries.
+# Checks for external libraries.
+PKG_PROG_PKG_CONFIG()
+if test x$WINDOWS = xyes; then
+    PKG_CONFIG="$PKG_CONFIG --static"
+fi
 PKG_CHECK_MODULES(ZIP, libzip)
 PKG_CHECK_MODULES(XML, libxml-2.0)
-PKG_CHECK_MODULES(POPPLER, [poppler poppler-cpp])
-PKG_CHECK_MODULES(PCRE, [libpcreposix libpcre])
+PKG_CHECK_MODULES(POPPLER, [poppler-cpp])
+PKG_CHECK_MODULES(PCRE, [libpcreposix])
 
 AC_ARG_ENABLE([gcov],
   [AS_HELP_STRING([--enable-gcov],
@@ -56,14 +61,12 @@ AM_CONDITIONAL([GPROF_ENABLED],[test x$enable_gprof = xyes])
 AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_MODE_T
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([gettimeofday localtime_r regcomp strcasecmp strchr strerror strstr strtoul])
+AC_CHECK_FUNCS([gettimeofday localtime regcomp strcasecmp strchr strerror strstr strtoul])
 
 AC_CONFIG_FILES([Makefile test/Makefile])
 AC_OUTPUT
