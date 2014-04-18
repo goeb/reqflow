@@ -1,0 +1,23 @@
+# temporary files
+*~
+*.swp
+
+# ignore compilation files
+*.o
+*.gcno
+*.gcda
+/req
+
+# ignore ./configure generated files
+/config.h
+Makefile
+/.deps/
+/stamp-h1
+
+# ignore Autotools generated files
+/autom4te.cache/
+/autoscan.log
+/configure.scan
+/config.log
+/config.status
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+../req trac > trac1.out 2>&1
+diff trac1.out trac1.ref
+
