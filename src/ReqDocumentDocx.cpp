@@ -40,7 +40,8 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
                     attribute = attribute->next;
                 }
                 // TODO take benefit of styles in the future
-            }
+            } else if (0 == strcmp((char*)currentNode->name, "del")) continue; // ignore deleted text (revision marks)
+
             LOG_DEBUG("node: %s", (char*)currentNode->name);
             nodeName = (char*)currentNode->name;
 
@@ -57,6 +58,7 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
             xmlFree(text);
         }
 
+        // recursively go down the xml structure
         loadDocxXmlNode(doc, currentNode->children, debug);
 
         if (nodeName =="p" && !textInParagraphCurrent.empty()) {
