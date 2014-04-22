@@ -87,3 +87,6 @@ all-local: @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
 	$(WINE) "@ISCC@" /q /dMyAppName=@PACKAGE_NAME@ /dMyAppVersion=@PACKAGE_VERSION@ /dMyAppExeName=req$(EXEEXT) /f@PACKAGE_TARNAME@-@VERSION@-setup $<
 endif
 
+clean-local:
+	rm -f @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
+
