@@ -1,0 +1,56 @@
+This directory contains the 1.3.0 release of Reqflow.
+
+See the file NEWS for the user-visible changes from previous releases.
+In addition, there have been bugs fixed.
+
+Please check the system-specific notes below for any caveats related to
+your operating system.
+
+For general building and installation instructions, see the file INSTALL.
+
+Reqflow is free software.  See the file COPYING for copying conditions.
+
+
+Overview
+--------
+
+Reqflow is a free and open-source tool for tracing requirements across
+documents.
+
+To launch Reqflow:
+    - create a file with a .req extension, as follows,
+    - double-click it,
+    - this will generate an HTML report and open it.
+
+Sample file 'test.req'
+
+    define ALPHANUM [-a-zA-Z0-9_]
+    define REQ_PATTERN "REQ_ALPHANUM+"
+    define TST_PATTERN "TST_ALPHANUM+"
+    define REF_PATTERN "Ref: (ALPHANUM+)"
+
+    document SPEC -path SPEC.pdf -req REQ_PATTERN -stop-after Annex
+
+    document TEST -path TEST.docx
+        -req TST_PATTERN
+        -ref REF_PATTERN
+        -stop-after Annex
+        -nocov
+
+
+Downloading
+-----------
+
+Reqflow can be obtained in many different ways.  See a description here:
+
+    http://goeb.github.io/reqflow
+
+
+System-specific Notes
+---------------------
+
+Reqflow can be cross-compiled using the Mingw GNU toolchain. Use 
+mingw32-configure and make to generate the InnoSetup installer.
+
+    $ mingw32-configure ; make
+

@@ -22,7 +22,8 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=LICENSE
+LicenseFile=COPYING
+OutputDir=.
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
@@ -32,14 +33,24 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "req.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "README-win.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "README"; DestName: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "COPYING"; DestDir: "{app}"; Flags: ignoreversion
+Source: "NEWS"; DestDir: "{app}"; Flags: ignoreversion
+Source: "ChangeLog"; DestDir: "{app}"; Flags: ignoreversion
+Source: "AUTHORS"; DestDir: "{app}"; Flags: ignoreversion
+Source: "test\*.test"; DestDir: "{app}"; Flags: ignoreversion
+Source: "test\*.ref"; DestDir: "{app}"; Flags: ignoreversion
+Source: "test\*.req"; DestDir: "{app}"; Flags: ignoreversion
+Source: "test\*.pdf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "test\*.docx"; DestDir: "{app}"; Flags: ignoreversion
+Source: "test\*.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Run]
-Filename: "{app}\README-win.txt"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
+Filename: "{app}\README.txt"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 
 
 [Registry]
