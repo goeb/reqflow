@@ -6,6 +6,7 @@
 *.o
 *.gcno
 *.gcda
+*.gcov
 
 # ignore binaries
 /req

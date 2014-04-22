@@ -36,11 +36,11 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@GCOV_ENABLED_TRUE@am__append_1 = -fprofile-arcs -ftest-coverage
-@GCOV_ENABLED_TRUE@am__append_2 = -fprofile-arcs -ftest-coverage
+@GCOV_ENABLED_TRUE@am__append_1 = -O0 -g3 -fprofile-arcs -ftest-coverage
+@GCOV_ENABLED_TRUE@am__append_2 = -O0 -g3 -fprofile-arcs -ftest-coverage
 @GCOV_ENABLED_TRUE@am__append_3 = -lgcov
-@GPROF_ENABLED_TRUE@am__append_4 = -pg -fprofile-arcs
-@GPROF_ENABLED_TRUE@am__append_5 = -pg -fprofile-arcs
+@GPROF_ENABLED_TRUE@am__append_4 = -O0 -g3 -pg -fprofile-arcs
+@GPROF_ENABLED_TRUE@am__append_5 = -O0 -g3 -pg -fprofile-arcs
 @GPROF_ENABLED_TRUE@am__append_6 = -pg -lgcov
 @WINDOWS_TRUE@am__append_7 = -static -static-libgcc -DZIP_EXTERN= \
 @WINDOWS_TRUE@	-DZLIB_INTERNAL -DLIBXML_STATIC -DPCRE_STATIC \
@@ -1292,6 +1292,7 @@ dist-hook: bin/gitlog2changelog.py
 
 clean-local:
 	rm -f @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
+	rm -f src/*.gcno src/*.gcda *.*.gcov
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

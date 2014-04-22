@@ -5,14 +5,14 @@ AM_CXXFLAGS=-Wall
 AM_LDFLAGS=
 
 if GCOV_ENABLED
-    AM_CFLAGS += -fprofile-arcs -ftest-coverage
-    AM_CXXFLAGS += -fprofile-arcs -ftest-coverage
+    AM_CFLAGS += -O0 -g3 -fprofile-arcs -ftest-coverage
+    AM_CXXFLAGS += -O0 -g3 -fprofile-arcs -ftest-coverage
     AM_LDFLAGS += -lgcov
 endif
 
 if GPROF_ENABLED
-    AM_CFLAGS += -pg -fprofile-arcs
-    AM_CXXFLAGS += -pg -fprofile-arcs
+    AM_CFLAGS += -O0 -g3 -pg -fprofile-arcs
+    AM_CXXFLAGS += -O0 -g3 -pg -fprofile-arcs
     AM_LDFLAGS += -pg -lgcov
 endif
 
@@ -89,4 +89,5 @@ endif
 
 clean-local:
 	rm -f @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
+	rm -f src/*.gcno src/*.gcda *.*.gcov
 

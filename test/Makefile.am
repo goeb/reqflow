@@ -8,5 +8,7 @@ req-trac-html.test
 EXTRA_DIST = .
 # cleanup tests results before including
 dist-hook:
-	rm -rf $(distdir)/.git* $(distdir)/*~ $(distdir)/*.out
+	rm -f $(distdir)/.git* $(distdir)/*~ $(distdir)/*.out
 
+clean-local:
+	rm -f *.out
