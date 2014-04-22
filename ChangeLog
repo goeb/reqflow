@@ -1,0 +1,268 @@
+2014-04-18  Clément DAVID <clement.david@scilab-enterprises.com>
+
+  * .gitignore, COPYING, Makefile.am, Makefile.in, aclocal.m4, compile,
+  configure, configure.ac, src/config.h, src/config.h.in, src/dateTools.cpp,
+  src/global.h, src/main_pdf.cpp, src/main_regex.c,
+  src/main_testStringCompare.cpp, src/main_unzip.c, src/main_xml.c,
+  src/pdf.cpp, src/regex.c, src/testStringCompare.cpp, src/unzip.c, src/xml.c:
+  Switch the windows build to Autotools.  Also compile main tests to
+  non-installed binaries
+
+  * .gitignore, COPYING, INSTALL, LICENSE, Makefile, Makefile.am, Makefile.in,
+  aclocal.m4, config.guess, config.h.in, config.sub, configure, configure.ac,
+  depcomp, install-sh, missing, src/.gitignore, src/ReqDocumentDocx.cpp,
+  src/ReqDocumentHtml.cpp, src/ReqDocumentPdf.cpp, src/ReqDocumentTxt.cpp,
+  src/StringIt.cpp, src/config.h, src/config.h.in, src/dateTools.cpp,
+  src/global.h, src/logging.cpp, src/main.cpp, src/parseConfig.cpp,
+  src/renderingHtml.cpp, src/req.cpp, src/stringTools.cpp, test-driver,
+  test/.gitignore, test/Makefile, test/Makefile.am, test/Makefile.in,
+  test/req-stat.test, test/req-trac-html.test, test/req-trac-pdf.test,
+  test/req-trac.test: Switch to the Autotools to manage compile
+
+2014-04-06  fred <fred@fred1>
+
+  * CHANGES, LICENSE, README-win.txt, reqflow.iss, src/global.h, src/main.cpp:
+  finish windows installer with README
+
+  * CHANGES, Makefile, reqflow.iss, src/main.cpp: windows installer
+
+2014-04-03  fred <fred@fred1>
+
+  * reqflow.iss, src/main.cpp: inno setup file
+
+  * CHANGES, src/logging.cpp, src/logging.h, src/main.cpp: launch web browser
+  in Windows (cmdOpen)
+
+  * bin/reqReport.bat, src/dateTools.cpp, src/dateTools.h, src/logging.cpp,
+  src/logging.h, src/main.cpp, src/renderingHtml.cpp, src/stringTools.cpp,
+  src/stringTools.h: direct opening of config file (usage case 2)
+
+2014-03-26  fred <fred@fred1>
+
+  * CHANGES, req.files, src/StringIt.cpp, src/StringIt.h, src/global.h,
+  src/main.cpp, src/req.cpp, src/req.h: -type option in config file
+
+2014-03-10  fred <fred@fred1>
+
+  * src/main.cpp, src/renderingHtml.cpp, src/req.cpp, src/req.h, test/conf.req:
+  documents in config may be broken in several lines
+
+  * LICENSE, src/ReqDocumentDocx.cpp, src/ReqDocumentDocx.h,
+  src/ReqDocumentHtml.cpp, src/ReqDocumentHtml.h, src/ReqDocumentPdf.cpp,
+  src/ReqDocumentPdf.h, src/ReqDocumentTxt.cpp, src/ReqDocumentTxt.h,
+  src/dateTools.cpp, src/dateTools.h, src/global.h, src/logging.cpp,
+  src/logging.h, src/main.cpp, src/parseConfig.cpp, src/parseConfig.h,
+  src/renderingHtml.cpp, src/renderingHtml.h, src/req.cpp, src/req.h,
+  src/stringTools.cpp, src/stringTools.h: clarify license: GPLv2+
+
+2014-03-06  fred <fred@fred1>
+
+  * src/renderingHtml.cpp, test/SPEC.docx, test/TEST.txt, test/pdf.ref,
+  test/trac1.ref, test/trac2.ref: improve HTML report
+
+2014-03-05  fred <fred@fred1>
+
+  * CHANGES, src/global.h: v1.2.1
+
+  * src/ReqDocumentHtml.cpp, src/ReqDocumentPdf.cpp, src/ReqDocumentTxt.cpp:
+  finalize req text at end of documents
+
+2014-03-04  fred <fred@fred1>
+
+  * src/renderingHtml.cpp, src/req.cpp, src/req.h: errors displayed for each
+  document in HTML page
+
+  * src/ReqDocumentDocx.cpp, src/main.cpp, src/renderingHtml.cpp, src/req.cpp,
+  src/req.h, src/stringTools.cpp, src/stringTools.h, test/SPEC.docx,
+  test/html.ref, test/pdf.ref, test/trac1.ref, test/trac2.ref: review & errors
+  organized by document
+
+2014-03-03  fred <fred@fred1>
+
+  * src/ReqDocumentDocx.cpp, src/ReqDocumentDocx.h, src/ReqDocumentHtml.cpp,
+  src/ReqDocumentHtml.h, src/ReqDocumentPdf.cpp, src/ReqDocumentPdf.h,
+  src/ReqDocumentTxt.cpp, src/ReqDocumentTxt.h, src/main.cpp,
+  src/renderingHtml.cpp, src/req.cpp, src/req.h: use pointers
+
+2014-02-26  fred <fred@fred1>
+
+  * src/ReqDocumentTxt.cpp, src/main.cpp, src/req.cpp, src/req.h: capture the
+  text of requirements (not tested)
+
+  * src/ReqDocumentHtml.cpp, src/req.cpp, src/req.h, test/conf.req,
+  test/html.req, test/pdf.ref, test/pdf.req, test/trac1.ref, test/trac2.ref:
+  allow several refs on same line & fix HTML scanning
+
+2014-02-25  fred <fred@fred1>
+
+  * req.files, req.includes, src/ReqDocumentDocx.cpp, src/main.cpp,
+  src/req.cpp, src/req.h, test/SPEC.docx, test/TEST.txt, test/conf.req:
+  getAllPatterns in progress
+
+2014-02-23  fred <fred@fred1>
+
+  * test/SPEC.docx, test/SPEC.pdf, test/TEST.txt, test/conf.req, test/pdf.ref,
+  test/pdf.req, test/trac1.ref, test/trac2.ref: take example on man printf
+
+2014-02-21  Frederic Hoerni <fhoerni@free.fr>
+
+  * src/req.cpp, src/req.h, src/stringTools.cpp, src/stringTools.h,
+  src/testStringCompare.cpp: use alpha num sorting of requirements  The purpose
+  is to keep the order of paragraphs.
+
+2014-02-19  fred <fred@fred1>
+
+  * Makefile, src/global.h: v1.2.0, make WIN release, generate zip
+
+  * Makefile, src/main.cpp: build WIN32 with static libs poppler, iconv
+
+2014-02-18  fred <fred@fred1>
+
+  * Makefile, src/renderingHtml.cpp, src/stringTools.cpp, src/stringTools.h:
+  fix CSS position "absolute" of error box
+
+2014-02-16  fred <fred@fred1>
+
+  * src/global.h, src/main.cpp, test/Makefile, test/html.ref, test/pdf.ref,
+  test/req2.conf, test/req3.conf, test/trac1.ref, test/trac2.ref: invert
+  upstream/downstream (text and csv output)
+
+  * src/ReqDocumentHtml.cpp, src/ReqDocumentHtml.h, src/req.h: support for
+  input HTML documents
+
+2014-02-15  fred <fred@fred1>
+
+  * Makefile, req.files, src/ReqDocumentDocx.cpp, src/ReqDocumentHtml.cpp,
+  src/ReqDocumentHtml.h, src/dateTools.cpp, src/dateTools.h, src/logging.h,
+  src/main.cpp, src/parseConfig.cpp, src/renderingHtml.cpp,
+  src/stringTools.cpp, src/stringTools.h, test/SPEC.html, test/TEST.html,
+  test/html.req: add support for HTML documents (in progress)
+
+  * test/SPEC.docx, test/conf.req: add undefined referenced requirement in docx
+
+2014-02-12  fred <fred@fred1>
+
+  * bin/reqReport.bat, src/global.h, src/renderingHtml.cpp: reqReport.bat
+
+  * src/global.h, src/main.cpp, src/req.h, test/Makefile, test/conf.req,
+  test/req-rfc2246.conf, test/req.conf, test/req2.conf, test/req3.conf,
+  test/rfc2246-spec.pdf, test/rfc2246-test.txt, test/rfc2246.pdf,
+  test/rfc2246.req, test/rfc2246.txt, test/test-rfc2246.txt: v1.1
+
+  * src/ReqDocumentDocx.cpp, src/main.cpp, src/renderingHtml.cpp,
+  src/renderingHtml.h, src/req.cpp, test/req.conf: support ODT, prevent
+  recursive defines
+
+  * src/main.cpp, test/req-rfc2246.conf, test/req.conf: define keyword in conf
+  file
+
+2014-02-12  Frederic Hoerni <fhoerni@free.fr>
+
+  * src/main.cpp, src/renderingHtml.cpp: HTML report takes -nocov into account
+
+  * src/ReqDocumentDocx.cpp, src/ReqDocumentDocx.h, src/ReqDocumentPdf.cpp,
+  src/ReqDocumentPdf.h, src/ReqDocumentTxt.cpp, src/ReqDocumentTxt.h,
+  src/main.cpp, src/renderingHtml.cpp, src/req.cpp, src/req.h: command dump and
+  option -nocov
+
+2014-02-11  fred <fred@fred1>
+
+  * src/renderingHtml.cpp, test/req-rfc2246.conf, test/req.conf,
+  test/rfc2246.pdf, test/rfc2246.txt, test/test-rfc2246.txt: improve HTML
+  styles and add test files
+
+2014-02-11  Frederic Hoerni <fhoerni@free.fr>
+
+  * src/ReqDocumentDocx.cpp, test/req.conf: support opend ocument (.docx)
+
+2014-02-10  fred <fred@fred1>
+
+  * req.config, req.creator, req.files, req.includes, src/main.cpp,
+  src/req.cpp, src/req.h, test/req.conf, test/req2.conf, test/req3.conf:
+  replace -tag by -req in req.conf
+
+  * Makefile, src/global.h, src/main.cpp: win32 build ok
+
+2014-02-09  fred <fred@fred1>
+
+  * Makefile, src/global.h, src/main.cpp, src/req.h, test/Makefile,
+  test/req.conf, test/req2.conf, test/req3.conf: work for WIN32 build, but no
+  yet ok
+
+  * src/main.cpp, src/renderingHtml.cpp, src/req.cpp, src/req.h, test/TEST.txt,
+  test/req.conf: dependency graph && links in HTML report
+
+2014-02-06  fred <fred@fred1>
+
+  * src/main.cpp, src/renderingHtml.cpp, src/renderingHtml.h, src/req.cpp,
+  src/req.h, test/TEST.txt: html summary
+
+  * Makefile, src/main.cpp, src/parseConfig.cpp, src/renderingHtml.cpp,
+  src/renderingHtml.h, src/req.cpp, src/req.h, test/TEST.txt: PUSH_ERROR
+
+2014-02-05  fred <fred@fred1>
+
+  * src/main.cpp, test/req2.conf: export to csv format
+
+  * src/main.cpp, test/Makefile: command cov [-r]
+
+2014-02-05  Frederic Hoerni <fhoerni@free.fr>
+
+  * src/ReqDocumentTxt.cpp, src/req.cpp: improve some error logging
+
+  * src/ReqDocumentDocx.cpp, src/main.cpp, src/req.cpp: add total in summary of
+  several files
+
+2014-02-04  fred <fred@fred1>
+
+  * Makefile, src/ReqDocumentDocx.cpp, src/ReqDocumentDocx.h,
+  src/ReqDocumentPdf.cpp, src/ReqDocumentPdf.h, src/ReqDocumentTxt.cpp,
+  src/ReqDocumentTxt.h, src/importerDocx.cpp, src/importerDocx.h,
+  src/importerPdf.cpp, src/importerPdf.h, src/importerTxt.cpp,
+  src/importerTxt.h, src/main.cpp, src/req.cpp, src/req.h, test/req.conf: fix
+  -stop-after for txt, pdf, docx
+
+  * src/importerPdf.cpp, src/importerPdf.h, src/main.cpp, src/req.cpp,
+  src/req.h, test/Makefile, test/SPEC.docx, test/SPEC.pdf, test/TEST.txt,
+  test/req.conf: rework with classes
+
+2014-02-04  Frederic Hoerni <fhoerni@free.fr>
+
+  * src/main.cpp, test/req.conf: minor change
+
+  * Makefile, src/importerDocx.cpp, src/importerDocx.h, src/importerPdf.cpp,
+  src/importerPdf.h, src/main.cpp, src/req.h: -start-after and -stop-after
+
+  * Makefile, src/importerPdf.cpp, src/importerPdf.h, src/req.h, test/TEST.txt,
+  test/req.conf: not compiling yet...
+
+2014-02-03  fred <fred@fred1>
+
+  * Makefile, src/importerDocx.cpp, src/importerDocx.h, src/importerTxt.cpp,
+  src/importerTxt.h, src/main.cpp, src/req.cpp, src/req.h: separate files for
+  importers
+
+2014-02-02  fred <fred@fred1>
+
+  * src/main.cpp, test/TEST.txt: coverage matrixes
+
+  * Makefile, src/main.cpp, src/regex.c, test/req.conf: list requirements, and
+  coverage
+
+  * src/main.cpp, test/TEST.txt, test/req.conf, test/req2.conf, test/req3.conf:
+  capture requirements from text file
+
+  * src/logging.h, src/main.cpp: shor logging by default
+
+2014-02-01  fred <fred@fred1>
+
+  * Makefile, req.conf, src/logging.cpp, src/main.cpp, src/parseConfig.cpp,
+  src/parseConfig.h, test/SPEC.docx, test/TEST.txt, test/req.conf, toto.docx:
+  in progress...
+
+  * Makefile, src/dateTools.cpp, src/dateTools.h, src/global.h,
+  src/logging.cpp, src/logging.h, src/main.cpp: main
+
+  * README.md, req.conf, src/Makefile, src/xml.c: add xml parsing sample
+
+  * README.md, src/unzip.c, toto.docx: add unzip.c
