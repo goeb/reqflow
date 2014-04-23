@@ -73,8 +73,7 @@ PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_main_pdf_OBJECTS = src/main_pdf-main_pdf.$(OBJEXT)
 main_pdf_OBJECTS = $(am_main_pdf_OBJECTS)
-am__DEPENDENCIES_1 =
-main_pdf_DEPENDENCIES = $(am__DEPENDENCIES_1)
+main_pdf_DEPENDENCIES =
 am_main_regex_OBJECTS = src/main_regex-main_regex.$(OBJEXT)
 main_regex_OBJECTS = $(am_main_regex_OBJECTS)
 main_regex_DEPENDENCIES =
@@ -97,7 +96,7 @@ am_req_OBJECTS = src/req-main.$(OBJEXT) src/req-logging.$(OBJEXT) \
 	src/req-stringTools.$(OBJEXT) src/req-renderingHtml.$(OBJEXT) \
 	src/req-ReqDocumentPdf.$(OBJEXT)
 req_OBJECTS = $(am_req_OBJECTS)
-req_DEPENDENCIES = $(am__DEPENDENCIES_1)
+req_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -308,9 +307,6 @@ AM_CPPFLAGS = -Wall
 AM_CFLAGS = -Wall $(am__append_1) $(am__append_4) $(am__append_7)
 AM_CXXFLAGS = -Wall $(am__append_2) $(am__append_5) $(am__append_8)
 AM_LDFLAGS = $(am__append_3) $(am__append_6)
-
-# FIXME: in Fedora 20, poppler-cpp.pc does not provide all its dependencies, hardcode them
-@WINDOWS_TRUE@POPPLER_LIBS_EXTRA = -llcms2 -liconv
 req_SOURCES = src/main.cpp \
     src/logging.cpp \
     src/dateTools.cpp \
@@ -324,7 +320,7 @@ req_SOURCES = src/main.cpp \
     src/ReqDocumentPdf.cpp
 
 req_CPPFLAGS = @ZIP_CFLAGS@ @XML_CFLAGS@ @POPPLER_CFLAGS@ @PCRE_CFLAGS@
-req_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ $(POPPLER_LIBS_EXTRA) @PCRE_LIBS@
+req_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ @PCRE_LIBS@
 
 # specific subdirs
 SUBDIRS = test
@@ -335,7 +331,7 @@ dist_pkgdata_DATA = README COPYING NEWS ChangeLog AUTHORS
 # Test sub-programs (will not be packaged)
 main_pdf_SOURCES = src/main_pdf.cpp
 main_pdf_CPPFLAGS = @POPPLER_CFLAGS@
-main_pdf_LDADD = @POPPLER_LIBS@ $(POPPLER_LIBS_EXTRA)
+main_pdf_LDADD = @POPPLER_LIBS@
 main_regex_SOURCES = src/main_regex.c
 main_regex_CPPFLAGS = @PCRE_CFLAGS@
 main_regex_LDADD = @PCRE_LIBS@

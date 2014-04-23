@@ -22,9 +22,6 @@ if WINDOWS
     
     AM_CXXFLAGS += -static -static-libgcc
     AM_CXXFLAGS += -DZIP_EXTERN= -DZLIB_INTERNAL -DLIBXML_STATIC -DPCRE_STATIC -Dpoppler_cpp_EXPORTS
-    
-# FIXME: in Fedora 20, poppler-cpp.pc does not provide all its dependencies, hardcode them
-    POPPLER_LIBS_EXTRA = -llcms2 -liconv
 endif
 
 
@@ -43,7 +40,7 @@ req_SOURCES = src/main.cpp \
     src/ReqDocumentPdf.cpp
 
 req_CPPFLAGS = @ZIP_CFLAGS@ @XML_CFLAGS@ @POPPLER_CFLAGS@ @PCRE_CFLAGS@
-req_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ $(POPPLER_LIBS_EXTRA) @PCRE_LIBS@
+req_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ @PCRE_LIBS@
 
 # specific subdirs
 SUBDIRS = test
@@ -58,7 +55,7 @@ dist-hook: bin/gitlog2changelog.py
 # Test sub-programs (will not be packaged)
 main_pdf_SOURCES = src/main_pdf.cpp
 main_pdf_CPPFLAGS = @POPPLER_CFLAGS@
-main_pdf_LDADD = @POPPLER_LIBS@ $(POPPLER_LIBS_EXTRA)
+main_pdf_LDADD = @POPPLER_LIBS@
 
 main_regex_SOURCES = src/main_regex.c
 main_regex_CPPFLAGS = @PCRE_CFLAGS@
