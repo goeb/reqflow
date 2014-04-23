@@ -1,0 +1,3 @@
+#!/bin/sh
+../req stat -s > trac2.out 2>&1
+diff trac2.out trac2.ref

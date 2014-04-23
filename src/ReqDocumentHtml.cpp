@@ -11,6 +11,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
+#include "config.h"
 
 #include <string.h>
 #include "ReqDocumentHtml.h"
@@ -32,7 +33,7 @@ BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph
         if (inParagaph) s = processBlock(text);
         else {
             // process line per line
-            LOG_DEBUG("processParagraph line per line, size=%d", text.size());
+            LOG_DEBUG("processParagraph line per line, size=%zd", text.size());
             size_t pos0 = 0;
             while (pos0 < text.size()) {
                 std::string line;
@@ -109,7 +110,7 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
             // accumulate text in current paragraph
             xmlChar *text;
             text = xmlNodeGetContent(currentNode);
-            LOG_DEBUG("text size: %d bytes", strlen((char*)text));
+            LOG_DEBUG("text size: %zd bytes", strlen((char*)text));
             //LOG_DEBUG("text: %s", (char*)text);
 
             currentText += (char*)text;

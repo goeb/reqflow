@@ -11,6 +11,8 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
+#include "config.h"
+
 #include <sys/time.h>
 #include <time.h>
 #include <stdio.h>
@@ -50,14 +52,14 @@ std::string epochToStringDelta(time_t t)
 
 std::string getDatetime()
 {
-    struct tm date;
+    struct tm *date;
     struct timeval tv;
     gettimeofday(&tv, 0);
-    localtime_r(&tv.tv_sec, &date);
+    date = localtime(&tv.tv_sec);
     //int milliseconds = tv.tv_usec / 1000;
     char buffer[100];
-    sprintf(buffer, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", date.tm_year + 1900,
-            date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
+    sprintf(buffer, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", date->tm_year + 1900,
+            date->tm_mon + 1, date->tm_mday, date->tm_hour, date->tm_min, date->tm_sec);
     return buffer;
 }
 
@@ -66,13 +68,13 @@ std::string getDatetime()
   */
 std::string getDatetimePath()
 {
-    struct tm date;
+    struct tm *date;
     struct timeval tv;
     gettimeofday(&tv, 0);
-    localtime_r(&tv.tv_sec, &date);
+    date = localtime(&tv.tv_sec);
     //int milliseconds = tv.tv_usec / 1000;
     char buffer[100];
-    sprintf(buffer, "%.4d%.2d%.2d-%.2d%.2d%.2d", date.tm_year + 1900,
-            date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
+    sprintf(buffer, "%.4d%.2d%.2d-%.2d%.2d%.2d", date->tm_year + 1900,
+            date->tm_mon + 1, date->tm_mday, date->tm_hour, date->tm_min, date->tm_sec);
     return buffer;
 }

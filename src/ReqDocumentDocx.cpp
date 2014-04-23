@@ -11,6 +11,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
+#include "config.h"
 
 #include <zip.h>
 #include <string.h>
@@ -48,7 +49,7 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
         } else if (XML_TEXT_NODE == currentNode->type) {
             xmlChar *text;
             text = xmlNodeListGetRawString(doc, currentNode, 1);
-            LOG_DEBUG("text size: %d bytes", strlen((char*)text));
+            LOG_DEBUG("text size: %zd bytes", strlen((char*)text));
             LOG_DEBUG("text: %s", (char*)text);
 
             textInParagraphCurrent += (char*)text;
@@ -142,7 +143,7 @@ int ReqDocumentDocx::loadRequirements(bool debug)
         while ( (r = zip_fread(fileInZip, buffer, BUF_SIZ)) > 0) {
             contents.append(buffer, r);
         }
-        LOG_DEBUG("%s:%s: %d bytes", fileConfig->path.c_str(), CONTENTS, contents.size());
+        LOG_DEBUG("%s:%s: %zd bytes", fileConfig->path.c_str(), CONTENTS, contents.size());
 
         zip_fclose(fileInZip);
     } else {

@@ -11,7 +11,7 @@ void test(const char *s1, const char *s2)
 	printf("lessThan(%s, %s) = %d\n", s1, s2, S(s1, s2));
 }
 
-main()
+int main()
 {
 	std::map<std::string, int, stringCompare> m;
 
@@ -29,10 +29,12 @@ main()
 	m["p2.1.1"] = 0;
 	m["p2.1.2"] = 0;
 
-	printf("size: %d\n", m.size());
+	printf("size: %zd\n", m.size());
 
 	std::map<std::string, int, stringCompare>::iterator i;
 	for (i = m.begin(); i != m.end(); i++) {
 		printf("%s\n", i->first.c_str());
 	}
+
+	return 0;
 }

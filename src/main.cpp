@@ -11,6 +11,7 @@
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
+#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -95,7 +96,7 @@ enum StatusMode { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL };
 
 int showVersion()
 {
-    printf("Reqflow v%s\n"
+    printf("%s\n"
            "Copyright (C) 2014 Frederic Hoerni\n"
            "\n"
            "This program is free software; you can redistribute it and/or modify\n"
@@ -107,7 +108,7 @@ int showVersion()
            "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
            "GNU General Public License for more details.\n"
-           , VERSION);
+           , PACKAGE_STRING);
     exit(1);
 }
 
