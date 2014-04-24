@@ -33,7 +33,7 @@ public:
     ReqDocumentDocxXml(ReqFileConfig &c) {fileConfig = &c;}
     int loadRequirements(bool debug);
     int loadContents(const char *xml, size_t size, bool debug);
-    int loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug);
+    int loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug);
 
 
 private:

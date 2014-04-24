@@ -23,64 +23,65 @@
 /** Analyse a node of the document
   *
   */
-int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug)
+int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug)
 {
-    xmlNode *currentNode = NULL;
-
     static std::string textInParagraphCurrent; // consolidated over recursive calls
+    std::string nodeName;
 
-    for (currentNode = a_node; currentNode; currentNode = currentNode->next) {
-        std::string nodeName;
-        if (currentNode->type == XML_ELEMENT_NODE) {
-            if (0 == strcmp((char*)currentNode->name, "pStyle")) {
-                xmlAttr* attribute = currentNode->properties;
-                while(attribute && attribute->name && attribute->children)
-                {
-                    xmlChar* style = xmlNodeListGetString(currentNode->doc, attribute->children, 1);
-                    LOG_DEBUG("style: %s", (char*)style);
+    if (node->type == XML_ELEMENT_NODE) {
+        if (0 == strcmp((char*)node->name, "pStyle")) {
+            xmlAttr* attribute = node->properties;
+            while(attribute && attribute->name && attribute->children)
+            {
+                xmlChar* style = xmlNodeListGetString(node->doc, attribute->children, 1);
+                LOG_DEBUG("style: %s", (char*)style);
 
+                xmlFree(style);
+                attribute = attribute->next;
+            }
+            // TODO take benefit of styles in the future
+        } else if (0 == strcmp((char*)node->name, "del")) return 0; // ignore deleted text (revision marks)
+        else if (0 == strcmp((char*)node->name, "moveFrom")) return 0; // ignore deleted text (revision marks)
 
-                    xmlFree(style);
-                    attribute = attribute->next;
-                }
-                // TODO take benefit of styles in the future
-            } else if (0 == strcmp((char*)currentNode->name, "del")) continue; // ignore deleted text (revision marks)
-            else if (0 == strcmp((char*)currentNode->name, "moveFrom")) continue; // ignore deleted text (revision marks)
+        LOG_DEBUG("node: %s", (char*)node->name);
+        nodeName = (char*)node->name;
 
-            LOG_DEBUG("node: %s", (char*)currentNode->name);
-            nodeName = (char*)currentNode->name;
+        xmlNode *subnode = NULL;
+        for (subnode = node->children; subnode; subnode = subnode->next) {
 
-        } else if (XML_TEXT_NODE == currentNode->type) {
-            xmlChar *text;
-            text = xmlNodeListGetRawString(doc, currentNode, 1);
-            LOG_DEBUG("text size: %zd bytes", strlen((char*)text));
-            LOG_DEBUG("text: %s", (char*)text);
-
-            textInParagraphCurrent += (char*)text;
-
-            LOG_DEBUG("textInParagraphCurrent: %s", textInParagraphCurrent.c_str());
-
-            xmlFree(text);
+            // recursively go down the xml structure
+            loadDocxXmlNode(doc, subnode, debug);
         }
 
-        // recursively go down the xml structure
-        loadDocxXmlNode(doc, currentNode->children, debug);
+    } else if (XML_TEXT_NODE == node->type) {
+        xmlChar *text;
+        text = xmlNodeListGetRawString(doc, node, 1);
+        LOG_DEBUG("text size: %zd bytes", strlen((char*)text));
+        LOG_DEBUG("text: %s", (char*)text);
 
-        if (nodeName =="p" && !textInParagraphCurrent.empty()) {
-			if (debug) {
-				 dumpText(textInParagraphCurrent.c_str());
+        textInParagraphCurrent += (char*)text;
 
-			} else {
-				// process text of paragraph
-				BlockStatus status = processBlock(textInParagraphCurrent);
-				if (status == STOP_REACHED) return 0;
-			}
+        LOG_DEBUG("textInParagraphCurrent: %s", textInParagraphCurrent.c_str());
 
-            textInParagraphCurrent.clear();
-        } else if (nodeName =="document" || nodeName =="document-content") {
-            // end of document
-            finalizeCurrentReq();
+        xmlFree(text);
+    }
+
+
+    if (nodeName =="p" && !textInParagraphCurrent.empty()) {
+        if (debug) {
+            dumpText(textInParagraphCurrent.c_str());
+
+        } else {
+            // process text of paragraph
+            BlockStatus status = processBlock(textInParagraphCurrent);
+            if (status == STOP_REACHED) return 0;
         }
+
+        textInParagraphCurrent.clear();
+
+    } else if (nodeName =="document" || nodeName =="document-content") {
+        // end of document
+        finalizeCurrentReq();
     }
     return 0;
 }
@@ -128,6 +129,14 @@ int ReqDocumentDocx::loadRequirements(bool debug)
     const char *CONTENTS = "word/document.xml";
     int i = zip_name_locate(zipFile, CONTENTS, 0);
     if (i < 0) {
+        // I suppose here something to be confirmed (or not):
+        // MS Word 2010 stores OpenDocument files with suffix .docx.
+        // So we cannot say at first sight if a docx is an OpenXml or an OpenDocument.
+        // Therefore we try OpenXml first (by looking at word/document.xml)
+        // and in case of failure, we try OpenDocument (by looking at content.xml)
+
+        // From a wikipedia page I see that I am probably wrong.
+        // If so, this second try should be removed.
         LOG_DEBUG("Not a Open XML document (missing word/document.xml). Trying Open Document.");
 		const char *OPEN_DOC_CONTENTS = "content.xml";
 		i = zip_name_locate(zipFile, OPEN_DOC_CONTENTS, 0);

@@ -81,6 +81,7 @@ if WINDOWS
 all-local: @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
 
 @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT): reqflow.iss req$(EXEEXT)
+	@STRIP@ req$(EXEEXT)
 	$(WINE) "@ISCC@" /q /dMyAppName=@PACKAGE_NAME@ /dMyAppVersion=@PACKAGE_VERSION@ /dMyAppExeName=req$(EXEEXT) /f@PACKAGE_TARNAME@-@VERSION@-setup $<
 endif
 
