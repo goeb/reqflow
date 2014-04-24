@@ -20,6 +20,9 @@
 #include "logging.h"
 #include "parseConfig.h"
 
+/** Analyse a node of the document
+  *
+  */
 int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool debug)
 {
     xmlNode *currentNode = NULL;
@@ -42,6 +45,7 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *a_node, bool deb
                 }
                 // TODO take benefit of styles in the future
             } else if (0 == strcmp((char*)currentNode->name, "del")) continue; // ignore deleted text (revision marks)
+            else if (0 == strcmp((char*)currentNode->name, "moveFrom")) continue; // ignore deleted text (revision marks)
 
             LOG_DEBUG("node: %s", (char*)currentNode->name);
             nodeName = (char*)currentNode->name;

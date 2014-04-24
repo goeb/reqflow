@@ -1,0 +1,5 @@
+
+document SPEC 
+    -path docx_rev_marks.docx 
+    -req REQ_.*
+
