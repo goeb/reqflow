@@ -70,8 +70,9 @@ void usage()
            "\n"
            "  debug <file>    Dump text extracted from file (debug purpose).\n"
            "\n"
-           "  regex <pattern> <text>\n"
+           "  regex <pattern> [<text>]\n"
            "                  Test regex given by <pattern> applied on <text>.\n"
+           "                  If <text> is omitted, then the text is read from stdin.\n"
            "\n"
            "  version\n"
            "  help\n"
@@ -896,9 +897,50 @@ int cmdDebug(int argc, const char **argv)
     return 0;
 }
 
+
+/** Apply a regex on some text and print the result
+  *
+  */
+void testRegex(regex_t regex, const char *text, bool verbose)
+{
+    const int N = 5;
+
+    char buffer[256];
+    regmatch_t pmatch[N];
+    int reti = regexec(&regex, text, N, pmatch, 0);
+    if (!reti) {
+        if (verbose) OUTPUT("Match: \n");
+        // if there are groups and not in verbose mode
+        // we want only the groups, thus not the first match
+        // that encompasses all matching pattern
+        int i = 0;
+        if (!verbose && pmatch[1].rm_so != -1) i = 1;
+        for (; i<N; i++) {
+            if (pmatch[i].rm_so != -1) {
+                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
+                memcpy(buffer, text+pmatch[i].rm_so, length);
+                buffer[length] = 0;
+                if (verbose) OUTPUT("match[%d]: %s\n", i, buffer);
+                else OUTPUT("%s ", buffer);
+            }
+        }
+        if (!verbose) OUTPUT("\n");
+    } else { // reti == REG_NOMATCH)
+        if (verbose) OUTPUT("No match\n");
+    }
+}
+
+/** Test a regex on some pattern
+  *
+  * If stdin is used, reqflow is similar to 'grep' (but far more simple)
+  * Example: capture requirements
+  *
+  * req debug SPEC2.docx | req regex "(PRINTF_[^ ]*)"
+  *
+  */
 int cmdRegex(int argc, const char **argv)
 {
-    if (argc != 2) usage();
+    if (argc < 1 || argc > 2) usage();
 
     regex_t regex;
     int reti;
@@ -910,34 +952,13 @@ int cmdRegex(int argc, const char **argv)
         return 1;
     }
 
-    /* Execute regular expression */
-
-    const int N = 5;
-
-    char buffer[256];
-    const char *text = argv[1];
-    regmatch_t pmatch[N];
-    reti = regexec(&regex, text, N, pmatch, 0);
-    if (!reti) {
-        OUTPUT("Match: \n");
-        int i;
-        for (i=0; i<N; i++) {
-            if (pmatch[i].rm_so != -1) {
-                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
-                memcpy(buffer, text+pmatch[i].rm_so, length);
-                buffer[length] = 0;
-                OUTPUT("match[%d]: %s\n", i, buffer);
-            } else OUTPUT("match[%d]:\n", i);
-        }
-    } else if (reti == REG_NOMATCH) {
-        OUTPUT("No match\n");
-
-    } else {
-        char msgbuf[100];
-        regerror(reti, &regex, msgbuf, sizeof(msgbuf));
-        LOG_ERROR("Regex match failed: %s", msgbuf);
-        return 1;
+    if (argc == 2) testRegex(regex, argv[1], true);
+    else {
+        // get the lines from stdin
+        std::string line;
+        while (std::getline(std::cin, line)) testRegex(regex, line.c_str(), false);
     }
+
 
     return 0;
 }

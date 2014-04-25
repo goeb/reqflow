@@ -57,8 +57,7 @@ int hasErrors(const std::string &file)
 
 void printErrors()
 {
-    if (Errors.empty()) fprintf(stderr, "Ok.\n");
-    else {
+    if (!Errors.empty()) {
         fprintf(stderr, "Error(s): %d\n", getErrorNumber());
         std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file;
         FOREACH(file, Errors) {
