@@ -38,54 +38,62 @@
 
 std::string Cmdline;
 
+// Directory where the config file is
+// Relative paths are computed from there.
+std::string RootDir = ".";
+
+
+
 void usage()
 {
-    printf("Usage: 1. req <command> [<options>] [<args>]\n"
-           "       2. req <config-file>\n"
+    printf("Usage: 1. reqflow <command> [<options>] [<args>]\n"
+           "       2. reqflow <config-file>\n"
            "\n"
            "\n"
-           "1. req <command> [<options>] [<args>]\n"
+           "1. reqflow <command> [<options>] [<args>]\n"
            "\n"
            "Commands:\n"
            "\n"
-           "  stat [doc ...]  Print the status of requirements in all documents or the given documents.\n"
-           "                  Without additionnal option, only unresolved coverage issues are reported.\n"
-           "       -s         Print a one-line summary for each document.\n"
-           "       -v         Print the status of all requirements.\n"
-           "                  Status codes:\n"
+           "    stat [doc ...]  Print the status of requirements in all documents or the\n"
+           "                    given documents. Without additionnal option, only\n"
+           "                    unresolved coverage issues are reported.\n"
+           "         -s         Print a one-line summary for each document.\n"
+           "         -v         Print the status of all requirements.\n"
+           "                    Status codes:\n"
            "\n"
            "                      'U'  Uncovered\n"
            "\n"
-           "  trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).\n"
-           "       [-r]       Print the reverse traceability matrix (A covers B).\n"
-           "       [-x <fmt>] Select export format: text (default), csv, html.\n"
-           "                  If format 'html' is chosen, -r is ignored, as both foward and reverse\n"
-           "                  traceability matrices are displayed.\n"
+           "    trac [doc ...]  Print the traceability matrix of the requirements \n"
+           "                    (A covered by B).\n"
+           "         [-r]       Print the reverse traceability matrix (A covers B).\n"
+           "         [-x <fmt>] Select export format: text (default), csv, html.\n"
+           "                    If format 'html' is chosen, -r is ignored, as both foward\n"
+           "                    and reverse traceability matrices are displayed.\n"
            "\n"
-           "  review          Print the requirements with their text.\n"
-           "       [-f | -r]  Print also traceability (forward or backward)\n"
-           "       [-x <fmt>] Choose format: txt, csv.\n"
+           "    review          Print the requirements with their text.\n"
+           "         [-f | -r]  Print also traceability (forward or backward)\n"
+           "         [-x <fmt>] Choose format: txt, csv.\n"
            "\n"
-           "  config          Print the list of configured documents.\n"
+           "    config          Print the list of configured documents.\n"
            "\n"
-           "  debug <file>    Dump text extracted from file (debug purpose).\n"
+           "    debug <file>    Dump text extracted from file (debug purpose).\n"
            "\n"
-           "  regex <pattern> [<text>]\n"
-           "                  Test regex given by <pattern> applied on <text>.\n"
-           "                  If <text> is omitted, then the text is read from stdin.\n"
+           "    regex <pattern> [<text>]\n"
+           "                    Test regex given by <pattern> applied on <text>.\n"
+           "                    If <text> is omitted, then the text is read from stdin.\n"
            "\n"
-           "  version\n"
-           "  help\n"
+           "    version\n"
+           "    help\n"
            "\n"
            "Options:\n"
-           "  -c <config>  Select configuration file. Defaults to 'conf.req'.\n"
-           "  -o <file>    Output to file instead of stdout.\n"
-           "               Not supported for commands 'config', debug' and 'regex'."
+           "    -c <config>  Select configuration file. Defaults to 'conf.req'.\n"
+           "    -o <file>    Output to file instead of stdout.\n"
+           "                 Not supported for commands 'config', debug' and 'regex'."
            "\n"
            "\n"
-           "2. req <config>\n"
+           "2. reqflow <config>\n"
            "This is equivalent to:\n"
-           "  req trac -c <config> -x html -o <outfile> && start <outfile>\n"
+           "    reqflow trac -c <config> -x html -o <outfile> && start <outfile>\n"
            "\n"
            "Purpose: This usage is suitable for double-cliking on the config file.\n"
            "Note: <config> must be different from the commands of use case 1.\n"
@@ -167,6 +175,9 @@ int loadConfiguration(const char * file)
         PUSH_ERROR(file, "", _("Empty configuration"));
         return 1;
     }
+
+    RootDir = getDirname(file);
+
     // parse the configuration
     std::list<std::list<std::string> > configTokens = parseConfigTokens(config, r);
     free((void*)config);
@@ -350,6 +361,13 @@ int loadConfiguration(const char * file)
 int loadRequirementsOfFile(ReqFileConfig &fileConfig, bool debug)
 {
     int result = 0;
+
+    if (isPathAbsolute(fileConfig.path)) fileConfig.realpath = fileConfig.path;
+    else {
+        // prefix with the root path
+        fileConfig.realpath = RootDir + '/' + fileConfig.path;
+    }
+
     ReqFileType fileType = fileConfig.getFileType();
     switch(fileType) {
     case RF_TEXT:

@@ -31,6 +31,8 @@ std::vector<std::string> split(const std::string &s, const char *c, int limit = 
 
 std::string join(const std::list<std::string> &items, const char *separator);
 std::string getBasename(const std::string &path);
+std::string getDirname(std::string path);
+bool isPathAbsolute(const std::string &path);
 std::string replaceAll(const std::string &in, char c, const char *replaceBy);
 bool stringLessThan(std::string const &s1, std::string const &s2);
 struct stringCompare

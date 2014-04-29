@@ -5,7 +5,7 @@
 #define MyAppVersion "1.3.0"
 #define MyAppPublisher "Frederic Hoerni"
 #define MyAppURL "http://goeb.github.io/reqflow"
-#define MyAppExeName "req.exe"
+#define MyAppExeName "reqflow.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -32,7 +32,7 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "req.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "reqflow.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README"; DestName: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "COPYING"; DestDir: "{app}"; Flags: ignoreversion
 Source: "NEWS"; DestDir: "{app}"; Flags: ignoreversion
@@ -57,8 +57,8 @@ Filename: "{app}\README.txt"; Description: "View the README file"; Flags: postin
 ; associate .req files with reqflow
 Root: HKCR; Subkey: ".req"; ValueType: string; ValueName: ""; ValueData: "Reqflow"; Flags: uninsdeletevalue
 Root: HKCR; Subkey: "Reqflow"; ValueType: string; ValueName: ""; ValueData: "Reqflow File"; Flags: uninsdeletekey
-Root: HKCR; Subkey: "Reqflow\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\REQ.EXE,0"
-Root: HKCR; Subkey: "Reqflow\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\REQ.EXE"" ""%1""" 
+Root: HKCR; Subkey: "Reqflow\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\REQFLOW.EXE,0"
+Root: HKCR; Subkey: "Reqflow\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\REQFLOW.EXE"" ""%1""" 
 
 ; set reqflow in the PATH
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"

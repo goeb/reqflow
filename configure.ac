@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Reqflow], [1.3.2-rc1], [], [reqflow], [http://goeb.github.io/reqflow])
+AC_INIT([Reqflow], [1.3.2], [], [reqflow], [http://goeb.github.io/reqflow])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
@@ -81,6 +81,6 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_CHECK_FUNCS([gettimeofday localtime regcomp strcasecmp strchr strerror strstr strtoul])
 
-AC_CONFIG_FILES([Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile test/Makefile test/envtest])
 AC_OUTPUT
 

@@ -1,3 +1,4 @@
 #!/bin/sh
-../req stat -c docx_rev_marks.req > docx_rev_marks.out 2>&1
-diff docx_rev_marks.out docx_rev_marks.ref 
+. ./envtest
+../reqflow stat -c $TEST_ORIGIN/docx_rev_marks.req > docx_rev_marks.out 2>&1
+diff docx_rev_marks.out $TEST_ORIGIN/docx_rev_marks.ref 

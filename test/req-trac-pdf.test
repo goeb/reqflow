@@ -1,3 +1,4 @@
 #!/bin/sh
-../req trac -c pdf.req > pdf.out 2>&1
-diff pdf.out pdf.ref
+. ./envtest
+../reqflow trac -c $TEST_ORIGIN/pdf.req > pdf.out 2>&1
+diff pdf.out $TEST_ORIGIN/pdf.ref

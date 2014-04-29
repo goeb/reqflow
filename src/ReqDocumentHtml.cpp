@@ -129,17 +129,17 @@ int ReqDocumentHtml::loadRequirements(bool debug)
     xmlDocPtr pDoc = 0;
     xmlNodePtr pRoot = 0;
 
-    LOG_DEBUG("htmlParseFile(%s)...", fileConfig->path.c_str());
-    pDoc = htmlParseFile(fileConfig->path.c_str(), (const char*)"utf-8"); // TODO support other than UTF-8
+    LOG_DEBUG("htmlParseFile(%s)...", fileConfig->realpath.c_str());
+    pDoc = htmlParseFile(fileConfig->realpath.c_str(), (const char*)"utf-8"); // TODO support other than UTF-8
 
     if (!pDoc) {
-        LOG_ERROR("Cannot open/parse HTML file: %s", fileConfig->path.c_str());
+        LOG_ERROR("Cannot open/parse HTML file: %s", fileConfig->realpath.c_str());
         return -1;
     }
     pRoot = xmlDocGetRootElement(pDoc);
 
     if (!pRoot) {
-        LOG_ERROR("Cannot get Root of HTML file: %s", fileConfig->path.c_str());
+        LOG_ERROR("Cannot get Root of HTML file: %s", fileConfig->realpath.c_str());
         return -1;
     }
 

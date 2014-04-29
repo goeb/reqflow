@@ -1,4 +1,4 @@
-This directory contains the 1.3.0 release of Reqflow.
+This directory contains the 1.3.2 release of Reqflow.
 
 See the file NEWS for the user-visible changes from previous releases.
 In addition, there have been bugs fixed.
@@ -52,5 +52,5 @@ System-specific Notes
 Reqflow can be cross-compiled using the Mingw GNU toolchain. Use 
 mingw32-configure and make to generate the InnoSetup installer.
 
-    $ mingw32-configure ; make
+    $ ./configure --host=i586-mingw32msvc ; make
 

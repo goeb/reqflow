@@ -34,7 +34,8 @@ enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_HTML, RF_P
 
 struct ReqFileConfig {
     std::string id;
-    std::string path;
+    std::string path; // path setup in .req file
+    std::string realpath; // path computed relatively to the dir of .req file
     std::string reqPattern;
     regex_t *reqRegex;
     std::string refPattern;

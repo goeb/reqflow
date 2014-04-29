@@ -90,9 +90,9 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug
 int ReqDocumentDocxXml::loadRequirements(bool debug)
 {
     const char *xml;
-    int r = loadFile(fileConfig->path.c_str(), &xml);
+    int r = loadFile(fileConfig->realpath.c_str(), &xml);
     if (r <= 0) {
-        LOG_ERROR("Cannot read file (or empty): %s", fileConfig->path.c_str());
+        LOG_ERROR("Cannot read file (or empty): %s", fileConfig->realpath.c_str());
         return -1;
     }
     loadContents(xml, r, debug);
@@ -117,12 +117,12 @@ int ReqDocumentDocx::loadRequirements(bool debug)
 {
     init();
 
-    LOG_DEBUG("loadDocx: %s", fileConfig->path.c_str());
+    LOG_DEBUG("loadDocx: %s", fileConfig->realpath.c_str());
     int err;
 
-    struct zip *zipFile = zip_open(fileConfig->path.c_str(), 0, &err);
+    struct zip *zipFile = zip_open(fileConfig->realpath.c_str(), 0, &err);
     if (!zipFile) {
-        LOG_ERROR("Cannot open file: %s", fileConfig->path.c_str());
+        LOG_ERROR("Cannot open file: %s", fileConfig->realpath.c_str());
         return -1;
     }
 

@@ -125,6 +125,41 @@ std::string getBasename(const std::string &path)
     else return path.substr(i+1);
 }
 
+/** dirname
+  * ""     -> .
+  * a/b/c  -> /a/b
+  * a/b/c/ -> /a/b
+  */
+std::string getDirname(std::string path)
+{
+    if (path.empty()) return ".";
+    size_t i;
+#if defined(_WIN32)
+    const char *dirsep = "/\\";
+#else
+    const char *dirsep = "/";
+#endif
+    i = path.find_last_of(dirsep);
+    if (i > 0 && i == path.size()-1) {
+        // case /a/b/c/
+        // remove the last / and do again
+        i = path.find_last_of(dirsep, path.size()-2);
+    }
+    if (i == std::string::npos) return ".";
+    else if (i == 0) return "/";
+    else return path.substr(0, i);
+}
+
+bool isPathAbsolute(const std::string &path)
+{
+#if defined(_WIN32)
+    if (path.size() && path[0] == '\\') return true;
+    if (path.find(":\\") != path.npos) return true;
+#else
+    if (path.size() && path[0] == '/') return true;
+#endif
+    return false;
+}
 
 std::string replaceAll(const std::string &in, char c, const char *replaceBy)
 {

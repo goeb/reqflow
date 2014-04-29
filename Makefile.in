@@ -48,7 +48,7 @@ target_triplet = @target@
 @WINDOWS_TRUE@am__append_8 = -static -static-libgcc -DZIP_EXTERN= \
 @WINDOWS_TRUE@	-DZLIB_INTERNAL -DLIBXML_STATIC -DPCRE_STATIC \
 @WINDOWS_TRUE@	-Dpoppler_cpp_EXPORTS
-bin_PROGRAMS = req$(EXEEXT)
+bin_PROGRAMS = reqflow$(EXEEXT)
 noinst_PROGRAMS = main_pdf$(EXEEXT) main_regex$(EXEEXT) \
 	main_unzip$(EXEEXT) main_xml$(EXEEXT) \
 	main_testStringCompare$(EXEEXT)
@@ -88,15 +88,17 @@ main_unzip_DEPENDENCIES =
 am_main_xml_OBJECTS = src/main_xml-main_xml.$(OBJEXT)
 main_xml_OBJECTS = $(am_main_xml_OBJECTS)
 main_xml_DEPENDENCIES =
-am_req_OBJECTS = src/req-main.$(OBJEXT) src/req-logging.$(OBJEXT) \
-	src/req-dateTools.$(OBJEXT) src/req-parseConfig.$(OBJEXT) \
-	src/req-req.$(OBJEXT) src/req-ReqDocumentTxt.$(OBJEXT) \
-	src/req-ReqDocumentDocx.$(OBJEXT) \
-	src/req-ReqDocumentHtml.$(OBJEXT) \
-	src/req-stringTools.$(OBJEXT) src/req-renderingHtml.$(OBJEXT) \
-	src/req-ReqDocumentPdf.$(OBJEXT)
-req_OBJECTS = $(am_req_OBJECTS)
-req_DEPENDENCIES =
+am_reqflow_OBJECTS = src/reqflow-main.$(OBJEXT) \
+	src/reqflow-logging.$(OBJEXT) src/reqflow-dateTools.$(OBJEXT) \
+	src/reqflow-parseConfig.$(OBJEXT) src/reqflow-req.$(OBJEXT) \
+	src/reqflow-ReqDocumentTxt.$(OBJEXT) \
+	src/reqflow-ReqDocumentDocx.$(OBJEXT) \
+	src/reqflow-ReqDocumentHtml.$(OBJEXT) \
+	src/reqflow-stringTools.$(OBJEXT) \
+	src/reqflow-renderingHtml.$(OBJEXT) \
+	src/reqflow-ReqDocumentPdf.$(OBJEXT)
+reqflow_OBJECTS = $(am_reqflow_OBJECTS)
+reqflow_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -112,10 +114,10 @@ CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 SOURCES = $(main_pdf_SOURCES) $(main_regex_SOURCES) \
 	$(main_testStringCompare_SOURCES) $(main_unzip_SOURCES) \
-	$(main_xml_SOURCES) $(req_SOURCES)
+	$(main_xml_SOURCES) $(reqflow_SOURCES)
 DIST_SOURCES = $(main_pdf_SOURCES) $(main_regex_SOURCES) \
 	$(main_testStringCompare_SOURCES) $(main_unzip_SOURCES) \
-	$(main_xml_SOURCES) $(req_SOURCES)
+	$(main_xml_SOURCES) $(reqflow_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -320,7 +322,7 @@ AM_CPPFLAGS = -Wall
 AM_CFLAGS = -Wall $(am__append_1) $(am__append_4) $(am__append_7)
 AM_CXXFLAGS = -Wall $(am__append_2) $(am__append_5) $(am__append_8)
 AM_LDFLAGS = $(am__append_3) $(am__append_6)
-req_SOURCES = src/main.cpp \
+reqflow_SOURCES = src/main.cpp \
     src/logging.cpp \
     src/dateTools.cpp \
     src/parseConfig.cpp \
@@ -332,8 +334,8 @@ req_SOURCES = src/main.cpp \
     src/renderingHtml.cpp \
     src/ReqDocumentPdf.cpp
 
-req_CPPFLAGS = @ZIP_CFLAGS@ @XML_CFLAGS@ @POPPLER_CFLAGS@ @PCRE_CFLAGS@
-req_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ @PCRE_LIBS@
+reqflow_CPPFLAGS = @ZIP_CFLAGS@ @XML_CFLAGS@ @POPPLER_CFLAGS@ @PCRE_CFLAGS@
+reqflow_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ @PCRE_LIBS@
 
 # specific subdirs
 SUBDIRS = test
@@ -485,31 +487,31 @@ src/main_xml-main_xml.$(OBJEXT): src/$(am__dirstamp) \
 main_xml$(EXEEXT): $(main_xml_OBJECTS) $(main_xml_DEPENDENCIES) $(EXTRA_main_xml_DEPENDENCIES) 
 	@rm -f main_xml$(EXEEXT)
 	$(LINK) $(main_xml_OBJECTS) $(main_xml_LDADD) $(LIBS)
-src/req-main.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-main.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-logging.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-logging.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-dateTools.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-dateTools.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-parseConfig.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-parseConfig.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-req.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-req.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-ReqDocumentTxt.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-ReqDocumentTxt.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-ReqDocumentDocx.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-ReqDocumentDocx.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-ReqDocumentHtml.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-ReqDocumentHtml.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-stringTools.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-stringTools.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-renderingHtml.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-renderingHtml.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/req-ReqDocumentPdf.$(OBJEXT): src/$(am__dirstamp) \
+src/reqflow-ReqDocumentPdf.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-req$(EXEEXT): $(req_OBJECTS) $(req_DEPENDENCIES) $(EXTRA_req_DEPENDENCIES) 
-	@rm -f req$(EXEEXT)
-	$(CXXLINK) $(req_OBJECTS) $(req_LDADD) $(LIBS)
+reqflow$(EXEEXT): $(reqflow_OBJECTS) $(reqflow_DEPENDENCIES) $(EXTRA_reqflow_DEPENDENCIES) 
+	@rm -f reqflow$(EXEEXT)
+	$(CXXLINK) $(reqflow_OBJECTS) $(reqflow_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -519,17 +521,17 @@ mostlyclean-compile:
 	-rm -f src/main_testStringCompare-stringTools.$(OBJEXT)
 	-rm -f src/main_unzip-main_unzip.$(OBJEXT)
 	-rm -f src/main_xml-main_xml.$(OBJEXT)
-	-rm -f src/req-ReqDocumentDocx.$(OBJEXT)
-	-rm -f src/req-ReqDocumentHtml.$(OBJEXT)
-	-rm -f src/req-ReqDocumentPdf.$(OBJEXT)
-	-rm -f src/req-ReqDocumentTxt.$(OBJEXT)
-	-rm -f src/req-dateTools.$(OBJEXT)
-	-rm -f src/req-logging.$(OBJEXT)
-	-rm -f src/req-main.$(OBJEXT)
-	-rm -f src/req-parseConfig.$(OBJEXT)
-	-rm -f src/req-renderingHtml.$(OBJEXT)
-	-rm -f src/req-req.$(OBJEXT)
-	-rm -f src/req-stringTools.$(OBJEXT)
+	-rm -f src/reqflow-ReqDocumentDocx.$(OBJEXT)
+	-rm -f src/reqflow-ReqDocumentHtml.$(OBJEXT)
+	-rm -f src/reqflow-ReqDocumentPdf.$(OBJEXT)
+	-rm -f src/reqflow-ReqDocumentTxt.$(OBJEXT)
+	-rm -f src/reqflow-dateTools.$(OBJEXT)
+	-rm -f src/reqflow-logging.$(OBJEXT)
+	-rm -f src/reqflow-main.$(OBJEXT)
+	-rm -f src/reqflow-parseConfig.$(OBJEXT)
+	-rm -f src/reqflow-renderingHtml.$(OBJEXT)
+	-rm -f src/reqflow-req.$(OBJEXT)
+	-rm -f src/reqflow-stringTools.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -540,17 +542,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_testStringCompare-stringTools.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_unzip-main_unzip.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main_xml-main_xml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentDocx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentHtml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentPdf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-ReqDocumentTxt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-dateTools.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-logging.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-parseConfig.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-renderingHtml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-req.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/req-stringTools.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-ReqDocumentDocx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-ReqDocumentHtml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-ReqDocumentPdf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-ReqDocumentTxt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-dateTools.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-logging.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-parseConfig.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-renderingHtml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-req.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reqflow-stringTools.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -668,159 +670,159 @@ src/main_testStringCompare-stringTools.obj: src/stringTools.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_testStringCompare_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/main_testStringCompare-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
 
-src/req-main.o: src/main.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-main.o -MD -MP -MF src/$(DEPDIR)/req-main.Tpo -c -o src/req-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-main.Tpo src/$(DEPDIR)/req-main.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/main.cpp' object='src/req-main.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-main.o: src/main.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-main.o -MD -MP -MF src/$(DEPDIR)/reqflow-main.Tpo -c -o src/reqflow-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-main.Tpo src/$(DEPDIR)/reqflow-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/main.cpp' object='src/reqflow-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-main.o `test -f 'src/main.cpp' || echo '$(srcdir)/'`src/main.cpp
 
-src/req-main.obj: src/main.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-main.obj -MD -MP -MF src/$(DEPDIR)/req-main.Tpo -c -o src/req-main.obj `if test -f 'src/main.cpp'; then $(CYGPATH_W) 'src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-main.Tpo src/$(DEPDIR)/req-main.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/main.cpp' object='src/req-main.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-main.obj: src/main.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-main.obj -MD -MP -MF src/$(DEPDIR)/reqflow-main.Tpo -c -o src/reqflow-main.obj `if test -f 'src/main.cpp'; then $(CYGPATH_W) 'src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-main.Tpo src/$(DEPDIR)/reqflow-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/main.cpp' object='src/reqflow-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-main.obj `if test -f 'src/main.cpp'; then $(CYGPATH_W) 'src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-main.obj `if test -f 'src/main.cpp'; then $(CYGPATH_W) 'src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/src/main.cpp'; fi`
 
-src/req-logging.o: src/logging.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-logging.o -MD -MP -MF src/$(DEPDIR)/req-logging.Tpo -c -o src/req-logging.o `test -f 'src/logging.cpp' || echo '$(srcdir)/'`src/logging.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-logging.Tpo src/$(DEPDIR)/req-logging.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/logging.cpp' object='src/req-logging.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-logging.o: src/logging.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-logging.o -MD -MP -MF src/$(DEPDIR)/reqflow-logging.Tpo -c -o src/reqflow-logging.o `test -f 'src/logging.cpp' || echo '$(srcdir)/'`src/logging.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-logging.Tpo src/$(DEPDIR)/reqflow-logging.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/logging.cpp' object='src/reqflow-logging.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-logging.o `test -f 'src/logging.cpp' || echo '$(srcdir)/'`src/logging.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-logging.o `test -f 'src/logging.cpp' || echo '$(srcdir)/'`src/logging.cpp
 
-src/req-logging.obj: src/logging.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-logging.obj -MD -MP -MF src/$(DEPDIR)/req-logging.Tpo -c -o src/req-logging.obj `if test -f 'src/logging.cpp'; then $(CYGPATH_W) 'src/logging.cpp'; else $(CYGPATH_W) '$(srcdir)/src/logging.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-logging.Tpo src/$(DEPDIR)/req-logging.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/logging.cpp' object='src/req-logging.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-logging.obj: src/logging.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-logging.obj -MD -MP -MF src/$(DEPDIR)/reqflow-logging.Tpo -c -o src/reqflow-logging.obj `if test -f 'src/logging.cpp'; then $(CYGPATH_W) 'src/logging.cpp'; else $(CYGPATH_W) '$(srcdir)/src/logging.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-logging.Tpo src/$(DEPDIR)/reqflow-logging.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/logging.cpp' object='src/reqflow-logging.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-logging.obj `if test -f 'src/logging.cpp'; then $(CYGPATH_W) 'src/logging.cpp'; else $(CYGPATH_W) '$(srcdir)/src/logging.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-logging.obj `if test -f 'src/logging.cpp'; then $(CYGPATH_W) 'src/logging.cpp'; else $(CYGPATH_W) '$(srcdir)/src/logging.cpp'; fi`
 
-src/req-dateTools.o: src/dateTools.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-dateTools.o -MD -MP -MF src/$(DEPDIR)/req-dateTools.Tpo -c -o src/req-dateTools.o `test -f 'src/dateTools.cpp' || echo '$(srcdir)/'`src/dateTools.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-dateTools.Tpo src/$(DEPDIR)/req-dateTools.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/dateTools.cpp' object='src/req-dateTools.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-dateTools.o: src/dateTools.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-dateTools.o -MD -MP -MF src/$(DEPDIR)/reqflow-dateTools.Tpo -c -o src/reqflow-dateTools.o `test -f 'src/dateTools.cpp' || echo '$(srcdir)/'`src/dateTools.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-dateTools.Tpo src/$(DEPDIR)/reqflow-dateTools.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/dateTools.cpp' object='src/reqflow-dateTools.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-dateTools.o `test -f 'src/dateTools.cpp' || echo '$(srcdir)/'`src/dateTools.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-dateTools.o `test -f 'src/dateTools.cpp' || echo '$(srcdir)/'`src/dateTools.cpp
 
-src/req-dateTools.obj: src/dateTools.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-dateTools.obj -MD -MP -MF src/$(DEPDIR)/req-dateTools.Tpo -c -o src/req-dateTools.obj `if test -f 'src/dateTools.cpp'; then $(CYGPATH_W) 'src/dateTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/dateTools.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-dateTools.Tpo src/$(DEPDIR)/req-dateTools.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/dateTools.cpp' object='src/req-dateTools.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-dateTools.obj: src/dateTools.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-dateTools.obj -MD -MP -MF src/$(DEPDIR)/reqflow-dateTools.Tpo -c -o src/reqflow-dateTools.obj `if test -f 'src/dateTools.cpp'; then $(CYGPATH_W) 'src/dateTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/dateTools.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-dateTools.Tpo src/$(DEPDIR)/reqflow-dateTools.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/dateTools.cpp' object='src/reqflow-dateTools.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-dateTools.obj `if test -f 'src/dateTools.cpp'; then $(CYGPATH_W) 'src/dateTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/dateTools.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-dateTools.obj `if test -f 'src/dateTools.cpp'; then $(CYGPATH_W) 'src/dateTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/dateTools.cpp'; fi`
 
-src/req-parseConfig.o: src/parseConfig.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-parseConfig.o -MD -MP -MF src/$(DEPDIR)/req-parseConfig.Tpo -c -o src/req-parseConfig.o `test -f 'src/parseConfig.cpp' || echo '$(srcdir)/'`src/parseConfig.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-parseConfig.Tpo src/$(DEPDIR)/req-parseConfig.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/parseConfig.cpp' object='src/req-parseConfig.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-parseConfig.o: src/parseConfig.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-parseConfig.o -MD -MP -MF src/$(DEPDIR)/reqflow-parseConfig.Tpo -c -o src/reqflow-parseConfig.o `test -f 'src/parseConfig.cpp' || echo '$(srcdir)/'`src/parseConfig.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-parseConfig.Tpo src/$(DEPDIR)/reqflow-parseConfig.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/parseConfig.cpp' object='src/reqflow-parseConfig.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-parseConfig.o `test -f 'src/parseConfig.cpp' || echo '$(srcdir)/'`src/parseConfig.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-parseConfig.o `test -f 'src/parseConfig.cpp' || echo '$(srcdir)/'`src/parseConfig.cpp
 
-src/req-parseConfig.obj: src/parseConfig.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-parseConfig.obj -MD -MP -MF src/$(DEPDIR)/req-parseConfig.Tpo -c -o src/req-parseConfig.obj `if test -f 'src/parseConfig.cpp'; then $(CYGPATH_W) 'src/parseConfig.cpp'; else $(CYGPATH_W) '$(srcdir)/src/parseConfig.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-parseConfig.Tpo src/$(DEPDIR)/req-parseConfig.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/parseConfig.cpp' object='src/req-parseConfig.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-parseConfig.obj: src/parseConfig.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-parseConfig.obj -MD -MP -MF src/$(DEPDIR)/reqflow-parseConfig.Tpo -c -o src/reqflow-parseConfig.obj `if test -f 'src/parseConfig.cpp'; then $(CYGPATH_W) 'src/parseConfig.cpp'; else $(CYGPATH_W) '$(srcdir)/src/parseConfig.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-parseConfig.Tpo src/$(DEPDIR)/reqflow-parseConfig.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/parseConfig.cpp' object='src/reqflow-parseConfig.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-parseConfig.obj `if test -f 'src/parseConfig.cpp'; then $(CYGPATH_W) 'src/parseConfig.cpp'; else $(CYGPATH_W) '$(srcdir)/src/parseConfig.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-parseConfig.obj `if test -f 'src/parseConfig.cpp'; then $(CYGPATH_W) 'src/parseConfig.cpp'; else $(CYGPATH_W) '$(srcdir)/src/parseConfig.cpp'; fi`
 
-src/req-req.o: src/req.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-req.o -MD -MP -MF src/$(DEPDIR)/req-req.Tpo -c -o src/req-req.o `test -f 'src/req.cpp' || echo '$(srcdir)/'`src/req.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-req.Tpo src/$(DEPDIR)/req-req.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/req.cpp' object='src/req-req.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-req.o: src/req.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-req.o -MD -MP -MF src/$(DEPDIR)/reqflow-req.Tpo -c -o src/reqflow-req.o `test -f 'src/req.cpp' || echo '$(srcdir)/'`src/req.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-req.Tpo src/$(DEPDIR)/reqflow-req.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/req.cpp' object='src/reqflow-req.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-req.o `test -f 'src/req.cpp' || echo '$(srcdir)/'`src/req.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-req.o `test -f 'src/req.cpp' || echo '$(srcdir)/'`src/req.cpp
 
-src/req-req.obj: src/req.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-req.obj -MD -MP -MF src/$(DEPDIR)/req-req.Tpo -c -o src/req-req.obj `if test -f 'src/req.cpp'; then $(CYGPATH_W) 'src/req.cpp'; else $(CYGPATH_W) '$(srcdir)/src/req.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-req.Tpo src/$(DEPDIR)/req-req.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/req.cpp' object='src/req-req.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-req.obj: src/req.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-req.obj -MD -MP -MF src/$(DEPDIR)/reqflow-req.Tpo -c -o src/reqflow-req.obj `if test -f 'src/req.cpp'; then $(CYGPATH_W) 'src/req.cpp'; else $(CYGPATH_W) '$(srcdir)/src/req.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-req.Tpo src/$(DEPDIR)/reqflow-req.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/req.cpp' object='src/reqflow-req.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-req.obj `if test -f 'src/req.cpp'; then $(CYGPATH_W) 'src/req.cpp'; else $(CYGPATH_W) '$(srcdir)/src/req.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-req.obj `if test -f 'src/req.cpp'; then $(CYGPATH_W) 'src/req.cpp'; else $(CYGPATH_W) '$(srcdir)/src/req.cpp'; fi`
 
-src/req-ReqDocumentTxt.o: src/ReqDocumentTxt.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentTxt.o -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentTxt.Tpo -c -o src/req-ReqDocumentTxt.o `test -f 'src/ReqDocumentTxt.cpp' || echo '$(srcdir)/'`src/ReqDocumentTxt.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentTxt.Tpo src/$(DEPDIR)/req-ReqDocumentTxt.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentTxt.cpp' object='src/req-ReqDocumentTxt.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentTxt.o: src/ReqDocumentTxt.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentTxt.o -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentTxt.Tpo -c -o src/reqflow-ReqDocumentTxt.o `test -f 'src/ReqDocumentTxt.cpp' || echo '$(srcdir)/'`src/ReqDocumentTxt.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentTxt.Tpo src/$(DEPDIR)/reqflow-ReqDocumentTxt.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentTxt.cpp' object='src/reqflow-ReqDocumentTxt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentTxt.o `test -f 'src/ReqDocumentTxt.cpp' || echo '$(srcdir)/'`src/ReqDocumentTxt.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentTxt.o `test -f 'src/ReqDocumentTxt.cpp' || echo '$(srcdir)/'`src/ReqDocumentTxt.cpp
 
-src/req-ReqDocumentTxt.obj: src/ReqDocumentTxt.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentTxt.obj -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentTxt.Tpo -c -o src/req-ReqDocumentTxt.obj `if test -f 'src/ReqDocumentTxt.cpp'; then $(CYGPATH_W) 'src/ReqDocumentTxt.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentTxt.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentTxt.Tpo src/$(DEPDIR)/req-ReqDocumentTxt.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentTxt.cpp' object='src/req-ReqDocumentTxt.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentTxt.obj: src/ReqDocumentTxt.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentTxt.obj -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentTxt.Tpo -c -o src/reqflow-ReqDocumentTxt.obj `if test -f 'src/ReqDocumentTxt.cpp'; then $(CYGPATH_W) 'src/ReqDocumentTxt.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentTxt.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentTxt.Tpo src/$(DEPDIR)/reqflow-ReqDocumentTxt.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentTxt.cpp' object='src/reqflow-ReqDocumentTxt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentTxt.obj `if test -f 'src/ReqDocumentTxt.cpp'; then $(CYGPATH_W) 'src/ReqDocumentTxt.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentTxt.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentTxt.obj `if test -f 'src/ReqDocumentTxt.cpp'; then $(CYGPATH_W) 'src/ReqDocumentTxt.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentTxt.cpp'; fi`
 
-src/req-ReqDocumentDocx.o: src/ReqDocumentDocx.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentDocx.o -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentDocx.Tpo -c -o src/req-ReqDocumentDocx.o `test -f 'src/ReqDocumentDocx.cpp' || echo '$(srcdir)/'`src/ReqDocumentDocx.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentDocx.Tpo src/$(DEPDIR)/req-ReqDocumentDocx.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentDocx.cpp' object='src/req-ReqDocumentDocx.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentDocx.o: src/ReqDocumentDocx.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentDocx.o -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentDocx.Tpo -c -o src/reqflow-ReqDocumentDocx.o `test -f 'src/ReqDocumentDocx.cpp' || echo '$(srcdir)/'`src/ReqDocumentDocx.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentDocx.Tpo src/$(DEPDIR)/reqflow-ReqDocumentDocx.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentDocx.cpp' object='src/reqflow-ReqDocumentDocx.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentDocx.o `test -f 'src/ReqDocumentDocx.cpp' || echo '$(srcdir)/'`src/ReqDocumentDocx.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentDocx.o `test -f 'src/ReqDocumentDocx.cpp' || echo '$(srcdir)/'`src/ReqDocumentDocx.cpp
 
-src/req-ReqDocumentDocx.obj: src/ReqDocumentDocx.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentDocx.obj -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentDocx.Tpo -c -o src/req-ReqDocumentDocx.obj `if test -f 'src/ReqDocumentDocx.cpp'; then $(CYGPATH_W) 'src/ReqDocumentDocx.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentDocx.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentDocx.Tpo src/$(DEPDIR)/req-ReqDocumentDocx.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentDocx.cpp' object='src/req-ReqDocumentDocx.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentDocx.obj: src/ReqDocumentDocx.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentDocx.obj -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentDocx.Tpo -c -o src/reqflow-ReqDocumentDocx.obj `if test -f 'src/ReqDocumentDocx.cpp'; then $(CYGPATH_W) 'src/ReqDocumentDocx.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentDocx.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentDocx.Tpo src/$(DEPDIR)/reqflow-ReqDocumentDocx.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentDocx.cpp' object='src/reqflow-ReqDocumentDocx.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentDocx.obj `if test -f 'src/ReqDocumentDocx.cpp'; then $(CYGPATH_W) 'src/ReqDocumentDocx.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentDocx.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentDocx.obj `if test -f 'src/ReqDocumentDocx.cpp'; then $(CYGPATH_W) 'src/ReqDocumentDocx.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentDocx.cpp'; fi`
 
-src/req-ReqDocumentHtml.o: src/ReqDocumentHtml.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentHtml.o -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentHtml.Tpo -c -o src/req-ReqDocumentHtml.o `test -f 'src/ReqDocumentHtml.cpp' || echo '$(srcdir)/'`src/ReqDocumentHtml.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentHtml.Tpo src/$(DEPDIR)/req-ReqDocumentHtml.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentHtml.cpp' object='src/req-ReqDocumentHtml.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentHtml.o: src/ReqDocumentHtml.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentHtml.o -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentHtml.Tpo -c -o src/reqflow-ReqDocumentHtml.o `test -f 'src/ReqDocumentHtml.cpp' || echo '$(srcdir)/'`src/ReqDocumentHtml.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentHtml.Tpo src/$(DEPDIR)/reqflow-ReqDocumentHtml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentHtml.cpp' object='src/reqflow-ReqDocumentHtml.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentHtml.o `test -f 'src/ReqDocumentHtml.cpp' || echo '$(srcdir)/'`src/ReqDocumentHtml.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentHtml.o `test -f 'src/ReqDocumentHtml.cpp' || echo '$(srcdir)/'`src/ReqDocumentHtml.cpp
 
-src/req-ReqDocumentHtml.obj: src/ReqDocumentHtml.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentHtml.obj -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentHtml.Tpo -c -o src/req-ReqDocumentHtml.obj `if test -f 'src/ReqDocumentHtml.cpp'; then $(CYGPATH_W) 'src/ReqDocumentHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentHtml.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentHtml.Tpo src/$(DEPDIR)/req-ReqDocumentHtml.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentHtml.cpp' object='src/req-ReqDocumentHtml.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentHtml.obj: src/ReqDocumentHtml.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentHtml.obj -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentHtml.Tpo -c -o src/reqflow-ReqDocumentHtml.obj `if test -f 'src/ReqDocumentHtml.cpp'; then $(CYGPATH_W) 'src/ReqDocumentHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentHtml.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentHtml.Tpo src/$(DEPDIR)/reqflow-ReqDocumentHtml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentHtml.cpp' object='src/reqflow-ReqDocumentHtml.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentHtml.obj `if test -f 'src/ReqDocumentHtml.cpp'; then $(CYGPATH_W) 'src/ReqDocumentHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentHtml.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentHtml.obj `if test -f 'src/ReqDocumentHtml.cpp'; then $(CYGPATH_W) 'src/ReqDocumentHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentHtml.cpp'; fi`
 
-src/req-stringTools.o: src/stringTools.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-stringTools.o -MD -MP -MF src/$(DEPDIR)/req-stringTools.Tpo -c -o src/req-stringTools.o `test -f 'src/stringTools.cpp' || echo '$(srcdir)/'`src/stringTools.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-stringTools.Tpo src/$(DEPDIR)/req-stringTools.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/stringTools.cpp' object='src/req-stringTools.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-stringTools.o: src/stringTools.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-stringTools.o -MD -MP -MF src/$(DEPDIR)/reqflow-stringTools.Tpo -c -o src/reqflow-stringTools.o `test -f 'src/stringTools.cpp' || echo '$(srcdir)/'`src/stringTools.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-stringTools.Tpo src/$(DEPDIR)/reqflow-stringTools.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/stringTools.cpp' object='src/reqflow-stringTools.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-stringTools.o `test -f 'src/stringTools.cpp' || echo '$(srcdir)/'`src/stringTools.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-stringTools.o `test -f 'src/stringTools.cpp' || echo '$(srcdir)/'`src/stringTools.cpp
 
-src/req-stringTools.obj: src/stringTools.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-stringTools.obj -MD -MP -MF src/$(DEPDIR)/req-stringTools.Tpo -c -o src/req-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-stringTools.Tpo src/$(DEPDIR)/req-stringTools.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/stringTools.cpp' object='src/req-stringTools.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-stringTools.obj: src/stringTools.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-stringTools.obj -MD -MP -MF src/$(DEPDIR)/reqflow-stringTools.Tpo -c -o src/reqflow-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-stringTools.Tpo src/$(DEPDIR)/reqflow-stringTools.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/stringTools.cpp' object='src/reqflow-stringTools.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-stringTools.obj `if test -f 'src/stringTools.cpp'; then $(CYGPATH_W) 'src/stringTools.cpp'; else $(CYGPATH_W) '$(srcdir)/src/stringTools.cpp'; fi`
 
-src/req-renderingHtml.o: src/renderingHtml.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-renderingHtml.o -MD -MP -MF src/$(DEPDIR)/req-renderingHtml.Tpo -c -o src/req-renderingHtml.o `test -f 'src/renderingHtml.cpp' || echo '$(srcdir)/'`src/renderingHtml.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-renderingHtml.Tpo src/$(DEPDIR)/req-renderingHtml.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/renderingHtml.cpp' object='src/req-renderingHtml.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-renderingHtml.o: src/renderingHtml.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-renderingHtml.o -MD -MP -MF src/$(DEPDIR)/reqflow-renderingHtml.Tpo -c -o src/reqflow-renderingHtml.o `test -f 'src/renderingHtml.cpp' || echo '$(srcdir)/'`src/renderingHtml.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-renderingHtml.Tpo src/$(DEPDIR)/reqflow-renderingHtml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/renderingHtml.cpp' object='src/reqflow-renderingHtml.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-renderingHtml.o `test -f 'src/renderingHtml.cpp' || echo '$(srcdir)/'`src/renderingHtml.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-renderingHtml.o `test -f 'src/renderingHtml.cpp' || echo '$(srcdir)/'`src/renderingHtml.cpp
 
-src/req-renderingHtml.obj: src/renderingHtml.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-renderingHtml.obj -MD -MP -MF src/$(DEPDIR)/req-renderingHtml.Tpo -c -o src/req-renderingHtml.obj `if test -f 'src/renderingHtml.cpp'; then $(CYGPATH_W) 'src/renderingHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/renderingHtml.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-renderingHtml.Tpo src/$(DEPDIR)/req-renderingHtml.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/renderingHtml.cpp' object='src/req-renderingHtml.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-renderingHtml.obj: src/renderingHtml.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-renderingHtml.obj -MD -MP -MF src/$(DEPDIR)/reqflow-renderingHtml.Tpo -c -o src/reqflow-renderingHtml.obj `if test -f 'src/renderingHtml.cpp'; then $(CYGPATH_W) 'src/renderingHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/renderingHtml.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-renderingHtml.Tpo src/$(DEPDIR)/reqflow-renderingHtml.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/renderingHtml.cpp' object='src/reqflow-renderingHtml.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-renderingHtml.obj `if test -f 'src/renderingHtml.cpp'; then $(CYGPATH_W) 'src/renderingHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/renderingHtml.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-renderingHtml.obj `if test -f 'src/renderingHtml.cpp'; then $(CYGPATH_W) 'src/renderingHtml.cpp'; else $(CYGPATH_W) '$(srcdir)/src/renderingHtml.cpp'; fi`
 
-src/req-ReqDocumentPdf.o: src/ReqDocumentPdf.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentPdf.o -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentPdf.Tpo -c -o src/req-ReqDocumentPdf.o `test -f 'src/ReqDocumentPdf.cpp' || echo '$(srcdir)/'`src/ReqDocumentPdf.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentPdf.Tpo src/$(DEPDIR)/req-ReqDocumentPdf.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentPdf.cpp' object='src/req-ReqDocumentPdf.o' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentPdf.o: src/ReqDocumentPdf.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentPdf.o -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentPdf.Tpo -c -o src/reqflow-ReqDocumentPdf.o `test -f 'src/ReqDocumentPdf.cpp' || echo '$(srcdir)/'`src/ReqDocumentPdf.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentPdf.Tpo src/$(DEPDIR)/reqflow-ReqDocumentPdf.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentPdf.cpp' object='src/reqflow-ReqDocumentPdf.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentPdf.o `test -f 'src/ReqDocumentPdf.cpp' || echo '$(srcdir)/'`src/ReqDocumentPdf.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentPdf.o `test -f 'src/ReqDocumentPdf.cpp' || echo '$(srcdir)/'`src/ReqDocumentPdf.cpp
 
-src/req-ReqDocumentPdf.obj: src/ReqDocumentPdf.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/req-ReqDocumentPdf.obj -MD -MP -MF src/$(DEPDIR)/req-ReqDocumentPdf.Tpo -c -o src/req-ReqDocumentPdf.obj `if test -f 'src/ReqDocumentPdf.cpp'; then $(CYGPATH_W) 'src/ReqDocumentPdf.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentPdf.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/req-ReqDocumentPdf.Tpo src/$(DEPDIR)/req-ReqDocumentPdf.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentPdf.cpp' object='src/req-ReqDocumentPdf.obj' libtool=no @AMDEPBACKSLASH@
+src/reqflow-ReqDocumentPdf.obj: src/ReqDocumentPdf.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/reqflow-ReqDocumentPdf.obj -MD -MP -MF src/$(DEPDIR)/reqflow-ReqDocumentPdf.Tpo -c -o src/reqflow-ReqDocumentPdf.obj `if test -f 'src/ReqDocumentPdf.cpp'; then $(CYGPATH_W) 'src/ReqDocumentPdf.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentPdf.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) src/$(DEPDIR)/reqflow-ReqDocumentPdf.Tpo src/$(DEPDIR)/reqflow-ReqDocumentPdf.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/ReqDocumentPdf.cpp' object='src/reqflow-ReqDocumentPdf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(req_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/req-ReqDocumentPdf.obj `if test -f 'src/ReqDocumentPdf.cpp'; then $(CYGPATH_W) 'src/ReqDocumentPdf.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentPdf.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(reqflow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/reqflow-ReqDocumentPdf.obj `if test -f 'src/ReqDocumentPdf.cpp'; then $(CYGPATH_W) 'src/ReqDocumentPdf.cpp'; else $(CYGPATH_W) '$(srcdir)/src/ReqDocumentPdf.cpp'; fi`
 install-dist_pkgdataDATA: $(dist_pkgdata_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(pkgdatadir)" || $(MKDIR_P) "$(DESTDIR)$(pkgdatadir)"
@@ -1313,9 +1315,9 @@ dist-hook: bin/gitlog2changelog.py
 # Windows installer
 @WINDOWS_TRUE@all-local: @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
 
-@WINDOWS_TRUE@@PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT): reqflow.iss req$(EXEEXT)
-@WINDOWS_TRUE@	@STRIP@ req$(EXEEXT)
-@WINDOWS_TRUE@	$(WINE) "@ISCC@" /q /dMyAppName=@PACKAGE_NAME@ /dMyAppVersion=@PACKAGE_VERSION@ /dMyAppExeName=req$(EXEEXT) /f@PACKAGE_TARNAME@-@VERSION@-setup $<
+@WINDOWS_TRUE@@PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT): reqflow.iss reqflow$(EXEEXT)
+@WINDOWS_TRUE@	@STRIP@ reqflow$(EXEEXT)
+@WINDOWS_TRUE@	$(WINE) "@ISCC@" /q /dMyAppName=@PACKAGE_NAME@ /dMyAppVersion=@PACKAGE_VERSION@ /dMyAppExeName=reqflow$(EXEEXT) /f@PACKAGE_TARNAME@-@VERSION@-setup $<
 
 clean-local:
 	rm -f @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)

@@ -26,8 +26,8 @@ endif
 
 
 # Main program
-bin_PROGRAMS = req
-req_SOURCES = src/main.cpp \
+bin_PROGRAMS = reqflow
+reqflow_SOURCES = src/main.cpp \
     src/logging.cpp \
     src/dateTools.cpp \
     src/parseConfig.cpp \
@@ -39,8 +39,8 @@ req_SOURCES = src/main.cpp \
     src/renderingHtml.cpp \
     src/ReqDocumentPdf.cpp
 
-req_CPPFLAGS = @ZIP_CFLAGS@ @XML_CFLAGS@ @POPPLER_CFLAGS@ @PCRE_CFLAGS@
-req_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ @PCRE_LIBS@
+reqflow_CPPFLAGS = @ZIP_CFLAGS@ @XML_CFLAGS@ @POPPLER_CFLAGS@ @PCRE_CFLAGS@
+reqflow_LDADD = @ZIP_LIBS@ @XML_LIBS@ @POPPLER_LIBS@ @PCRE_LIBS@
 
 # specific subdirs
 SUBDIRS = test
@@ -80,9 +80,9 @@ noinst_PROGRAMS = main_pdf main_regex main_unzip main_xml main_testStringCompare
 if WINDOWS
 all-local: @PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT)
 
-@PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT): reqflow.iss req$(EXEEXT)
-	@STRIP@ req$(EXEEXT)
-	$(WINE) "@ISCC@" /q /dMyAppName=@PACKAGE_NAME@ /dMyAppVersion=@PACKAGE_VERSION@ /dMyAppExeName=req$(EXEEXT) /f@PACKAGE_TARNAME@-@VERSION@-setup $<
+@PACKAGE_TARNAME@-@VERSION@-setup$(EXEEXT): reqflow.iss reqflow$(EXEEXT)
+	@STRIP@ reqflow$(EXEEXT)
+	$(WINE) "@ISCC@" /q /dMyAppName=@PACKAGE_NAME@ /dMyAppVersion=@PACKAGE_VERSION@ /dMyAppExeName=reqflow$(EXEEXT) /f@PACKAGE_TARNAME@-@VERSION@-setup $<
 endif
 
 clean-local:
