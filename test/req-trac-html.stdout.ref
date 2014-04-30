@@ -1,6 +1,3 @@
-Error(s): 2
-SPEC:SYS_155: Undefined requirement, referenced by: REQ_01
-TEST:REQ_333: Undefined requirement, referenced by: T_01
 
 Requirements of SPEC                               Requirements Downstream                           
 --------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,6 @@
 #!/bin/sh
 . ./envtest
-../reqflow stat -s -c $TEST_ORIGIN/conf.req > trac2.out 2>&1
-diff trac2.out $TEST_ORIGIN/trac2.ref
+T=req-stat
+$REQFLOW stat -s -c $TEST_ORIGIN/conf.req > $T.stdout.out 2> $T.stderr.out
+diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref
+diff -w $T.stderr.out $TEST_ORIGIN/$T.stderr.ref

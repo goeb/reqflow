@@ -1,4 +1,6 @@
 #!/bin/sh
 . ./envtest
-../reqflow trac -c $TEST_ORIGIN/html.req > html.out 2>&1
-diff html.out $TEST_ORIGIN/html.ref
+T=req-trac-html
+$REQFLOW trac -c $TEST_ORIGIN/html.req > $T.out 2> $T.err
+diff -w $T.out $TEST_ORIGIN/$T.stdout.ref
+diff -w $T.err $TEST_ORIGIN/$T.stderr.ref

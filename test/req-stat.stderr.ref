@@ -6,8 +6,3 @@ TEST:PRINTF_01b: Undefined requirement, referenced by: T_01
 TEST:PRINTF_333: Undefined requirement, referenced by: T_01
 TEST:PRINTF_03a: Undefined requirement, referenced by: T_02
 TEST:PRINTF_03b: Undefined requirement, referenced by: T_02
-Document                          % covered / total
-----------------------------------------------------------------------
-SPEC                            77%       7 /     9 SPEC.docx
-TEST                           nocov  nocov /     5 TEST.txt
-Total                           77%       7 /     9 

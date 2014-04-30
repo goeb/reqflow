@@ -1,2 +1,6 @@
 
 export TEST_ORIGIN=@srcdir@
+if [ x@EXEEXT@ = x.exe ]; then WINE=wine
+else WINE=""; fi
+export REQFLOW="$WINE ../reqflow@EXEEXT@"
+
