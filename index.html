@@ -49,50 +49,71 @@
 <h2 id="download">Download</h2>
 <h3 id="linux">Linux</h3>
 <pre><code>git clone https://github.com/goeb/reqflow.git
+configure
 make
-cd test &amp;&amp; ../req stat -s</code></pre>
+make check
+cd test &amp;&amp; ../reqflow stat -s</code></pre>
 <h3 id="windows">Windows</h3>
+<p>Latest stable:</p>
+<ul>
+<li><a href="download/reqflow-1.3.2-setup.exe">reqflow-1.3.2-setup.exe</a></li>
+</ul>
+<p>Previous versions:</p>
 <ul>
 <li><a href="download/reqflow-1.3.0-setup.exe">reqflow-1.3.0-setup.exe</a></li>
 <li><a href="download/reqflow-v1.2.1.zip">reqflow-v1.2.1.zip</a></li>
 </ul>
 <h2 id="usage">Usage</h2>
-<pre><code>Usage: req &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
+<pre><code>Usage: 1. reqflow &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
+       2. reqflow &lt;config-file&gt;
+
+
+1. reqflow &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
 
 Commands:
 
-    stat [doc ...]  Print the status of requirements in all documents or the given documents.
-                    Without additionnal option, only unresolved coverage issues are reported.
+    stat [doc ...]  Print the status of requirements in all documents or the
+                    given documents. Without additionnal option, only
+                    unresolved coverage issues are reported.
          -s         Print a one-line summary for each document.
          -v         Print the status of all requirements.
                     Status codes:
 
-                        &#39;U&#39;  Uncovered
+                      &#39;U&#39;  Uncovered
 
-    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).
+    trac [doc ...]  Print the traceability matrix of the requirements 
+                    (A covered by B).
          [-r]       Print the reverse traceability matrix (A covers B).
          [-x &lt;fmt&gt;] Select export format: text (default), csv, html.
-                    If format &#39;html&#39; is chosen, -r is ignored, as both foward and reverse
-                    traceability matrices are displayed.
+                    If format &#39;html&#39; is chosen, -r is ignored, as both foward
+                    and reverse traceability matrices are displayed.
 
-    review          Print the requirements with their text (experimental).
-         [-f | -r]  Print also traceability (forward or backward) (not implemented yet)
+    review          Print the requirements with their text.
+         [-f | -r]  Print also traceability (forward or backward)
          [-x &lt;fmt&gt;] Choose format: txt, csv.
 
     config          Print the list of configured documents.
 
     debug &lt;file&gt;    Dump text extracted from file (debug purpose).
-                    (PDF not supported on Windows)
 
-    regex &lt;pattern&gt; &lt;text&gt;
+    regex &lt;pattern&gt; [&lt;text&gt;]
                     Test regex given by &lt;pattern&gt; applied on &lt;text&gt;.
+                    If &lt;text&gt; is omitted, then the text is read from stdin.
 
     version
     help
 
 Options:
-    -c &lt;config&gt; Select configuration file. Defaults to &#39;conf.req&#39;.
-</code></pre>
+    -c &lt;config&gt;  Select configuration file. Defaults to &#39;conf.req&#39;.
+    -o &lt;file&gt;    Output to file instead of stdout.
+                 Not supported for commands &#39;config&#39;, debug&#39; and &#39;regex&#39;.
+
+2. reqflow &lt;config&gt;
+This is equivalent to:
+    reqflow trac -c &lt;config&gt; -x html -o &lt;outfile&gt; &amp;&amp; start &lt;outfile&gt;
+
+Purpose: This usage is suitable for double-cliking on the config file.
+Note: &lt;config&gt; must be different from the commands of use case 1.</code></pre>
 <h2 id="sample-configuration-file">Sample Configuration File</h2>
 <p><code>conf.req</code></p>
 <pre><code># document &lt;document-id&gt; -path &lt;document-path&gt; -req &lt;pattern&gt; \
@@ -138,7 +159,7 @@ document TEST -path TEST.txt \
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on  6 Apr 2014
+            Page updated on 30 Apr 2014
         </div>
     </body>
 </html>

@@ -28,10 +28,19 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 ### Linux
 
     git clone https://github.com/goeb/reqflow.git
+    configure
     make
-    cd test && ../req stat -s
+    make check
+    cd test && ../reqflow stat -s
 
 ### Windows
+
+Latest stable:
+
+* [reqflow-1.3.2-setup.exe](download/reqflow-1.3.2-setup.exe)
+
+
+Previous versions:
 
 * [reqflow-1.3.0-setup.exe](download/reqflow-1.3.0-setup.exe)
 * [reqflow-v1.2.1.zip](download/reqflow-v1.2.1.zip)
@@ -39,42 +48,56 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 ## Usage
 
 ```
-Usage: req <command> [<options>] [<args>]
+Usage: 1. reqflow <command> [<options>] [<args>]
+       2. reqflow <config-file>
+
+
+1. reqflow <command> [<options>] [<args>]
 
 Commands:
 
-    stat [doc ...]  Print the status of requirements in all documents or the given documents.
-                    Without additionnal option, only unresolved coverage issues are reported.
+    stat [doc ...]  Print the status of requirements in all documents or the
+                    given documents. Without additionnal option, only
+                    unresolved coverage issues are reported.
          -s         Print a one-line summary for each document.
          -v         Print the status of all requirements.
                     Status codes:
 
-                        'U'  Uncovered
+                      'U'  Uncovered
 
-    trac [doc ...]  Print the traceability matrix of the requirements (A covered by B).
+    trac [doc ...]  Print the traceability matrix of the requirements 
+                    (A covered by B).
          [-r]       Print the reverse traceability matrix (A covers B).
          [-x <fmt>] Select export format: text (default), csv, html.
-                    If format 'html' is chosen, -r is ignored, as both foward and reverse
-                    traceability matrices are displayed.
+                    If format 'html' is chosen, -r is ignored, as both foward
+                    and reverse traceability matrices are displayed.
 
-    review          Print the requirements with their text (experimental).
-         [-f | -r]  Print also traceability (forward or backward) (not implemented yet)
+    review          Print the requirements with their text.
+         [-f | -r]  Print also traceability (forward or backward)
          [-x <fmt>] Choose format: txt, csv.
 
     config          Print the list of configured documents.
 
     debug <file>    Dump text extracted from file (debug purpose).
-                    (PDF not supported on Windows)
 
-    regex <pattern> <text>
+    regex <pattern> [<text>]
                     Test regex given by <pattern> applied on <text>.
+                    If <text> is omitted, then the text is read from stdin.
 
     version
     help
 
 Options:
-    -c <config> Select configuration file. Defaults to 'conf.req'.
+    -c <config>  Select configuration file. Defaults to 'conf.req'.
+    -o <file>    Output to file instead of stdout.
+                 Not supported for commands 'config', debug' and 'regex'.
 
+2. reqflow <config>
+This is equivalent to:
+    reqflow trac -c <config> -x html -o <outfile> && start <outfile>
+
+Purpose: This usage is suitable for double-cliking on the config file.
+Note: <config> must be different from the commands of use case 1.
 ```
 
 ## Sample Configuration File
