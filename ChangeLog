@@ -1,3 +1,84 @@
+2014-04-30  fred <fhoerni@free.fr>
+
+  * dev/README-cross-libs.txt, dev/TEMPLATE.rqtf, dev/TODO, dev/win32env: add
+  doc about my cross-compiled libraries
+
+  * NEWS, dev/req.config, dev/req.creator, dev/req.files, dev/req.includes,
+  req.config, req.creator, req.files, req.includes: move qtcreator files to
+  directory 'dev'
+
+  * Makefile.in, configure, configure.ac, reqflow.iss, reqflow.iss.in: locate
+  reqflow-x.x.x-setup.exe in build directory
+
+  * test/docx_rev_marks.ref, test/envtest.in, test/html.ref, test/pdf.ref,
+  test/req-stat-docx-rm.stdout.ref, test/req-stat-docx-rm.test,
+  test/req-stat.stderr.ref, test/req-stat.stdout.ref, test/req-stat.test,
+  test/req-trac-html.stderr.ref, test/req-trac-html.stdout.ref,
+  test/req-trac-html.test, test/req-trac-pdf.stderr.ref,
+  test/req-trac-pdf.stdout.ref, test/req-trac-pdf.test,
+  test/req-trac.stderr.ref, test/req-trac.stdout.ref, test/req-trac.test,
+  test/trac1.ref, test/trac2.ref: tests ok for windows platform also
+
+2014-04-29  fred <fhoerni@free.fr>
+
+  * INSTALL, Makefile.am, Makefile.in, NEWS, README, compile, config.guess,
+  config.sub, configure, configure.ac, depcomp, install-sh, missing,
+  reqflow.iss, src/ReqDocumentDocx.cpp, src/ReqDocumentHtml.cpp,
+  src/ReqDocumentPdf.cpp, src/ReqDocumentTxt.cpp, src/main.cpp, src/req.h,
+  src/stringTools.cpp, src/stringTools.h, test/Makefile.in, test/envtest.in,
+  test/req-stat-docx-rm.test, test/req-stat.test, test/req-trac-html.test,
+  test/req-trac-pdf.test, test/req-trac.test: req renamed reqflow  tests can be
+  relocated (make check)
+
+2014-04-25  fred <fhoerni@free.fr>
+
+  * NEWS, src/main.cpp, src/req.cpp, test/docx_rev_marks.ref: test regex on
+  stdin  and reomve the "Ok." when there is no error.
+
+2014-04-24  fred <fhoerni@free.fr>
+
+  * Makefile.am, Makefile.in, configure, configure.ac, src/ReqDocumentDocx.cpp,
+  src/ReqDocumentDocx.h: redesign loadDocxXmlNode slightly & strip req.exe
+
+  * Makefile.in, aclocal.m4, configure, configure.ac, src/ReqDocumentDocx.cpp,
+  src/config.h.in, test/Makefile.am, test/Makefile.in,
+  test/docx_rev_marks.docx, test/docx_rev_marks.ref, test/docx_rev_marks.req,
+  test/req-stat-docx-rm.test: manage "moveFrom" in docx documents  "moveFrom"
+  indicates text that has been moved somewhere else and that is kept for
+  displaying the revision marks in Word. Therefore req should ignore it. 
+  v1.3.2 initiated
+
+2014-04-23  Clément DAVID <c.david86@gmail.com>
+
+  * Makefile.am, Makefile.in: Autotools: Remove Fedora only workaround.  A fix
+  is in progress, see https://bugzilla.redhat.com/show_bug.cgi?id=1089380 .
+
+  * src/ReqDocumentDocx.cpp, src/ReqDocumentHtml.cpp,
+  src/main_testStringCompare.cpp: Fix some warnings on printf
+
+2014-04-22  fred <fhoerni@free.fr>
+
+  * CHANGES, src/ReqDocumentDocx.cpp, src/global.h: docx input: ignore deleted
+  text (revision marks)
+
+2014-04-22  Clément DAVID <c.david86@gmail.com>
+
+  * .gitignore, Makefile.am, Makefile.in, test/Makefile.am, test/Makefile.in:
+  Autotools: "distclean" clean any generated files  git clean -Xd can be use to
+  check generated files
+
+  * Makefile.am, Makefile.in: Autotools mingw: clean the generated InnoSetup
+  exe file
+
+  * .gitignore, AUTHORS, CHANGES, ChangeLog, INSTALL, Makefile.am, Makefile.in,
+  NEWS, README, README-win.txt, README.md, aclocal.m4, bin/gitlog2changelog.py,
+  compile, config.guess, config.sub, configure, configure.ac, depcomp,
+  install-sh, missing, reqflow.iss, src/config.h.in, test/Makefile.am,
+  test/Makefile.in: Use automake 1.11 instead of 1.13  * Switch to GNU
+  conventions (ChangeLog, NEWS, AUTHORS, README) * Call InnoSetup (through
+  wine) while after cross-compiling * Add a script to generate the ChangeLog
+  using git log
+
 2014-04-18  Clément DAVID <clement.david@scilab-enterprises.com>
 
   * .gitignore, COPYING, Makefile.am, Makefile.in, aclocal.m4, compile,
