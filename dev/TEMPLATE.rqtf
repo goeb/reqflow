@@ -1,0 +1,10 @@
+# sample file from another tool
+
+[Files]
+Names=Document1
+
+[Document1]
+GraphicPosition=1950@1070
+Type=Text
+Path=document
+

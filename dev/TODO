@@ -1,0 +1,12 @@
+
+
+8. latin1/utf8 (dans le .conf)
+
+9. -prefix dans le .conf
+
+10. enable multi -req options in conf file
+
+addFile x -path x.txt -req 1. -req 2. etc.
+
+12. document made of several files (recursive search in sub-directories
+
