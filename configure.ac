@@ -81,6 +81,6 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_CHECK_FUNCS([gettimeofday localtime regcomp strcasecmp strchr strerror strstr strtoul])
 
-AC_CONFIG_FILES([Makefile test/Makefile test/envtest])
+AC_CONFIG_FILES([Makefile test/Makefile test/envtest reqflow.iss])
 AC_OUTPUT
 

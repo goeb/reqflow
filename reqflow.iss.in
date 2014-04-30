@@ -22,7 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=COPYING
+LicenseFile=@srcdir@\COPYING
 OutputDir=.
 OutputBaseFilename=setup
 Compression=lzma
@@ -33,17 +33,18 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "reqflow.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "README"; DestName: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "COPYING"; DestDir: "{app}"; Flags: ignoreversion
-Source: "NEWS"; DestDir: "{app}"; Flags: ignoreversion
-Source: "ChangeLog"; DestDir: "{app}"; Flags: ignoreversion
-Source: "AUTHORS"; DestDir: "{app}"; Flags: ignoreversion
-Source: "test\*.test"; DestDir: "{app}"; Flags: ignoreversion
-Source: "test\*.ref"; DestDir: "{app}"; Flags: ignoreversion
-Source: "test\*.req"; DestDir: "{app}"; Flags: ignoreversion
-Source: "test\*.pdf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "test\*.docx"; DestDir: "{app}"; Flags: ignoreversion
-Source: "test\*.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@srcdir@\README"; DestName: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@srcdir@\COPYING"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@srcdir@\NEWS"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@srcdir@\ChangeLog"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@srcdir@\AUTHORS"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@srcdir@\test\*.test"; DestDir: "{app}\test"; Flags: ignoreversion
+Source: "@srcdir@\test\*.ref"; DestDir: "{app}\test"; Flags: ignoreversion
+Source: "@srcdir@\test\*.req"; DestDir: "{app}\test"; Flags: ignoreversion
+Source: "@srcdir@\test\*.pdf"; DestDir: "{app}\test"; Flags: ignoreversion
+Source: "@srcdir@\test\*.docx"; DestDir: "{app}\test"; Flags: ignoreversion
+Source: "@srcdir@\test\*.txt"; DestDir: "{app}\test"; Flags: ignoreversion
+Source: "@srcdir@\test\*.html"; DestDir: "{app}\test"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
