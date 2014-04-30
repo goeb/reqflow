@@ -1,5 +1,6 @@
 Reqflow 1.3.2
 
+    - Executable renamed from 'req' to 'reqflow'
     - Fix acquisition of docx with deleted or moved text
       (tracked changes, revision marks)
 
