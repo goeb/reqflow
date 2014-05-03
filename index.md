@@ -28,6 +28,7 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 ### Linux
 
     git clone https://github.com/goeb/reqflow.git
+    cd reqflow
     ./configure
     make
     make check
