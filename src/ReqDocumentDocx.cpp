@@ -92,7 +92,7 @@ int ReqDocumentDocxXml::loadRequirements(bool debug)
     const char *xml;
     int r = loadFile(fileConfig->realpath.c_str(), &xml);
     if (r <= 0) {
-        LOG_ERROR("Cannot read file (or empty): %s", fileConfig->realpath.c_str());
+        PUSH_ERROR(fileConfig->id, "", "Cannot read file (or empty): %s", fileConfig->realpath.c_str());
         return -1;
     }
     loadContents(xml, r, debug);
@@ -122,7 +122,7 @@ int ReqDocumentDocx::loadRequirements(bool debug)
 
     struct zip *zipFile = zip_open(fileConfig->realpath.c_str(), 0, &err);
     if (!zipFile) {
-        LOG_ERROR("Cannot open file: %s", fileConfig->realpath.c_str());
+        PUSH_ERROR(fileConfig->id, "", "Cannot open file: %s", fileConfig->realpath.c_str());
         return -1;
     }
 
@@ -141,7 +141,7 @@ int ReqDocumentDocx::loadRequirements(bool debug)
 		const char *OPEN_DOC_CONTENTS = "content.xml";
 		i = zip_name_locate(zipFile, OPEN_DOC_CONTENTS, 0);
 		if (i < 0) {
-            LOG_ERROR("Not a valid docx document; %s", fileConfig->path.c_str());
+            PUSH_ERROR(fileConfig->id, "", "Not a valid docx document: %s", fileConfig->realpath.c_str());
 			zip_close(zipFile);
 			return -1;
 		}
@@ -160,7 +160,7 @@ int ReqDocumentDocx::loadRequirements(bool debug)
 
         zip_fclose(fileInZip);
     } else {
-        LOG_ERROR("Cannot open file %d in zip: %s", i, fileConfig->path.c_str());
+        PUSH_ERROR(fileConfig->id, "", "Cannot open file %d in zip: %s", i, fileConfig->realpath.c_str());
     }
     zip_close(zipFile);
 

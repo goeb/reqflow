@@ -31,7 +31,7 @@ int ReqDocumentPdf::loadRequirements(bool debug)
 
     poppler::document *doc = poppler::document::load_from_file(fileConfig->realpath.c_str());
 	if (!doc) {
-        LOG_ERROR("Cannot open file: %s", fileConfig->realpath.c_str());
+        PUSH_ERROR(fileConfig->id, "", "Cannot open file: %s", fileConfig->realpath.c_str());
         return -1;
 	}
 	const int pagesNbr = doc->pages();

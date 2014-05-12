@@ -32,7 +32,7 @@ int ReqDocumentTxt::loadRequirements(bool debug)
     currentRequirement = "";
 
     if (!ifs.good()) {
-        LOG_ERROR("Cannot open file: %s", fileConfig->realpath.c_str());
+        PUSH_ERROR(fileConfig->id, "", "Cannot open file: %s", fileConfig->realpath.c_str());
         return -1;
     }
 
@@ -49,7 +49,7 @@ int ReqDocumentTxt::loadRequirements(bool debug)
 		linenum++;
     }
 	if (!ifs.eof()) {
-        LOG_ERROR("Line too long in file '%s': %d (max size=%d)", fileConfig->path.c_str(), linenum, LINE_SIZE_MAX);
+        PUSH_ERROR(fileConfig->id, "", "Line too long in file '%s': %d (max size=%d)", fileConfig->path.c_str(), linenum, LINE_SIZE_MAX);
 	}
     finalizeCurrentReq();
 
