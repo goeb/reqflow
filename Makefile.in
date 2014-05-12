@@ -57,7 +57,7 @@ DIST_COMMON = README $(am__configure_deps) $(dist_pkgdata_DATA) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/reqflow.iss.in $(top_srcdir)/configure \
 	$(top_srcdir)/src/config.h.in AUTHORS COPYING ChangeLog \
-	INSTALL NEWS TODO compile config.guess config.sub depcomp \
+	INSTALL NEWS compile config.guess config.sub depcomp \
 	install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
