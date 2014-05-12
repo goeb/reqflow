@@ -22,6 +22,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <fstream>
+#include <iostream>
 
 #include "parseConfig.h"
 #include "logging.h"
@@ -160,6 +162,7 @@ std::list<std::list<std::string> > parseConfigTokens(const char *buf, size_t len
     return linesOftokens;
 }
 
+// DEPRECATED
 // Allocate a buffer (malloc) and load a file into this buffer.
 // @return the number of bytes read (that is also the size of the buffer)
 //         -1 in case of error
@@ -209,6 +212,40 @@ int loadFile(const char *filepath, const char **data)
     fclose(f);
     return n;
 }
+
+// Load the contents of a file in string
+// @return the number of bytes read (that is also the size of the buffer)
+//         -1 in case of error
+int loadFile(const char *filepath, std::string &contents)
+{
+    if (0 == strcmp(filepath, "-")) {
+        std::string line;
+        while (getline(std::cin, line)) {
+            if (contents.size()) contents += "\n";
+            contents += line;
+        }
+
+    } else {
+        std::ifstream f;
+        f.open(filepath, std::ios::in | std::ios::binary);
+
+        if (!f) {
+            LOG_ERROR("Cannot open file '%s': %s", filepath, strerror(errno));
+            return -1;
+        }
+
+        f.seekg(0, std::ios::end);
+        contents.resize(f.tellg());
+        f.seekg(0, std::ios::beg);
+        f.read(&contents[0], contents.size());
+        if (f.bad()) {
+            LOG_ERROR("Read error '%s': %s", filepath, strerror(errno));
+            return -1;
+        }
+    }
+    return contents.size();
+}
+
 
 /** Write a string to a file
   *

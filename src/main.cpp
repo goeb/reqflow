@@ -166,9 +166,9 @@ int loadConfiguration(const char * file)
 {
     LOG_DEBUG(_("Loading configuration file: '%s'"), file);
 
-    const char *config;
-    int r = loadFile(file, &config);
-    if (r<0) {
+    std::string config;
+    int r = loadFile(file, config);
+    if (r < 0) {
         PUSH_ERROR(file, "", _("Cannot load file: %s"), strerror(errno));
         return 1;
     } else if (r == 0) {
@@ -179,8 +179,7 @@ int loadConfiguration(const char * file)
     RootDir = getDirname(file);
 
     // parse the configuration
-    std::list<std::list<std::string> > configTokens = parseConfigTokens(config, r);
-    free((void*)config);
+    std::list<std::list<std::string> > configTokens = parseConfigTokens(config.c_str(), r);
 
     std::list<std::pair<std::string, std::string> > defs;
 
