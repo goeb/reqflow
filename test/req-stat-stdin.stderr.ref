@@ -1,0 +1,8 @@
+Error(s): 7
+SPEC:PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
+SPEC:SYS_155: Undefined requirement, referenced by: PRINTF_01
+TEST:PRINTF_01a: Undefined requirement, referenced by: T_01
+TEST:PRINTF_01b: Undefined requirement, referenced by: T_01
+TEST:PRINTF_333: Undefined requirement, referenced by: T_01
+TEST:PRINTF_03a: Undefined requirement, referenced by: T_02
+TEST:PRINTF_03b: Undefined requirement, referenced by: T_02
