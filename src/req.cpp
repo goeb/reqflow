@@ -153,19 +153,9 @@ BlockStatus ReqDocument::processBlock(std::string &text)
     }
 
     // check if text covers a requirement
-    std::set<std::string> refs = getAllPatterns(fileConfig->refRegex, text.c_str());
-    if (!refs.empty()) {
-        std::set<std::string>::iterator ref;
-        FOREACH(ref, refs) {
-            if (currentRequirement.empty()) {
-                PUSH_ERROR(fileConfig->id, *ref, "Reference without requirement");
-            } else {
-                Requirements[currentRequirement].covers.insert(*ref);
-            }
-        }
-    }
+    std::set<std::string> refs = extractAllPatterns(fileConfig->refRegex, text);
 
-    std::string reqId = extractPattern(fileConfig->reqRegex, text, true);
+    std::string reqId = extractPattern(fileConfig->reqRegex, text, ERASE_ALL);
 
     if (!reqId.empty() && refs.find(reqId) == refs.end()) {
         std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
@@ -187,11 +177,24 @@ BlockStatus ReqDocument::processBlock(std::string &text)
         }
     }
 
+    // refs are stored after capturing a possible requirement
+    // this is to deal with the case where the req and refs are on the same line
+    if (!refs.empty()) {
+        std::set<std::string>::iterator ref;
+        FOREACH(ref, refs) {
+            if (currentRequirement.empty()) {
+                PUSH_ERROR(fileConfig->id, *ref, "Reference without requirement");
+            } else {
+                Requirements[currentRequirement].covers.insert(*ref);
+            }
+        }
+    }
+
     // TODO check for endReq and endReqStyle to know if text of
     // current requirement is finished
 
     // accumulate text of current requirement
-    if (currentRequirement.size() && refs.empty()) {
+    if (currentRequirement.size()) {
         if (textOfCurrentReq.size()) textOfCurrentReq += "\n";
         textOfCurrentReq += text;
     }
@@ -212,11 +215,29 @@ void ReqDocument::finalizeCurrentReq()
 }
 
 
-/** Get first matching pattern and erase it from the text.
+/** Get first matching pattern
+  *
+  * The erase flag is typically used as:
+  *    for a requirement, erase the whole pattern, as requirements go one by one
+  *    for a reference, erase the least pattern, as there may be several refs on the same line.
+  *
+  * Example:
+  * TEST_01: ... Ref: REQ_01, REQ_02, REQ_03
+  *
+  * with REF_PATTERN = "Ref:[ ,]+(REQ_[0-9]+)"
+  *
+  * In this example, when extracting the refs, the extraction sequence will be:
+  *    Ref: REQ_01, REQ_02, REQ_03
+  *    Ref: , REQ_02, REQ_03
+  *    Ref: , , REQ_03
+  *    Ref: , ,
+  * @return
+  *     if not found, empty string
+  *     otherwise, extracted text
   */
-std::string extractPattern(regex_t *regex, std::string &text, bool eraseExtracted)
+std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtracted erase)
 {
-    LOG_DEBUG("extractPattern: textin=%s, erase=%d", text.c_str(), eraseExtracted);
+    LOG_DEBUG("extractPattern: textin=%s, erase=%d", text.c_str(), erase);
 
     if (!regex) return "";
 
@@ -257,11 +278,20 @@ std::string extractPattern(regex_t *regex, std::string &text, bool eraseExtracte
             }
         }
 
-        // erase first group
-        regmatch_t firstGroup = pmatch[0];
-        if (eraseExtracted && firstGroup.rm_so != -1) {
-            int length = firstGroup.rm_eo - firstGroup.rm_so;
-            text.erase(firstGroup.rm_so, length);
+        if (erase == ERASE_ALL) {
+            // erase first group
+            regmatch_t firstGroup = pmatch[0];
+            if (firstGroup.rm_so != -1) {
+                int length = firstGroup.rm_eo - firstGroup.rm_so;
+                text.erase(firstGroup.rm_so, length);
+            }
+        } else if (erase == ERASE_LEAST) {
+            // erase last group
+            regmatch_t lastGroup = pmatch[i];
+            if (lastGroup.rm_so != -1) {
+                int length = lastGroup.rm_eo - lastGroup.rm_so;
+                text.erase(lastGroup.rm_so, length);
+            }
         }
 
     } else { // no match
@@ -273,49 +303,18 @@ std::string extractPattern(regex_t *regex, std::string &text, bool eraseExtracte
     return result;
 }
 
-
-std::set<std::string> getAllPatterns(regex_t *regex, const char *text)
+/** Extract all matching patterns and remove them from the text
+  */
+std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text)
 {
     std::set<std::string> result;
 
-    if (!regex) return result;
+    std::string extracted;
+    do {
+        extracted = extractPattern(regex, text, ERASE_LEAST);
+        if (!extracted.empty()) result.insert(extracted);
 
-    // check if line matches
-    const int N = 5; // max number of groups
-    regmatch_t pmatch[N];
-    std::string localText = text;
-    int reti;
-    while ( !(reti = regexec(regex, localText.c_str(), N, pmatch, 0)) ) {
-        LOG_DEBUG("getAllPatterns: localText=%s", localText.c_str());
-        // match
-        // take the last group
-
-        int i;
-        const int LINE_SIZE_MAX = 4096;
-        char buffer[LINE_SIZE_MAX];
-        for (i=N-1; i>=0; i--) {
-            if (pmatch[i].rm_so != -1) {
-                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
-                if (length <= 0) {
-                    localText.clear();
-                    break;
-                }
-                if (length > LINE_SIZE_MAX-1) {
-                    PUSH_ERROR("", "", "Requirement size too big (%d)", length);
-                    localText.clear();
-                    break;
-                }
-                memcpy(buffer, localText.c_str()+pmatch[i].rm_so, length);
-                buffer[length] = 0;
-                result.insert(buffer);
-                LOG_DEBUG("getAllPatterns: got pattern=%s", buffer);
-
-                // modify localText
-                localText.erase(pmatch[i].rm_so, length);
-                break;
-            }
-        }
-    }
+    } while (!extracted.empty());
 
     return result;
 }

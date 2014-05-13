@@ -1,0 +1,6 @@
+#!/bin/sh
+. ./envtest
+T=req-same-line
+$REQFLOW trac -c $TEST_ORIGIN/same-line.req -r TEST > $T.stdout.out 2>&1
+$REQFLOW review -c $TEST_ORIGIN/same-line.req >> $T.stdout.out 2>&1
+diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref

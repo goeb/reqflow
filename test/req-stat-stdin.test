@@ -2,7 +2,6 @@
 . ./envtest
 T=req-stat-stdin
 TEST_DIR=$PWD
-echo "PWD=$PWD"
 cp $TEST_ORIGIN/SPEC.docx .
 cp $TEST_ORIGIN/TEST.txt .
 $REQFLOW stat -s -c - > $T.stdout.out 2> $T.stderr.out << EOF

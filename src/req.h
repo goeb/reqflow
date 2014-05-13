@@ -109,6 +109,8 @@ protected:
     Errors[_file].push_back(std::make_pair(_req, buffer)); \
     } while(0)
 
+enum PolicyEraseExtracted { ERASE_NONE, ERASE_ALL, ERASE_LEAST };
+
 // exported functions
 
 void dumpText(const char *text);
@@ -117,8 +119,8 @@ Requirement *getRequirement(std::string id);
 ReqFileConfig *getDocument(std::string docId);
 void consolidateCoverage();
 void checkUndefinedRequirements();
-std::string extractPattern(regex_t *regex, std::string &text, bool eraseExtracted = false);
-std::set<std::string> getAllPatterns(regex_t *regex, const char *text);
+std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtracted erase = ERASE_NONE);
+std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text);
 
 void computeGlobalStatistics();
 

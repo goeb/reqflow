@@ -1,0 +1,12 @@
+
+define NUM [0-9]
+define REQ_PATTERN "(REQ_NUM+)"
+define TST_PATTERN "(TEST_NUM+) *: *"
+define REF_PATTERN "Ref:[, ]+(REQ_NUM+)"
+
+document SPEC -path same-line-spec.txt -req REQ_PATTERN
+
+document TEST -path same-line-test.txt 
+        -req TST_PATTERN
+        -ref REF_PATTERN
+
