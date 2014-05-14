@@ -1,14 +1,11 @@
-This directory contains the 1.3.2 release of Reqflow.
+
+This is Reqflow, a requirement traceability tool.
 
 See the file NEWS for the user-visible changes from previous releases.
-In addition, there have been bugs fixed.
-
-Please check the system-specific notes below for any caveats related to
-your operating system.
 
 For general building and installation instructions, see the file INSTALL.
 
-Reqflow is free software.  See the file COPYING for copying conditions.
+Reqflow is free software. See the file COPYING for copying conditions.
 
 
 Overview
@@ -38,19 +35,15 @@ Sample file 'test.req'
         -nocov
 
 
-Downloading
------------
+Documentation and Downloading
+-----------------------------
 
-Reqflow can be obtained in many different ways.  See a description here:
-
-    http://goeb.github.io/reqflow
+See: http://goeb.github.io/reqflow
 
 
 System-specific Notes
 ---------------------
 
-Reqflow can be cross-compiled using the Mingw GNU toolchain. Use 
-mingw32-configure and make to generate the InnoSetup installer.
-
-    $ ./configure --host=i586-mingw32msvc ; make
+Reqflow can be cross-compiled using the Mingw GNU toolchain.
+See dev/README-cross-libs.txt for guidance.
 

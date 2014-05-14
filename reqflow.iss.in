@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Reqflow"
-#define MyAppVersion "1.3.0"
+#define MyAppVersion "@VERSION@"
 #define MyAppPublisher "Frederic Hoerni"
 #define MyAppURL "http://goeb.github.io/reqflow"
 #define MyAppExeName "reqflow.exe"
