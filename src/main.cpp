@@ -401,7 +401,7 @@ int loadRequirementsOfFile(ReqFileConfig &fileConfig, bool debug)
         break;
     }
     default:
-        LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
+        PUSH_ERROR(fileConfig.id, "", "Cannot load unsupported file type: %s", fileConfig.path.c_str());
         result = -1;
     }
     return result;
