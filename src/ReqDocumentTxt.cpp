@@ -14,6 +14,7 @@
 #include "config.h"
 
 #include <fstream>
+#include <errno.h>
 
 #include "ReqDocumentTxt.h"
 #include "logging.h"
@@ -32,7 +33,7 @@ int ReqDocumentTxt::loadRequirements(bool debug)
     currentRequirement = "";
 
     if (!ifs.good()) {
-        PUSH_ERROR(fileConfig->id, "", "Cannot open file: %s", fileConfig->realpath.c_str());
+        PUSH_ERROR(fileConfig->id, "", "Cannot open file '%s': %s", fileConfig->realpath.c_str(), strerror(errno));
         return -1;
     }
 
