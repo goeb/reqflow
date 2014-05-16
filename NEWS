@@ -1,8 +1,8 @@
 Reqflow 1.3.3
 
-    handle refs on same line as req
-    read config file from stdin if '-'
-    display errors about files not found in the html report
+    - handle refs on same line as requirement
+    - read config file from stdin if '-'
+    - display all errors in the html report
 
 Reqflow 1.3.2
 

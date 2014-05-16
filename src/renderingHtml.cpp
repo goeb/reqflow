@@ -377,7 +377,7 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
     }
 }
 
-void htmlOUTPUTooter(const std::string &cmdline)
+void htmlPrintFooter(const std::string &cmdline)
 {
     OUTPUT("</div>\n"); // end of "r_main"
     OUTPUT("<br><br>\n");
@@ -422,5 +422,5 @@ void htmlRender(const std::string &cmdline, int argc, const char **argv)
     htmlPrintErrors();
 
     // print footer
-    htmlOUTPUTooter(cmdline);
+    htmlPrintFooter(cmdline);
 }

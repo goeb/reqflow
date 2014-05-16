@@ -129,8 +129,8 @@ std::string replaceDefinedVariable(const std::list<std::pair<std::string, std::s
     FOREACH(v, definedVariables) {
         size_t pos = v->second.find(v->first);
         if (pos != std::string::npos) {
-            LOG_ERROR("Recursive pattern in defined variable: %s => %s", v->first.c_str(), v->second.c_str());
-            exit(1);
+            PUSH_ERROR("[config]", "", "Recursive pattern in defined variable: %s => %s", v->first.c_str(), v->second.c_str());
+            return result;
         }
         while ( (pos = result.find (v->first)) != std::string::npos) {
             result = result.replace(pos, v->first.size(), v->second);
@@ -401,7 +401,7 @@ int loadRequirementsOfFile(ReqFileConfig &fileConfig, bool debug)
         break;
     }
     default:
-        LOG_ERROR("Cannot load unsupported file type: %s", fileConfig.path.c_str());
+        PUSH_ERROR(fileConfig.id, "", "Cannot load unsupported file type: %s", fileConfig.path.c_str());
         result = -1;
     }
     return result;
@@ -768,7 +768,13 @@ int cmdTrac(int argc, const char **argv)
     }
 
     int r = loadConfiguration(configFile);
-    if (r != 0) return 1;
+    if (r != 0) {
+        if (0 == strcmp(exportFormat, "html")) {
+            if (output) initOutputFd(output);
+            htmlRender(Cmdline, argc-i, argv+i);
+        }
+        return 1;
+    }
 
     r = loadRequirements(false);
     if (r != 0) return 1;
