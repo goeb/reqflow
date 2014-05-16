@@ -31,18 +31,18 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
     cd reqflow
     ./configure
     make
-    make check
     cd test && ../reqflow stat -s
 
 ### Windows
 
 Latest stable:
 
-* [reqflow-1.3.2-setup.exe](download/reqflow-1.3.2-setup.exe)
+* [reqflow-1.3.3-setup.exe](download/reqflow-1.3.3-setup.exe)
 
 
 Previous versions:
 
+* [reqflow-1.3.2-setup.exe](download/reqflow-1.3.2-setup.exe)
 * [reqflow-1.3.0-setup.exe](download/reqflow-1.3.0-setup.exe)
 * [reqflow-v1.2.1.zip](download/reqflow-v1.2.1.zip)
 
