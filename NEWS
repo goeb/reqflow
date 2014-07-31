@@ -1,3 +1,9 @@
+
+Reqflow 1.3.4, 31 Jul 2014
+
+    - [Windows only] fix multiple additions of reqflow path to system path
+      when installed several times
+
 Reqflow 1.3.3, 16 May 2014
 
     - handle refs on same line as requirement

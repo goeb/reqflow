@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Reqflow], [1.3.3], [], [reqflow], [http://goeb.github.io/reqflow])
+AC_INIT([Reqflow], [1.3.4], [], [reqflow], [http://goeb.github.io/reqflow])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
