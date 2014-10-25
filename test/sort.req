@@ -1,0 +1,23 @@
+
+define REQ_PATTERN PRINTF_[-a-zA-Z0-9_]*
+define ALPHANUM [-a-zA-Z0-9_]
+
+document TEST_sort_document -path TEST-sort-document.txt 
+    -req T_[-a-zA-Z0-9_]* 
+	-stop-after "Annex" 
+	-start-after "Tests cases" 
+    -nocov
+    -sort document
+
+document TEST_sort_alphanum -path TEST-sort-alphanum.txt 
+    -req T_[-a-zA-Z0-9_]* 
+	-stop-after "Annex" 
+	-start-after "Tests cases" 
+    -nocov
+    -sort alphanum
+
+document TEST_sort_default -path TEST-sort-default.txt 
+    -req T_[-a-zA-Z0-9_]* 
+	-stop-after "Annex" 
+	-start-after "Tests cases" 
+    -nocov

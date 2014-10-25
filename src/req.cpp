@@ -24,7 +24,7 @@
 
 // static objects
 std::map<std::string, ReqFileConfig*> ReqConfig;
-std::map<std::string, Requirement, stringCompare> Requirements;
+std::map<std::string, Requirement> Requirements;
 std::map<std::string, std::list<std::pair<std::string, std::string> > > Errors; // errors indexed by file
 int ReqTotal = 0;
 int ReqCovered = 0;
@@ -68,6 +68,41 @@ void printErrors()
         }
     }
 }
+
+bool ReqCompare::operator()(const Requirement *a, const Requirement *b)
+{
+    if (!a) {
+        LOG_ERROR("null a in ReqCompare");
+        return true;
+    }
+
+    if (!b) {
+        LOG_ERROR("null b in ReqCompare");
+        return false;
+    }
+
+    if (!a->parentDocument) {
+        LOG_ERROR("null a->parentDocument in ReqCompare");
+        return true;
+    }
+    if (a->parentDocument->sortMode == ReqFileConfig::SORT_ALPHANUMERIC_ORDER)
+    {
+        stringCompare sc;
+        return sc(a->id, b->id);
+    } else {
+        // SORT_DOCUMENT_ORDER by default
+        return a->seqnum < b->seqnum;
+    }
+}
+
+
+ReqFileConfig::SortMode ReqFileConfig::getSortMode(const std::string &text)
+{
+    if (text == "document") return SORT_DOCUMENT_ORDER;
+    else if (text == "alphanum") return SORT_ALPHANUMERIC_ORDER;
+    else return SORT_UNKNOWN;
+}
+
 
 ReqFileType ReqFileConfig::getFileType(const std::string &extension)
 {
@@ -168,11 +203,13 @@ BlockStatus ReqDocument::processBlock(std::string &text)
 
             finalizeCurrentReq(); // finalize current req before starting a new one
 
+            // insert new requirement in the global storage table
             Requirement req;
             req.id = reqId;
+            req.seqnum = reqSeqnum; reqSeqnum++;
             req.parentDocument = fileConfig;
             Requirements[reqId] = req;
-            fileConfig->requirements[reqId]= &(Requirements[reqId]);
+            fileConfig->requirements.insert(&(Requirements[reqId]));
             currentRequirement = reqId;
         }
     }
@@ -375,3 +412,5 @@ void computeGlobalStatistics()
         }
     }
 }
+
+

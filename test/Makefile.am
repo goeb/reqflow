@@ -5,7 +5,8 @@ req-stat-stdin.test \
 req-trac-pdf.test \
 req-trac-html.test \
 req-stat-docx-rm.test \
-req-same-line.test
+req-same-line.test \
+req-stat-sort.test
 
 # include the tests on the distribution
 EXTRA_DIST = .

@@ -27,10 +27,21 @@
 
 enum Encoding { UTF8, LATIN1 };
 enum BlockStatus { NOT_STARTED, STOP_REACHED, REQ_OK };
+enum ReqSorting { SORT_DOCUMENT, SORT_ALPHANUMERIC };
 
 struct Requirement;
 
 enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_HTML, RF_PDF, RF_UNKNOWN };
+
+
+/** Functor for comparing requirements
+  *
+  * Usable in std::sort or containers std::set and std::map.
+  */
+struct ReqCompare
+{
+    bool operator()(const Requirement *a, const Requirement *b);
+};
 
 struct ReqFileConfig {
     std::string id;
@@ -47,13 +58,17 @@ struct ReqFileConfig {
     std::map<std::string, regex_t *> endReq;
     std::map<std::string, regex_t *> endReqStyle;
     ReqFileType type;
-
+    enum SortMode { SORT_DOCUMENT_ORDER, SORT_ALPHANUMERIC_ORDER, SORT_UNKNOWN };
+    SortMode sortMode;
 
     // for dependency graph
     std::set<std::string> upstreamDocuments;
     std::set<std::string> downstreamDocuments;
 
-    std::map<std::string, Requirement*, stringCompare> requirements; // use a map to keep them sorted
+    // pointers to requirements stored in the global map 'Requirements'
+    // TODO replace by a std::set<Requirement*> and have the compare function
+    // chose either document order or alphanumeric order
+    std::set<Requirement*, ReqCompare> requirements; // use a map to keep them sorted
     int nTotalRequirements;
     int nCoveredRequirements;
 	Encoding encoding;
@@ -66,11 +81,14 @@ struct ReqFileConfig {
     ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0), type(RF_UNKNOWN),
         nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false) {}
     static ReqFileType getFileType(const std::string &extension);
+    SortMode getSortMode(const std::string &text);
+
     ReqFileType getFileType();
 };
 
 struct Requirement {
     std::string id;
+    int seqnum; // sequence number in document order
     ReqFileConfig *parentDocument;
     std::set<std::string> covers;
     std::set<std::string> coveredBy;
@@ -80,7 +98,10 @@ struct Requirement {
 
 
 extern std::map<std::string, ReqFileConfig*> ReqConfig;
-extern std::map<std::string, Requirement, stringCompare> Requirements;
+// storage for all requirements
+// this storage needs not be sorted in a specific manner
+// pointers to the requirements are also kept in the ReqFileConfig objects
+extern std::map<std::string, Requirement> Requirements;
 extern std::map<std::string, std::list<std::pair<std::string, std::string> > > Errors; // errors indexed by file
 extern int ReqTotal;
 extern int ReqCovered;
@@ -90,6 +111,7 @@ int hasErrors(const std::string &file);
 
 class ReqDocument {
 public:
+    ReqDocument() { reqSeqnum = 0; }
     virtual int loadRequirements(bool debug) = 0;
     BlockStatus processBlock(std::string &text);
     void finalizeCurrentReq();
@@ -100,6 +122,7 @@ protected:
     std::string textOfCurrentReq;
     std::string currentText;
     ReqFileConfig *fileConfig;
+    int reqSeqnum; // last sequence number used for a requirement
 };
 
 #define BF_SZ 1024

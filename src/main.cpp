@@ -332,6 +332,18 @@ int loadConfiguration(const char * file)
 
                 fileConfig->endReqStyle[endReqStyle] = regex;
 
+            } else if (fileConfig && arg == "-sort") {
+                if (line->empty()) {
+                    PUSH_ERROR(file, "","Missing -sort value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                std::string s = pop(*line);
+                fileConfig->sortMode = fileConfig->getSortMode(s);
+                if (fileConfig->sortMode == ReqFileConfig::SORT_UNKNOWN) {
+                    PUSH_ERROR(file, "","Unknown sort mode '%s' for %s", s.c_str(), fileConfig->id.c_str());
+                    return -1;
+                }
+
             } else if (fileConfig && arg == "-type") {
                 if (line->empty()) {
                     PUSH_ERROR(file, "","Missing -type value for %s", fileConfig->id.c_str());
@@ -509,15 +521,13 @@ void printTrac(const Requirement &r, bool reverse, bool verbose, ReqExportFormat
 
 /** Print traceability matrix of file.
   */
-void printTracOfFile(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
+void printTracOfFile(const ReqFileConfig &rfc, bool reverse, bool verbose, ReqExportFormat format)
 {
-    printTracHeader(docId, reverse, verbose, format);
+    printTracHeader(rfc.id.c_str(), reverse, verbose, format);
 
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        if (!docId || r->second.parentDocument->id == docId) {
-            printTrac(r->second, reverse, verbose, format);
-        }
+    std::set<Requirement*, ReqCompare>::iterator r;
+    FOREACH(r, rfc.requirements) {
+        printTrac(*(*r), reverse, verbose, format);
     }
 }
 
@@ -530,14 +540,14 @@ void printMatrix(int argc, const char **argv, bool reverse, bool verbose, ReqExp
     std::map<std::string, ReqFileConfig*>::iterator file;
     if (!argc) {
         FOREACH(file, ReqConfig) {
-            printTracOfFile(file->second->id.c_str(), reverse, verbose, format);
+            printTracOfFile(*(file->second), reverse, verbose, format);
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) {
             LOG_ERROR("Invalid document id: %s", docId);
-        } else printTracOfFile(file->second->id.c_str(), reverse, verbose, format);
+        } else printTracOfFile(*(file->second), reverse, verbose, format);
         argc--;
         argv++;
     }
@@ -588,13 +598,13 @@ void printTextOfReqs(int argc, const char **argv, ReviewMode rm, ReqExportFormat
 
     std::list<ReqFileConfig*>::iterator doc;
     FOREACH(doc, documents) {
-        std::map<std::string, Requirement*, stringCompare>::iterator req;
+        std::set<Requirement*, ReqCompare>::iterator req;
         FOREACH(req, (*doc)->requirements) {
             if (format == REQ_X_CSV) {
-                OUTPUT("%s,%s\r\n", escapeCsv(req->second->id).c_str(), escapeCsv(req->second->text).c_str());
+                OUTPUT("%s,%s\r\n", escapeCsv((*req)->id).c_str(), escapeCsv((*req)->text).c_str());
             } else {
-                OUTPUT("%s\n", req->second->id.c_str());
-                printIndented(req->second->text);
+                OUTPUT("%s\n", (*req)->id.c_str());
+                printIndented((*req)->text);
                 OUTPUT("\n");
             }
 
@@ -657,22 +667,20 @@ void printSummary(int argc, const char **argv)
     if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "", false);
 }
 
-void printRequirementsOfFile(StatusMode status, const char *documentId)
+void printRequirementsOfFile(StatusMode status, const ReqFileConfig &rfc)
 {
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        if (!documentId || r->second.parentDocument->id == documentId) {
-            bool doPrint = false;
-            if (REQ_ALL == status || r->second.coveredBy.empty()) doPrint = true;
+    std::set<Requirement*, ReqCompare>::iterator r;
+    FOREACH(r, rfc.requirements) {
+        bool doPrint = false;
+        if (REQ_ALL == status || (*r)->coveredBy.empty()) doPrint = true;
 
-            if (doPrint) {
-                if (r->second.coveredBy.empty()) OUTPUT("U");
-                else OUTPUT(" ");
+        if (doPrint) {
+            if ((*r)->coveredBy.empty()) OUTPUT("U");
+            else OUTPUT(" ");
 
-                OUTPUT(" %s", r->second.id.c_str());
-                if (REQ_ALL == status) OUTPUT(" %s", r->second.parentDocument->id.c_str());
-                OUTPUT("\n");
-            }
+            OUTPUT(" %s", (*r)->id.c_str());
+            if (REQ_ALL == status) OUTPUT(" %s", (*r)->parentDocument->id.c_str());
+            OUTPUT("\n");
         }
     }
 }
@@ -682,13 +690,13 @@ void printRequirements(StatusMode status, int argc, const char **argv)
     if (!argc) {
         // print requirements of all files
         FOREACH(file, ReqConfig) {
-            printRequirementsOfFile(status, file->first.c_str());
+            printRequirementsOfFile(status, *(file->second));
         }
     } else while (argc > 0) {
         const char *docId = argv[0];
         file = ReqConfig.find(docId);
         if (file == ReqConfig.end()) LOG_ERROR("Invalid document id: %s", docId);
-        else printRequirementsOfFile(status, argv[0]);
+        else printRequirementsOfFile(status, *(file->second));
         argc--;
         argv++;
     }

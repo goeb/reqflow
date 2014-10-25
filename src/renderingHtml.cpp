@@ -328,11 +328,9 @@ void htmlPrintMatrix(const ReqFileConfig &f, bool forward)
     }
     OUTPUT("</tr>\n");
 
-    std::map<std::string, Requirement>::iterator r;
-    FOREACH(r, Requirements) {
-        if (r->second.parentDocument->id == f.id) {
-            htmlPrintTraceability(r->second, forward);
-        }
+    std::set<Requirement*, ReqCompare>::iterator r;
+    FOREACH(r, f.requirements) {
+        htmlPrintTraceability(*(*r), forward);
     }
     OUTPUT("</table>\n");
 }

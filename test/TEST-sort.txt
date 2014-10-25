@@ -1,0 +1,48 @@
+
+# Test plan:
+
+## Tests cases
+
+T_01
+    Send command printf --help
+    Check that the result is a help message.
+Ref: PRINTF_01, PRINTF_01a, PRINTF_01b
+Ref: PRINTF_333
+
+
+T_02
+    Send command `printf "(%04d%-4s)\n" 33 aa`
+    Check that the result is: (0033aa  )
+    Check that the exit code is zero.
+Ref: PRINTF_02
+Ref: PRINTF_03, PRINTF_03a, PRINTF_03b
+
+
+T_05
+    Send command printf x%r
+    Check that an error is raised and that the exit code is 1
+Ref: PRINTF_03
+
+T_04
+    xxx
+    xxx2
+
+T_21
+    Send command `which printf`
+    Check that printf is installed in /usr/bin/printf
+Ref: PRINTF_06, PRINTF_12
+Ref: PRINTF_15
+
+T_22
+    This is test 22.
+Ref: PRINTF_15
+Ref: PRINTF_20
+
+## Annex: summary of tests
+
+	T_01
+	T_02
+	T_05
+    T_21
+
+
