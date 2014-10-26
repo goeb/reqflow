@@ -3,4 +3,5 @@
 T=req-stat-docx-rm
 $REQFLOW stat -c $TEST_ORIGIN/docx_rev_marks.req > $T.stdout.out 2> $T.stderr.out
 diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref
-diff -w $T.stderr.out $TEST_ORIGIN/$T.stderr.ref
+echo -n > $T.stderr.ref
+diff -w $T.stderr.out $T.stderr.ref

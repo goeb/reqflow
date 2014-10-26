@@ -1,6 +1,33 @@
 #!/bin/sh
 . ./envtest
 T=req-stat-sort
-$REQFLOW stat -c $TEST_ORIGIN/sort.req > $T.stdout.out 2> $T.stderr.out
+echo "$T step 1 (sort document order)" > $T.stdout.out
+$REQFLOW stat -c - << EOF >> $T.stdout.out 2> $T.stderr.out
+define ALPHANUM [-a-zA-Z0-9_]
+document TEST_sort_document -path $srcdir/TEST-sort.txt 
+    -req T_[-a-zA-Z0-9_]* 
+    -stop-after "Annex" 
+    -start-after "Tests cases" 
+    -sort document
+EOF
+echo "$T step 2 (sort default order)" >> $T.stdout.out
+$REQFLOW stat -c - << EOF >> $T.stdout.out 2>> $T.stderr.out
+define ALPHANUM [-a-zA-Z0-9_]
+document TEST_sort_document -path $srcdir/TEST-sort.txt 
+    -req T_[-a-zA-Z0-9_]* 
+    -stop-after "Annex" 
+    -start-after "Tests cases" 
+EOF
+echo "$T step 3 (sort alphanum order)" >> $T.stdout.out
+$REQFLOW stat -c - << EOF >> $T.stdout.out 2>> $T.stderr.out
+define ALPHANUM [-a-zA-Z0-9_]
+document TEST_sort_document -path $srcdir/TEST-sort.txt 
+    -req T_[-a-zA-Z0-9_]* 
+    -stop-after "Annex" 
+    -start-after "Tests cases" 
+    -sort alphanum
+EOF
+
 diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref
-diff -w $T.stderr.out $TEST_ORIGIN/$T.stderr.ref
+echo -n > $T.stderr.ref
+diff -w $T.stderr.out $T.stderr.ref

@@ -1,0 +1,21 @@
+req-stat-sort step 1 (sort document order)
+U T_01
+U T_02
+U T_05
+U T_04
+U T_21
+U T_22
+req-stat-sort step 2 (sort default order)
+U T_01
+U T_02
+U T_05
+U T_04
+U T_21
+U T_22
+req-stat-sort step 3 (sort alphanum order)
+U T_01
+U T_02
+U T_04
+U T_05
+U T_21
+U T_22
