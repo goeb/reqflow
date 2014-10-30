@@ -1,7 +1,8 @@
 
-Reqflow 1.4.0, not released
+Reqflow 1.4.0, 30 Oct 2014
 
-    - keep document order for the requirements
+    - keep document order for the requirements. alphanumeric order is still
+      possible with --sort in the .req file.
 
 Reqflow 1.3.4, 31 Jul 2014
 
