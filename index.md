@@ -132,7 +132,7 @@ document TEST -path TEST.txt \
     -ref "Ref:  *(.*)" \
     -stop-after "Annex" \
     -start-after "Tests cases" \
-    -nocov
+    -nocov -sort alphanum
 
 ```
 
