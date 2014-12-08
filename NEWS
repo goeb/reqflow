@@ -1,4 +1,9 @@
 
+Reqflow 1.4.1, 8 Dec 2014
+
+    - fix missing escaping of some HTML parts (HTML output format only)
+
+
 Reqflow 1.4.0, 30 Oct 2014
 
     - keep document order for the requirements. alphanumeric order is still

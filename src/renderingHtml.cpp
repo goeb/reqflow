@@ -355,6 +355,7 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
             }
             OUTPUT("</div>\n");
 
+            // print errors
             std::map<std::string, std::list<std::pair<std::string, std::string> > >::iterator file;
             file = Errors.find(*docId);
             if (file != Errors.end() && file->second.size()) {
@@ -363,7 +364,7 @@ void htmlPrintAllTraceability(const std::list<std::string> documents)
 
                 std::list<std::pair<std::string, std::string> >::iterator e;
                 FOREACH(e, file->second) {
-                    OUTPUT("%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
+                    OUTPUT("%s:%s: %s\n", htmlEscape(file->first).c_str(), htmlEscape(e->first).c_str(), htmlEscape(e->second).c_str());
                 }
                 OUTPUT("</div>\n");
             }
@@ -380,7 +381,7 @@ void htmlPrintFooter(const std::string &cmdline)
     OUTPUT("</div>\n"); // end of "r_main"
     OUTPUT("<br><br>\n");
     OUTPUT("<div class=\"r_footer\">Date: %s<br>Command Line: %s<br>Version: %s</div><br>",
-           getDatetime().c_str(), cmdline.c_str(), VERSION);
+           getDatetime().c_str(), htmlEscape(cmdline).c_str(), VERSION);
     OUTPUT("</body></html>\n");
 }
 
