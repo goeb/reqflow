@@ -37,11 +37,12 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 Latest stable:
 
-* [reqflow-1.4.0-setup.exe](download/reqflow-1.4.0-setup.exe)
+* [reqflow-1.4.1-setup.exe](download/reqflow-1.4.1-setup.exe)
 
 
 Previous versions:
 
+* [reqflow-1.4.0-setup.exe](download/reqflow-1.4.0-setup.exe)
 * [reqflow-1.3.4-setup.exe](download/reqflow-1.3.4-setup.exe)
 * [reqflow-1.3.3-setup.exe](download/reqflow-1.3.3-setup.exe)
 * [reqflow-1.3.2-setup.exe](download/reqflow-1.3.2-setup.exe)
