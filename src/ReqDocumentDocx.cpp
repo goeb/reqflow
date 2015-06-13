@@ -55,7 +55,7 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug
 
     } else if (XML_TEXT_NODE == node->type) {
         xmlChar *text;
-        text = xmlNodeListGetRawString(doc, node, 1);
+        text = xmlNodeGetContent(node);
         LOG_DEBUG("text size: %zd bytes", strlen((char*)text));
         LOG_DEBUG("text: %s", (char*)text);
 
