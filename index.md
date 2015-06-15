@@ -5,7 +5,7 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 
 ## News
 
-- 13 June 2015: Reqflow v1.4.2 (see [https://raw.githubusercontent.com/goeb/reqflow/master/NEWS](Changes))
+- 13 June 2015: Reqflow v1.4.2 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
 
 
 ## Supported Formats
@@ -34,31 +34,31 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 Pre-built executable for Linux i386 (32 bits):
 
-    * [reqflow-1.4.2](download/reqflow-1.4.2)
+* [reqflow-1.4.2](download/reqflow-1.4.2)
 
 Dependencies to third party libraries:
 
-    linux-gate.so.1
-    libzip.so.2
-    libxml2.so.2
-    libpoppler-cpp.so.0
-    libpcreposix.so.3
-    libstdc++.so.6
-    libgcc_s.so.1
     libc.so.6
-    libz.so.1
     libdl.so.2
-    libm.so.6
-    libpoppler.so.19
-    libpcre.so.3
-    /lib/ld-linux.so.2
-    liblcms2.so.2
-    libtiff.so.4
-    libjpeg.so.8
-    libpng12.so.0
-    libfreetype.so.6
-    libfontconfig.so.1
     libexpat.so.1
+    libfontconfig.so.1
+    libfreetype.so.6
+    libgcc_s.so.1
+    libjpeg.so.8
+    liblcms2.so.2
+    /lib/ld-linux.so.2
+    libm.so.6
+    libpcreposix.so.3
+    libpcre.so.3
+    libpng12.so.0
+    libpoppler-cpp.so.0
+    libpoppler.so.19
+    libstdc++.so.6
+    libtiff.so.4
+    libxml2.so.2
+    libzip.so.2
+    libz.so.1
+    linux-gate.so.1
 
     
 
