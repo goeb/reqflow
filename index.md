@@ -3,6 +3,11 @@
 
 Reqflow is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.
 
+## News
+
+- 13 June 2015: Reqflow v1.4.2 (see [https://raw.githubusercontent.com/goeb/reqflow/master/NEWS](Changes))
+
+
 ## Supported Formats
 
 ### Input formats
@@ -27,6 +32,38 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 ### Linux
 
+Pre-built executable for Linux i386 (32 bits):
+
+    * [reqflow-1.4.2](download/reqflow-1.4.2)
+
+Dependencies to third party libraries:
+
+    linux-gate.so.1
+    libzip.so.2
+    libxml2.so.2
+    libpoppler-cpp.so.0
+    libpcreposix.so.3
+    libstdc++.so.6
+    libgcc_s.so.1
+    libc.so.6
+    libz.so.1
+    libdl.so.2
+    libm.so.6
+    libpoppler.so.19
+    libpcre.so.3
+    /lib/ld-linux.so.2
+    liblcms2.so.2
+    libtiff.so.4
+    libjpeg.so.8
+    libpng12.so.0
+    libfreetype.so.6
+    libfontconfig.so.1
+    libexpat.so.1
+
+    
+
+Build From Source :
+
     git clone https://github.com/goeb/reqflow.git
     cd reqflow
     ./configure
@@ -37,11 +74,12 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 Latest stable:
 
-* [reqflow-1.4.1-setup.exe](download/reqflow-1.4.1-setup.exe)
+* [reqflow-1.4.2-setup.exe](download/reqflow-1.4.2-setup.exe)
 
 
 Previous versions:
 
+* [reqflow-1.4.1-setup.exe](download/reqflow-1.4.1-setup.exe)
 * [reqflow-1.4.0-setup.exe](download/reqflow-1.4.0-setup.exe)
 * [reqflow-1.3.4-setup.exe](download/reqflow-1.3.4-setup.exe)
 * [reqflow-1.3.3-setup.exe](download/reqflow-1.3.3-setup.exe)
