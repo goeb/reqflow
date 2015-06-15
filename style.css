@@ -16,7 +16,15 @@ a[href]:hover {
   text-decoration: underline;
 }
 
-
+h2 {
+    border-bottom: 1px solid #DDD;
+}
+h2:before {
+    content: '■ ';
+    position: relative;
+    bottom: .1em;
+    color: #666;
+}
 .menu {
     float: left;
     margin: 0;
