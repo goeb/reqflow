@@ -1,0 +1,5 @@
+
+document SPEC 
+    -path SPEC-with-table.docx 
+    -req REQ_.*
+

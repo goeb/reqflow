@@ -1,0 +1,24 @@
+REQFLOW trac
+
+Requirements of SPEC                               Requirements Downstream                           
+--------------------------------------------------------------------------------------------------------------------
+REQ_PRINTF_01                                     
+REQ_PRINTF_02                                     
+REQ_PRINTF_03                                     
+REQFLOW stat
+U REQ_PRINTF_01
+U REQ_PRINTF_02
+U REQ_PRINTF_03
+REQFLOW review
+REQ_PRINTF_01
+        Ref: SYS_155
+        printf –help shall display a help message and exit
+
+REQ_PRINTF_02
+        The FORMAT parameter shall control the output as in C printf.
+
+REQ_PRINTF_03
+        The exit code of printf shall be:
+        - zero if no error occurs
+        - 1 if the FORMAT has an invalid syntax
+

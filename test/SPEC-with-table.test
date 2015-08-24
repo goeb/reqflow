@@ -1,0 +1,10 @@
+#!/bin/sh
+. ./envtest
+T=SPEC-with-table
+echo "REQFLOW trac" > $T.out
+$REQFLOW trac -c $TEST_ORIGIN/$T.req >> $T.out 2>&1
+echo "REQFLOW stat" >> $T.out
+$REQFLOW stat -c $TEST_ORIGIN/$T.req >> $T.out 2>&1
+echo "REQFLOW review" >> $T.out
+$REQFLOW review -c $TEST_ORIGIN/$T.req >> $T.out 2>&1
+diff -w $T.out $TEST_ORIGIN/$T.ref
