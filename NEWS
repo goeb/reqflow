@@ -1,3 +1,7 @@
+Reqflow 1.5.0, 22 Oct 2015
+
+    - resolve environment variable in .req config file: syntax $x of ${x}
+
 Reqflow 1.4.2, 13 Jun 2015
 
     - fix bug in capture of requirements from odt documents
