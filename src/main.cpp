@@ -1020,7 +1020,8 @@ void testRegex(regex_t regex, const char *text, bool verbose)
 {
     const int N = 5;
 
-    char buffer[256];
+    const int BUF_SIZ = 256;
+    char buffer[BUF_SIZ+1];
     regmatch_t pmatch[N];
     int reti = regexec(&regex, text, N, pmatch, 0);
     if (!reti) {
@@ -1033,6 +1034,10 @@ void testRegex(regex_t regex, const char *text, bool verbose)
         for (; i<N; i++) {
             if (pmatch[i].rm_so != -1) {
                 int length = pmatch[i].rm_eo - pmatch[i].rm_so;
+                if (length > BUF_SIZ) {
+                    OUTPUT("Match too long. Truncate...\n");
+                    length = BUF_SIZ;
+                }
                 memcpy(buffer, text+pmatch[i].rm_so, length);
                 buffer[length] = 0;
                 if (verbose) OUTPUT("match[%d]: %s\n", i, buffer);
