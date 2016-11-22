@@ -22,6 +22,9 @@
 
 /** Analyse a node of the document
   *
+  * @return
+  *     0 : ok, continue
+  *    -1 : stop reached, do not continue
   */
 int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug)
 {
@@ -50,7 +53,8 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug
         for (subnode = node->children; subnode; subnode = subnode->next) {
 
             // recursively go down the xml structure
-            loadDocxXmlNode(doc, subnode, debug);
+            int ret = loadDocxXmlNode(doc, subnode, debug);
+            if (ret == -1) return -1; // STOP reached
         }
 
     } else if (XML_TEXT_NODE == node->type) {
@@ -74,7 +78,7 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug
         } else {
             // process text of paragraph
             BlockStatus status = processBlock(textInParagraphCurrent);
-            if (status == STOP_REACHED) return 0;
+            if (status == STOP_REACHED) return -1;
         }
 
         textInParagraphCurrent.clear();
