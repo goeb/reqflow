@@ -1,6 +1,8 @@
-Reqflow 1.5.0, 22 Oct 2015
+Reqflow 1.5.0, 22 Nov 2016
 
-    - resolve environment variable in .req config file: syntax $x of ${x}
+    - resolve environment variable in .req config file: syntax $x or ${x}
+    - fix buffer overflow in testRegex
+    - fix acquisition of requirements wrt stop condition (docx)
 
 Reqflow 1.4.2, 13 Jun 2015
 
