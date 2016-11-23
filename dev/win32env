@@ -3,25 +3,25 @@ LIBPCRE=$HOME/Downloads/pcre-8.34/.libs
 export PCRE_CFLAGS="-I$HOME/Downloads/pcre-8.34 -DPCRE_STATIC"
 export PCRE_LIBS="$LIBPCRE/libpcreposix.a $LIBPCRE/libpcre.a"
 
-LIBXML=$HOME/Downloads/libxml2-2.9.1
-export XML_CFLAGS="-DLIBXML_STATIC -I$LIBXML/include"
+LIBXML=$HOME/win32libs/libxml2-2.9.4
+export XML_CFLAGS="-DLIBXML_STATIC -I$LIBXML/include/libxml2"
 export XML_LIBS="-L$LIBXML/.libs -lxml2"
 
-LIBZIP=$HOME/Downloads/libzip-0.11.2
-LIBZ=$HOME/Downloads/zlib-1.2.8
+LIBZIP=$HOME/win32libs/libzip-0.11.2
+LIBZ=$HOME/win32libs/zlib-1.2.8
 export ZIP_CFLAGS="-DZLIB_INTERNAL -DZIP_EXTERN= -I$LIBZIP/lib"
-export ZIP_LIBS="$LIBZIP/lib/.libs/libzip.a $LIBZ/libz.a"
+export ZIP_LIBS="$LIBZIP/lib/libzip.a $LIBZ/libz.a"
 
-LIBICONV=$HOME/win32libs/libiconv-1.14
-LIBPOPPLER=$HOME/win32libs/poppler-0.24.5
+LIBICONV=/usr/i686-w64-mingw32/lib/libiconv.a
+LIBPOPPLER=$HOME/win32libs/poppler-0.48.0
 export POPPLER_CFLAGS="-I$LIBPOPPLER/include -Dpoppler_cpp_EXPORTS"
-export POPPLER_LIBS="$LIBPOPPLER/lib/libpoppler-cpp.a $LIBPOPPLER/lib/libpoppler.a $LIBICONV/lib/libiconv.a"
+export POPPLER_LIBS="$LIBPOPPLER/lib/libpoppler-cpp.a $LIBPOPPLER/lib/libpoppler.a $LIBICONV"
 
 
 export LDFLAGS="-lws2_32 -lgdi32 -Wl,-Bstatic"
 
 set -e
 cd ../build_win
-../configure --host=i586-mingw32msvc --prefix=/tmp/reqflow-mingw32
+../configure --host=i686-w64-mingw32 --prefix=/tmp/reqflow-mingw32
 make
 make check
