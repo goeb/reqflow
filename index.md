@@ -5,7 +5,7 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 
 ## News
 
-- 13 June 2015: Reqflow v1.4.2 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
+- 22 November 2016: Reqflow v1.5.0 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
 
 
 ## Supported Formats
@@ -32,36 +32,6 @@ No screenshot, but an example: [reqReport.html](reqReport.html)
 
 ### Linux
 
-Pre-built executable for Linux i386 (32 bits):
-
-* [reqflow-1.4.2](download/reqflow-1.4.2)
-
-Dependencies to third party libraries:
-
-    libc.so.6
-    libdl.so.2
-    libexpat.so.1
-    libfontconfig.so.1
-    libfreetype.so.6
-    libgcc_s.so.1
-    libjpeg.so.8
-    liblcms2.so.2
-    /lib/ld-linux.so.2
-    libm.so.6
-    libpcreposix.so.3
-    libpcre.so.3
-    libpng12.so.0
-    libpoppler-cpp.so.0
-    libpoppler.so.19
-    libstdc++.so.6
-    libtiff.so.4
-    libxml2.so.2
-    libzip.so.2
-    libz.so.1
-    linux-gate.so.1
-
-    
-
 Build From Source :
 
     git clone https://github.com/goeb/reqflow.git
@@ -74,11 +44,12 @@ Build From Source :
 
 Latest stable:
 
-* [reqflow-1.4.2-setup.exe](download/reqflow-1.4.2-setup.exe)
+* [reqflow-1.5.0-setup.exe](download/reqflow-1.5.0-setup.exe)
 
 
 Previous versions:
 
+* [reqflow-1.4.2-setup.exe](download/reqflow-1.4.2-setup.exe)
 * [reqflow-1.4.1-setup.exe](download/reqflow-1.4.1-setup.exe)
 * [reqflow-1.4.0-setup.exe](download/reqflow-1.4.0-setup.exe)
 * [reqflow-1.3.4-setup.exe](download/reqflow-1.3.4-setup.exe)
@@ -174,6 +145,21 @@ document TEST -path TEST.txt \
     -nocov -sort alphanum
 
 ```
+
+## Environment Variables
+
+Environment variables can be inserted in the configuration file, using a dollar sign ($) prefix.
+
+Example:
+
+```
+document SPEC -path $DOCUMENT -req REQ_[-a-zA-Z0-9_]*
+# or
+document SPEC -path ${DOCUMENT} -req REQ_[-a-zA-Z0-9_]*
+```
+
+
+
 
 ## External Dependencies
 
