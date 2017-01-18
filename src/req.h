@@ -58,6 +58,7 @@ struct ReqFileConfig {
     std::map<std::string, regex_t *> endReq;
     std::map<std::string, regex_t *> endReqStyle;
     ReqFileType type;
+    std::string prefixReq;
     enum SortMode { SORT_DOCUMENT_ORDER, SORT_ALPHANUMERIC_ORDER, SORT_UNKNOWN };
     SortMode sortMode;
 

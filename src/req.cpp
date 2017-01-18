@@ -205,12 +205,12 @@ BlockStatus ReqDocument::processBlock(std::string &text)
 
             // insert new requirement in the global storage table
             Requirement req;
-            req.id = reqId;
+            req.id = fileConfig->prefixReq + reqId;
             req.seqnum = reqSeqnum; reqSeqnum++;
             req.parentDocument = fileConfig;
-            Requirements[reqId] = req;
-            fileConfig->requirements.insert(&(Requirements[reqId]));
-            currentRequirement = reqId;
+            Requirements[req.id] = req;
+            fileConfig->requirements.insert(&(Requirements[req.id]));
+            currentRequirement = req.id;
         }
     }
 

@@ -237,6 +237,7 @@ std::string consolidateToken(const std::list<std::pair<std::string, std::string>
   *     -start-after <token>
   *     -stop-after <token>
   *     -type <type>
+  *     -prefix-req <id>
   *
   * A 'define' instanciates the definition of a variable, that will be used as replacement in the tokens.
   * A 'document' starts a new definition os document.
@@ -427,6 +428,14 @@ int loadConfiguration(const char * file)
                     PUSH_ERROR(file, "","Unknown sort mode '%s' for %s", s.c_str(), fileConfig->id.c_str());
                     return -1;
                 }
+
+            } else if (fileConfig && arg == "-prefix-req") {
+                // prefix to add to each requirement of this document
+                if (line->empty()) {
+                    PUSH_ERROR(file, "","Missing -prefix-req value for %s", fileConfig->id.c_str());
+                    return -1;
+                }
+                fileConfig->prefixReq = pop(*line);
 
             } else if (fileConfig && arg == "-type") {
                 if (line->empty()) {
