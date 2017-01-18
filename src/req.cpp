@@ -283,8 +283,9 @@ std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtract
     regmatch_t pmatch[N];
     int reti = regexec(regex, text.c_str(), N, pmatch, 0);
     if (reti == 0) {
-        // take the last group, but erase (optionally) the first group
-        // we want to support the 2 following cases.
+        // If there is at least 2 groups, erase optionnaly the  first one and take the second
+        // Else (if only one) take it.
+        // We want to support the 2 following cases.
         // Example 1: ./req regex "<\(REQ_[-a-zA-Z_0-9]*\)>" "ex: <REQ_123> (comment)"
         // match[0]: <REQ_123>
         // match[1]: REQ_123
@@ -295,24 +296,20 @@ std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtract
         // match[1]:
         // match[2]:
 
-        int i;
-        const int LINE_SIZE_MAX = 4096;
-        char buffer[LINE_SIZE_MAX];
-        for (i=N-1; i>=0; i--) {
-            if (pmatch[i].rm_so != -1) {
-                int length = pmatch[i].rm_eo - pmatch[i].rm_so;
-                if (length <= 0) {
-                    break;
-                }
-                if (length > LINE_SIZE_MAX-1) {
-                    PUSH_ERROR("", "", "Requirement size too big (%d)", length);
-                    break;
-                }
-                memcpy(buffer, text.c_str()+pmatch[i].rm_so, length);
-                buffer[length] = 0;
-                result = buffer;
-                break;
-            }
+        int index = 1; // try the second group first
+        if (-1 == pmatch[index].rm_so) index = 0; // no second group, take the first and unique group
+        if (-1 == pmatch[index].rm_so) {
+            // just to be sure
+            PUSH_ERROR("", "", "Error no group zero");
+            return "";
+        }
+
+        // extract the group
+        int length = pmatch[index].rm_eo - pmatch[index].rm_so;
+        if (length >= 0) {
+            result.assign(text.c_str()+pmatch[index].rm_so, length);
+        } else {
+            PUSH_ERROR("", "", "Error length=%d", length);
         }
 
         if (erase == ERASE_ALL) {
@@ -322,9 +319,9 @@ std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtract
                 int length = firstGroup.rm_eo - firstGroup.rm_so;
                 text.erase(firstGroup.rm_so, length);
             }
-        } else if (erase == ERASE_LEAST) {
+        } else if (erase == ERASE_LAST) {
             // erase last group
-            regmatch_t lastGroup = pmatch[i];
+            regmatch_t lastGroup = pmatch[index];
             if (lastGroup.rm_so != -1) {
                 int length = lastGroup.rm_eo - lastGroup.rm_so;
                 text.erase(lastGroup.rm_so, length);
@@ -348,7 +345,7 @@ std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text)
 
     std::string extracted;
     do {
-        extracted = extractPattern(regex, text, ERASE_LEAST);
+        extracted = extractPattern(regex, text, ERASE_LAST);
         if (!extracted.empty()) result.insert(extracted);
 
     } while (!extracted.empty());

@@ -133,7 +133,7 @@ protected:
     Errors[_file].push_back(std::make_pair(_req, buffer)); \
     } while(0)
 
-enum PolicyEraseExtracted { ERASE_NONE, ERASE_ALL, ERASE_LEAST };
+enum PolicyEraseExtracted { ERASE_NONE, ERASE_ALL, ERASE_LAST };
 
 // exported functions
 
