@@ -1,0 +1,7 @@
+#!/bin/sh
+. ./envtest
+T=req-stat-html2
+
+$REQFLOW stat -c $TEST_ORIGIN/html2.req > $T.out 2> $T.err
+
+diff -w $T.out $TEST_ORIGIN/$T.stdout.ref

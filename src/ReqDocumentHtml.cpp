@@ -19,6 +19,9 @@
 #include "parseConfig.h"
 #include "stringTools.h"
 
+/**
+  * @param[in/out] text
+  */
 BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph, bool debug)
 {
     LOG_DEBUG("processParagraph: inParagaph=%d", inParagaph);
@@ -57,6 +60,55 @@ BlockStatus ReqDocumentHtml::processParagraph(std::string &text, bool inParagaph
     return s;
 }
 
+const char *HtmlParagraphBoundaries[] = {
+    // some HTML block level elements
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "dd",
+    "div",
+    "dl",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "header",
+    "hgroup",
+    "hr",
+    "li",
+    "main",
+    "ol",
+    "output" ,
+    "p",
+    "section",
+    "table",
+    "tfoot",
+    "ul",
+    // other elements
+    "td",
+    NULL // the list must end with NULL
+};
+
+/** Tell if a HTML node name is considered as a paragraph boundary
+ */
+static bool isParagraphBoundary(const std::string &nodeName)
+{
+    const char **ptr = HtmlParagraphBoundaries;
+    while (*ptr) {
+        if (nodeName == *ptr) return true;
+        ptr++;
+    }
+    return false;
+}
+
 /** Parsing is done as follows:
   * - if inside a <p>, process paragraph as a whole
   * - else, process line per line
@@ -78,13 +130,16 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
             if (!fileConfig->startAfterRegex) acquisitionStarted = true;
 
         } else if (nodeName == "br") {
+            // stay in the same paragraph
             // add a newline
             currentText += "\n";
 
-        } else if (nodeName == "p") {
-            // process previous text (that was not in a paragraph)
-            s = processParagraph(currentText, false, debug);
-            if (s == STOP_REACHED) return STOP_REACHED;
+        } else if (isParagraphBoundary(nodeName)) {
+            if (!currentText.empty()) {
+                // process previous text (that was not in a paragraph)
+                s = processParagraph(currentText, false, debug);
+                if (s == STOP_REACHED) return STOP_REACHED;
+            }
             inParagraph = true;
         }
 
@@ -94,12 +149,12 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
             s = loadHtmlNode(doc, currentNode->children, inParagraph, debug);
             if (s == STOP_REACHED) return STOP_REACHED;
 
-            if (nodeName == "p") {
+            if (!currentText.empty() && isParagraphBoundary(nodeName)) {
                 // process this paragraph
                 s = processParagraph(currentText, true, debug);
                 if (s == STOP_REACHED) return STOP_REACHED;
 
-            } else if (nodeName == "body") {
+            } else if (!currentText.empty() && nodeName == "body") {
                 // process the text that was in no paragraph
                 s = processParagraph(currentText, false, debug);
                 if (s == STOP_REACHED) return STOP_REACHED;
