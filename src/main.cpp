@@ -106,7 +106,7 @@ enum StatusMode { REQ_SUMMARY, REQ_UNRESOLVED, REQ_ALL };
 int showVersion()
 {
     printf("%s\n"
-           "Copyright (C) 2014 Frederic Hoerni\n"
+           "Copyright (C) 2017 Frederic Hoerni\n"
            "\n"
            "This program is free software; you can redistribute it and/or modify\n"
            "it under the terms of the GNU General Public License as published by\n"

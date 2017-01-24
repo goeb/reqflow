@@ -1,3 +1,6 @@
+Reqflow 1.5.1
+	- improve acquisition in HTML documents
+
 Reqflow 1.5.0, 22 Nov 2016
 
     - resolve environment variable in .req config file: syntax $x or ${x}
