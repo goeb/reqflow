@@ -37,6 +37,7 @@ public:
 private:
     std::string contents;
     int loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug);
+    std::string textInParagraphCurrent;
 };
 
 #endif

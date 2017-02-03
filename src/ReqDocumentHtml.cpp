@@ -119,7 +119,7 @@ BlockStatus ReqDocumentHtml::loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool i
     xmlNode *currentNode = NULL;
     BlockStatus s;
 
-    static std::string currentText; // text of current paragraph, consolidated over recursive calls
+    // currentText consolidated over recursive calls
 
     LOG_DEBUG("loadHtmlNode: inParagraph=%d", inParagraph);
     for (currentNode = a_node; currentNode; currentNode = currentNode->next) {

@@ -28,7 +28,7 @@
   */
 int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug)
 {
-    static std::string textInParagraphCurrent; // consolidated over recursive calls
+    // textInParagraphCurrent consolidated over recursive calls
     std::string nodeName;
 
     if (node->type == XML_ELEMENT_NODE) {

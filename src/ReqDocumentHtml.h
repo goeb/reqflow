@@ -29,6 +29,8 @@ public:
     BlockStatus processParagraph(std::string &text, bool inParagaph, bool debug);
     BlockStatus loadHtmlNode(xmlDocPtr doc, xmlNode *a_node, bool inParagraph, bool debug);
     void init();
+private:
+    std::string currentText;
 };
 
 #endif
