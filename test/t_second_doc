@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Test that if .req file has 2 documents, with -stop-after statements,
+# then both documents are correctly analysed
+. ./envtest
+T=$(basename $0)
+
+# build .req file
+
+cat << EOF > $T.req
+
+document SPEC1 -path SPEC.docx -prefix-req SPEC1_ -stop-after Annex -req PRINTF_[-a-zA-Z0-9_]*
+document SPEC2 -path SPEC.docx -prefix-req SPEC2_ -stop-after Annex -req PRINTF_[-a-zA-Z0-9_]*
+
+EOF
+
+echo -n > $T.out
+echo $REQFLOW stat -s -c $T.req >> $T.out
+$REQFLOW stat -s -c $T.req >> $T.out 2>&1
+$REQFLOW trac -c $T.req >> $T.out 2>&1
+
+diff -w $T.out $srcdir/$T.ref

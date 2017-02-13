@@ -1,0 +1,30 @@
+wine ../reqflow.exe stat -s -c t_second_doc.req
+Document                          % covered / total
+----------------------------------------------------------------------
+SPEC1                            0%       0 /     9 SPEC.docx
+SPEC2                            0%       0 /     9 SPEC.docx
+Total                            0%       0 /    18 
+
+Requirements of SPEC1                              Requirements Downstream                           
+--------------------------------------------------------------------------------------------------------------------
+SPEC1_PRINTF_01                                   
+SPEC1_PRINTF_02                                   
+SPEC1_PRINTF_03                                   
+SPEC1_PRINTF_05                                   
+SPEC1_PRINTF_06                                   
+SPEC1_PRINTF_12                                   
+SPEC1_PRINTF_14                                   
+SPEC1_PRINTF_15                                   
+SPEC1_PRINTF_20                                   
+
+Requirements of SPEC2                              Requirements Downstream                           
+--------------------------------------------------------------------------------------------------------------------
+SPEC2_PRINTF_01                                   
+SPEC2_PRINTF_02                                   
+SPEC2_PRINTF_03                                   
+SPEC2_PRINTF_05                                   
+SPEC2_PRINTF_06                                   
+SPEC2_PRINTF_12                                   
+SPEC2_PRINTF_14                                   
+SPEC2_PRINTF_15                                   
+SPEC2_PRINTF_20                                   
