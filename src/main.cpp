@@ -533,7 +533,7 @@ enum ReqExportFormat { REQ_X_TXT, REQ_X_CSV };
 void printTracHeader(const char *docId, bool reverse, bool verbose, ReqExportFormat format)
 {
     if (format == REQ_X_CSV) {
-        OUTPUT(",,"CRLF);
+        OUTPUT(",," CRLF);
         OUTPUT("Requirements of %s,", docId);
         if (reverse) {
             OUTPUT("Requirements Upstream");
