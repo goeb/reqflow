@@ -1,4 +1,4 @@
-Reqflow 1.5.1
+Reqflow 1.5.1, 13 Feb 2017
 	- improve acquisition in HTML documents
 	- fix analysis of second document when first document has -stop-after
 	- option -prefix-req for prefixing acquired requirements
