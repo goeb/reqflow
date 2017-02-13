@@ -45,7 +45,7 @@ Build From Source :
 
 Latest stable:
 
-* [reqflow-1.5.1-setup.exe](/goeb/reqflow/releases/download/v1.5.1/reqflow-1.5.1-setup.exe)
+* [reqflow-1.5.1-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.1/reqflow-1.5.1-setup.exe)
 
 
 Previous versions:
