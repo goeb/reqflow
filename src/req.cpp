@@ -227,8 +227,18 @@ BlockStatus ReqDocument::processBlock(std::string &text)
         }
     }
 
-    // TODO check for endReq and endReqStyle to know if text of
-    // current requirement is finished
+    // Check for endReq to know if text of current requirement is finished
+    std::map<std::string, regex_t *>::iterator endreq;
+    // There may be several ways to end a requirement: check each one in turn.
+    FOREACH(endreq, fileConfig->endReq) {
+
+        std::string reqEndPat = extractPattern(endreq->second, text, ERASE_ALL);
+        if (!reqEndPat.empty()) {
+            finalizeCurrentReq(); // finalize current req before starting a new one            
+        }
+    }
+
+    // TODO check for endReqStyle to know if text of current requirement is finished
 
     // accumulate text of current requirement
     if (currentRequirement.size()) {
