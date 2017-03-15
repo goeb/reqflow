@@ -1,3 +1,6 @@
+Reqflow 1.6
+	- option -end-req for marking end of text of a requirement
+
 Reqflow 1.5.1, 13 Feb 2017
 	- improve acquisition in HTML documents
 	- fix analysis of second document when first document has -stop-after
