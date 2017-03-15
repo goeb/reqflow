@@ -9,7 +9,8 @@ req-stat-docx-rm.test \
 req-same-line.test \
 req-stat-sort.test \
 SPEC-with-table.test \
-t_second_doc
+t_second_doc \
+t_end_req
 
 # include the tests on the distribution
 EXTRA_DIST = .

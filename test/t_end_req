@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Test -end-req functionality
+. ./envtest
+. $srcdir/functions
+
+T=$(basename $0)
+
+# copy input files locally so that their path does not depend on $srcdir
+cp -f $srcdir/SPEC.docx .
+cp -f $srcdir/SPEC.html .
+cp -f $srcdir/SPEC.pdf .
+cp -f $srcdir/TEST.txt .
+
+
+# build .req file
+
+cat << EOF > $T.req
+
+document SPEC_docx -path SPEC.docx -prefix-req SPEC_docx_ -stop-after Annex -req PRINTF_[-a-zA-Z0-9_]* -end-req Ref:
+document SPEC_html -path SPEC.html -prefix-req SPEC_html_ -stop-after Annex -req REQ_[-a-zA-Z0-9_]* -end-req Ref:
+document SPEC_pdf -path SPEC.pdf -prefix-req SPEC_pdf_ -stop-after Annex -req PRINTF_[-a-zA-Z0-9_]* -end-req Ref:
+document TEST_txt -path TEST.txt -stop-after Annex -req T_[-a-zA-Z0-9_]* -end-req Ref:
+
+
+EOF
+
+echo -n > $T.out
+
+test_run $REQFLOW review -c $T.req
+
+diff -w $T.out $srcdir/$T.ref
