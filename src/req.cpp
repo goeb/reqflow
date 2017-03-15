@@ -192,25 +192,31 @@ BlockStatus ReqDocument::processBlock(std::string &text)
 
     std::string reqId = extractPattern(fileConfig->reqRegex, text, ERASE_ALL);
 
-    if (!reqId.empty() && refs.find(reqId) == refs.end()) {
-        std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
-        if (r != Requirements.end()) {
-            PUSH_ERROR(fileConfig->id, reqId, "Duplicate requirement: also defined in '%s'",
-                       r->second.parentDocument->path.c_str());
-            currentRequirement.clear();
+    if (!reqId.empty()) {
+        // add the prefix, if any
+        reqId = fileConfig->prefixReq + reqId;
 
-        } else {
+        if (refs.find(reqId) == refs.end()) {
 
-            finalizeCurrentReq(); // finalize current req before starting a new one
+            std::map<std::string, Requirement>::iterator r = Requirements.find(reqId);
+            if (r != Requirements.end()) {
+                PUSH_ERROR(fileConfig->id, reqId, "Duplicate requirement: also defined in '%s'",
+                           r->second.parentDocument->path.c_str());
+                currentRequirement.clear();
 
-            // insert new requirement in the global storage table
-            Requirement req;
-            req.id = fileConfig->prefixReq + reqId;
-            req.seqnum = reqSeqnum; reqSeqnum++;
-            req.parentDocument = fileConfig;
-            Requirements[req.id] = req;
-            fileConfig->requirements.insert(&(Requirements[req.id]));
-            currentRequirement = req.id;
+            } else {
+
+                finalizeCurrentReq(); // finalize current req before starting a new one
+
+                // insert new requirement in the global storage table
+                Requirement req;
+                req.id = reqId;
+                req.seqnum = reqSeqnum; reqSeqnum++;
+                req.parentDocument = fileConfig;
+                Requirements[req.id] = req;
+                fileConfig->requirements.insert(&(Requirements[req.id]));
+                currentRequirement = req.id;
+            }
         }
     }
 
