@@ -1,9 +1,17 @@
-wine ../reqflow.exe stat -s -c t_second_doc.req
+>>>REQFLOW stat -s -c t_second_doc.req
+Error(s): 2
+SPEC1:SPEC1_PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
+SPEC2:SPEC2_PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
 Document                          % covered / total
 ----------------------------------------------------------------------
 SPEC1                            0%       0 /     9 SPEC.docx
 SPEC2                            0%       0 /     9 SPEC.docx
 Total                            0%       0 /    18 
+
+>>>REQFLOW trac -c t_second_doc.req
+Error(s): 2
+SPEC1:SPEC1_PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
+SPEC2:SPEC2_PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
 
 Requirements of SPEC1                              Requirements Downstream                           
 --------------------------------------------------------------------------------------------------------------------
@@ -28,3 +36,4 @@ SPEC2_PRINTF_12
 SPEC2_PRINTF_14                                   
 SPEC2_PRINTF_15                                   
 SPEC2_PRINTF_20                                   
+

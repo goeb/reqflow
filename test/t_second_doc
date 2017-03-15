@@ -3,7 +3,12 @@
 # Test that if .req file has 2 documents, with -stop-after statements,
 # then both documents are correctly analysed
 . ./envtest
+. $srcdir/functions
+
 T=$(basename $0)
+
+# copy input files locally so that their path does not depend on $srcdir
+cp -f $srcdir/SPEC.docx .
 
 # build .req file
 
@@ -14,9 +19,9 @@ document SPEC2 -path SPEC.docx -prefix-req SPEC2_ -stop-after Annex -req PRINTF_
 
 EOF
 
+set -x
 echo -n > $T.out
-echo $REQFLOW stat -s -c $T.req >> $T.out
-$REQFLOW stat -s -c $T.req >> $T.out 2>&1
-$REQFLOW trac -c $T.req >> $T.out 2>&1
+test_run $REQFLOW stat -s -c $T.req
+test_run $REQFLOW trac -c $T.req
 
 diff -w $T.out $srcdir/$T.ref
