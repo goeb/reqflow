@@ -1,0 +1,83 @@
+>>>REQFLOW review -c t_end_req.req
+Error(s): 1
+SPEC_docx:SPEC_docx_PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
+SPEC_docx_PRINTF_01
+        printf –help shall display a help message and exit.
+
+SPEC_docx_PRINTF_02
+        The FORMAT parameter shall control the output as in C printf.
+
+SPEC_docx_PRINTF_03
+        The exit code of printf shall be:
+        - zero if no error occurs
+        - 1 if the FORMAT has an invalid syntax
+
+SPEC_docx_PRINTF_05
+        This is requirement 5.
+
+SPEC_docx_PRINTF_06
+        This is requirement 6.
+
+SPEC_docx_PRINTF_12
+        This is requirement 12.
+
+SPEC_docx_PRINTF_14
+        This is requirement 14.
+
+SPEC_docx_PRINTF_15
+
+SPEC_docx_PRINTF_20
+        This is requirement 20.
+
+SPEC_html_REQ_01
+        Globulus shall have 3
+        legs:
+        
+        one for walking
+        
+        
+        one for standing
+        
+        
+        one for jumping
+
+SPEC_html_REQ_02
+        At night Globulus shall
+        switch to standby mode.
+
+SPEC_html_REQ_03
+        Globulus shall not make
+        noise.
+
+SPEC_pdf_PRINTF_01
+        printf –help shall display a help message and exit.
+
+SPEC_pdf_PRINTF_02
+        The FORMAT parameter shall control the output as in C printf.
+
+SPEC_pdf_PRINTF_03
+        The exit code of printf shall be:
+        - zero if no error occurs
+        - 1 if the FORMAT has an invalid syntax
+
+T_01
+        Send command printf --help
+        Check that the result is a help message.
+
+T_02
+        Send command `printf "(%04d%-4s)\n" 33 aa`
+        Check that the result is: (0033aa  )
+        Check that the exit code is zero.
+
+T_05
+        Send command printf x%r
+        Check that an error is raised and that the exit code is 1
+
+T_21
+        Send command `which printf`
+        Check that printf is installed in /usr/bin/printf
+
+T_22
+        This is test 22.
+
+
