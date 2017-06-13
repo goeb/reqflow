@@ -46,6 +46,16 @@ int ReqDocumentDocxXml::loadDocxXmlNode(xmlDocPtr doc, xmlNode *node, bool debug
         } else if (0 == strcmp((char*)node->name, "del")) return 0; // ignore deleted text (revision marks)
         else if (0 == strcmp((char*)node->name, "moveFrom")) return 0; // ignore deleted text (revision marks)
 
+        // When OOXML AlternateContent is encountered, we decide to ignore the Fallback part.
+        // This prevents duplicated requirements in some documents.
+        // Typical structure:
+        // <mc:AlternateContent>
+        //   <mc:Choice>...</mc:Choice>
+        //   <mc:Fallback>...</mc:Fallback>
+        // </mc:AlternateContent>
+        else if (0 == strcmp((char*)node->name, "Fallback")) return 0; // ignore fallback
+
+
         LOG_DEBUG("node: %s", (char*)node->name);
         nodeName = (char*)node->name;
 

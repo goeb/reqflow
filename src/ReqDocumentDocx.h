@@ -21,6 +21,11 @@
 
 #include "req.h"
 
+/* The classes here manage the analysis of documents:
+ * - OpenXml (Office Open XML, OOXML)
+ * - OpenDocument
+ *
+ */
 
 class ReqDocumentDocx: public ReqDocument {
 public:
