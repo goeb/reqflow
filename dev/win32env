@@ -1,22 +1,17 @@
 
-LIBPCRE=$HOME/Downloads/pcre-8.34/.libs
-export PCRE_CFLAGS="-I$HOME/Downloads/pcre-8.34 -DPCRE_STATIC"
-export PCRE_LIBS="$LIBPCRE/libpcreposix.a $LIBPCRE/libpcre.a"
+WIN32LIBS=$HOME/win32libs
 
-LIBXML=$HOME/win32libs/libxml2-2.9.4
-export XML_CFLAGS="-DLIBXML_STATIC -I$LIBXML/include/libxml2"
-export XML_LIBS="-L$LIBXML/.libs -lxml2"
+export PCRE_CFLAGS="-I$WIN32LIBS/include -DPCRE_STATIC"
+export PCRE_LIBS="-L$WIN32LIBS/lib -lpcreposix -lpcre"
 
-LIBZIP=$HOME/win32libs/libzip-0.11.2
-LIBZ=$HOME/win32libs/zlib-1.2.8
-export ZIP_CFLAGS="-DZLIB_INTERNAL -DZIP_EXTERN= -I$LIBZIP/lib"
-export ZIP_LIBS="$LIBZIP/lib/libzip.a $LIBZ/libz.a"
+export XML_CFLAGS="-DLIBXML_STATIC -I$WIN32LIBS/include/libxml2"
+export XML_LIBS="-L$WIN32LIBS/lib -lxml2"
 
-LIBICONV=/usr/i686-w64-mingw32/lib/libiconv.a
-LIBPOPPLER=$HOME/win32libs/poppler-0.48.0
-export POPPLER_CFLAGS="-I$LIBPOPPLER/include -Dpoppler_cpp_EXPORTS"
-export POPPLER_LIBS="$LIBPOPPLER/lib/libpoppler-cpp.a $LIBPOPPLER/lib/libpoppler.a $LIBICONV"
+export ZIP_CFLAGS="-DZLIB_INTERNAL -DZIP_EXTERN= -I$WIN32LIBS/include -I$WIN32LIBS/lib/libzip/include"
+export ZIP_LIBS="-L$WIN32LIBS/lib -lzip -lz"
 
+export POPPLER_CFLAGS="-I$WIN32LIBS/include -Dpoppler_cpp_EXPORTS"
+export POPPLER_LIBS="-L$WIN32LIBS/lib -lpoppler-cpp -lpoppler -liconv"
 
 export LDFLAGS="-lws2_32 -lgdi32 -Wl,-Bstatic"
 
