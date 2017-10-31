@@ -1,5 +1,7 @@
-Reqflow 1.6
+Reqflow 1.5.2, 31 Oct 2017
 	- option -end-req for marking end of text of a requirement
+	- fix detection of duplicate reqs with -prefix-req
+	- docx: ignore 'fallback', to prevent duplicates
 
 Reqflow 1.5.1, 13 Feb 2017
 	- improve acquisition in HTML documents
