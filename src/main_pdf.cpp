@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include <poppler/cpp/poppler-document.h>
-#include <poppler/cpp/poppler-page.h>
+#include <poppler-document.h>
+#include <poppler-page.h>
 using namespace std;
 
 int main(int argc, char **argv)
