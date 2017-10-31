@@ -454,7 +454,8 @@ req-stat-docx-rm.test \
 req-same-line.test \
 req-stat-sort.test \
 SPEC-with-table.test \
-t_second_doc
+t_second_doc \
+t_end_req
 
 
 # include the tests on the distribution
@@ -645,6 +646,13 @@ recheck: all
 t_second_doc.log: t_second_doc
 	@p='t_second_doc'; \
 	b='t_second_doc'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t_end_req.log: t_end_req
+	@p='t_end_req'; \
+	b='t_end_req'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
