@@ -107,6 +107,10 @@ ReqFileConfig::SortMode ReqFileConfig::getSortMode(const std::string &text)
 ReqFileType ReqFileConfig::getFileType(const std::string &extension)
 {
     if (0 == strcasecmp(extension.c_str(), "txt")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "ad")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "adoc")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "asc")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "asciidoc")) return RF_TEXT;
     else if (0 == strcasecmp(extension.c_str(), "odt")) return RF_ODT;
     else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
     else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
