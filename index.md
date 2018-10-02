@@ -6,7 +6,9 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 ## News
 
 - 2 Oct 2018: Reqflow v1.5.3 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
-- 22 November 2016: Reqflow v1.5.0
+- 31 Oct 2017 Reqflow v1.5.2
+- 13 Feb 2017 Reqflow v1.5.1
+- 22 Nov 2016: Reqflow v1.5.0
 
 
 ## Supported Formats
@@ -45,20 +47,13 @@ Build From Source :
 
 Latest stable:
 
-* [reqflow-1.5.1-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.1/reqflow-1.5.1-setup.exe)
+* [reqflow-1.5.3-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.3/reqflow-1.5.3-setup.exe)
 
 
 Previous versions:
 
-* [reqflow-1.5.0-setup.exe](download/reqflow-1.5.0-setup.exe)
-* [reqflow-1.4.2-setup.exe](download/reqflow-1.4.2-setup.exe)
-* [reqflow-1.4.1-setup.exe](download/reqflow-1.4.1-setup.exe)
-* [reqflow-1.4.0-setup.exe](download/reqflow-1.4.0-setup.exe)
-* [reqflow-1.3.4-setup.exe](download/reqflow-1.3.4-setup.exe)
-* [reqflow-1.3.3-setup.exe](download/reqflow-1.3.3-setup.exe)
-* [reqflow-1.3.2-setup.exe](download/reqflow-1.3.2-setup.exe)
-* [reqflow-1.3.0-setup.exe](download/reqflow-1.3.0-setup.exe)
-* [reqflow-v1.2.1.zip](download/reqflow-v1.2.1.zip)
+* [reqflow-1.5.1-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.1/reqflow-1.5.1-setup.exe)
+* [reqflow-1.5.2-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.2/reqflow-1.5.2-setup.exe)
 
 ## Usage
 
