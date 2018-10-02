@@ -1,12 +1,15 @@
+Reqflow 1.5.3, 2 Oct 2018
+    - file extensions .ad, .adoc, .asc, .asciidoc, .md known as text documents
+
 Reqflow 1.5.2, 31 Oct 2017
-	- option -end-req for marking end of text of a requirement
-	- fix detection of duplicate reqs with -prefix-req
-	- docx: ignore 'fallback', to prevent duplicates
+    - option -end-req for marking end of text of a requirement
+    - fix detection of duplicate reqs with -prefix-req
+    - docx: ignore 'fallback', to prevent duplicates
 
 Reqflow 1.5.1, 13 Feb 2017
-	- improve acquisition in HTML documents
-	- fix analysis of second document when first document has -stop-after
-	- option -prefix-req for prefixing acquired requirements
+    - improve acquisition in HTML documents
+    - fix analysis of second document when first document has -stop-after
+    - option -prefix-req for prefixing acquired requirements
 
 Reqflow 1.5.0, 22 Nov 2016
 
