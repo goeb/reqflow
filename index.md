@@ -5,7 +5,7 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 
 ## News
 
-- 13 Feb 2017: Reqflow v1.5.1 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
+- 2 Oct 2018: Reqflow v1.5.3 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
 - 22 November 2016: Reqflow v1.5.0
 
 
@@ -15,7 +15,7 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 
 - docx (Open Xml)
 - odt (Open Document)
-- text
+- text (extensions .txt, .ad, .adoc, .asc, .asciidoc, .md)
 - HTML
 - PDF
 
