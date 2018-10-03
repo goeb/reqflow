@@ -143,6 +143,37 @@ document TEST -path TEST.txt \
 
 ```
 
+## Configuration Reference
+
+`define` Define a variable. Example:
+
+    define ALPHANUM [-a-zA-Z0-9_]
+    document X -path /path/to/x -req REQ_ALPHANUM
+
+`document` Start a document description.
+
+`-end-req` Indicate the end of the text of a requirement. This is used when you run `reqflow review`. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.
+
+`-nocov` Do not report uncovered requirements (useful for-top level documents).
+
+`-path` Path to the file.
+
+`-ref` Pattern for capturing references identifiers (regular expression).
+
+`-prefix-req` Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)
+
+`-req` Pattern for capturing requirements identifiers (regular expression).
+
+`-sort` Sort method when listing requirements: `document` (same order as the are in the document) or `alphanum` (alphanumeric order).
+
+`-start-after` Start capturing requirements after this pattern (regular expression).
+
+`-stop-after` Stop capturing requirements after this pattern (regular expression).
+
+`-type` Type of the document, overriding the file extension.
+
+
+
 ## Environment Variables
 
 Environment variables can be inserted in the configuration file, using a dollar sign ($) prefix.
@@ -154,6 +185,7 @@ document SPEC -path $DOCUMENT -req REQ_[-a-zA-Z0-9_]*
 # or
 document SPEC -path ${DOCUMENT} -req REQ_[-a-zA-Z0-9_]*
 ```
+
 
 
 

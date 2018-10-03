@@ -21,6 +21,7 @@
 <li><a href='#download'>Download</a></li>
 <li><a href='#usage'>Usage</a></li>
 <li><a href='#sample-configuration-file'>Sample Configuration File</a></li>
+<li><a href='#configuration-reference'>Configuration Reference</a></li>
 <li><a href='#environment-variables'>Environment Variables</a></li>
 <li><a href='#external-dependencies'>External Dependencies</a></li>
 <li><a href='#license-gplv2'>License GPLv2+</a></li>
@@ -152,6 +153,21 @@ document TEST -path TEST.txt \
     -start-after &quot;Tests cases&quot; \
     -nocov -sort alphanum
 </code></pre>
+<h2 id="configuration-reference">Configuration Reference</h2>
+<p><code>define</code> Define a variable. Example:</p>
+<pre><code>define ALPHANUM [-a-zA-Z0-9_]
+document X -path /path/to/x -req REQ_ALPHANUM</code></pre>
+<p><code>document</code> Start a document description.</p>
+<p><code>-end-req</code> Indicate the end of the text of a requirement. This is used when you run <code>reqflow review</code>. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.</p>
+<p><code>-nocov</code> Do not report uncovered requirements (useful for-top level documents).</p>
+<p><code>-path</code> Path to the file.</p>
+<p><code>-ref</code> Pattern for capturing references identifiers (regular expression).</p>
+<p><code>-prefix-req</code> Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)</p>
+<p><code>-req</code> Pattern for capturing requirements identifiers (regular expression).</p>
+<p><code>-sort</code> Sort method when listing requirements: <code>document</code> (same order as the are in the document) or <code>alphanum</code> (alphanumeric order).</p>
+<p><code>-start-after</code> Start capturing requirements after this pattern (regular expression).</p>
+<p><code>-stop-after</code> Stop capturing requirements after this pattern (regular expression).</p>
+<p><code>-type</code> Type of the document, overriding the file extension.</p>
 <h2 id="environment-variables">Environment Variables</h2>
 <p>Environment variables can be inserted in the configuration file, using a dollar sign ($) prefix.</p>
 <p>Example:</p>
@@ -175,7 +191,7 @@ document SPEC -path ${DOCUMENT} -req REQ_[-a-zA-Z0-9_]*</code></pre>
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on  2 Oct 2018
+            Page updated on  3 Oct 2018
         </div>
     </body>
 </html>
