@@ -231,13 +231,16 @@ std::string consolidateToken(const std::list<std::pair<std::string, std::string>
   *
   * document <id>
   *     -path <token>
-  *     -req <token>
-  *     -ref <token>
+  *     -req <regex>
+  *     -ref <regex>
   *     -nocov
-  *     -start-after <token>
-  *     -stop-after <token>
+  *     -start-after <regex>
+  *     -stop-after <regex>
   *     -type <type>
   *     -prefix-req <id>
+  *     -end-req <regex>
+  *     -end-req-style <regex> (not used)
+  *     -sort <sort-mode>
   *
   * A 'define' instanciates the definition of a variable, that will be used as replacement in the tokens.
   * A 'document' starts a new definition os document.
