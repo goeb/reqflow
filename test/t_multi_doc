@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Test reqflow with several upstream and dowstream documents
+# 
+. ./envtest
+. $srcdir/functions
+
+T=$(basename $0)
+
+init_test_documents() {
+	for upstream in A B; do
+		cat > doc_upstream_$upstream.txt << EOF
+		Doc $upstream
+		REQ_${upstream}_01
+		requirements ${upstream}/01
+		REQ_${upstream}_02
+		requirements ${upstream}/02
+EOF
+	done
+
+	for downstream in 1 2; do
+		cat > doc_downstream_${downstream}.txt << EOF
+			Doc downstream_${downstream}
+			TST_${downstream}_01
+			description of test ${downstream}/01
+			ref: REQ_A_0${downstream}
+			TST_${downstream}_02
+			description of test ${downstream}/02
+			ref: REQ_B_0${downstream}
+EOF
+	done
+}
+
+init_test_documents
+
+$REQFLOW trac -v -c - << EOF > $T.stdout.out 2> $T.stderr.out
+document UP_1 -path doc_upstream_A.txt -req REQ_[A-Z0-9_]*
+document UP_2 -path doc_upstream_B.txt -req REQ_[A-Z0-9_]*
+document DOWN_1 -path doc_downstream_1.txt -req TST_[A-Z0-9_]* -ref REQ_[A-Z0-9_]* -nocov
+document DOWN_2 -path doc_downstream_2.txt -req TST_[A-Z0-9_]* -ref REQ_[A-Z0-9_]* -nocov
+EOF
+
+diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref

@@ -10,7 +10,8 @@ req-same-line.test \
 req-stat-sort.test \
 SPEC-with-table.test \
 t_second_doc \
-t_end_req
+t_end_req \
+t_multi_doc
 
 # include the tests on the distribution
 EXTRA_DIST = .
