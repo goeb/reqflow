@@ -112,6 +112,8 @@ ReqFileType ReqFileConfig::getFileType(const std::string &extension)
     else if (0 == strcasecmp(extension.c_str(), "asc")) return RF_TEXT;
     else if (0 == strcasecmp(extension.c_str(), "asciidoc")) return RF_TEXT;
     else if (0 == strcasecmp(extension.c_str(), "md")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "c")) return RF_TEXT;
+    else if (0 == strcasecmp(extension.c_str(), "h")) return RF_TEXT;
     else if (0 == strcasecmp(extension.c_str(), "odt")) return RF_ODT;
     else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
     else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
