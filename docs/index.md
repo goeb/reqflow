@@ -17,9 +17,9 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 
 - docx (Open Xml)
 - odt (Open Document)
-- text (extensions .txt, .ad, .adoc, .asc, .asciidoc, .md)
 - HTML
 - PDF
+- text (default)
 
 ### Output formats
 
@@ -170,7 +170,7 @@ document TEST -path TEST.txt \
 
 `-stop-after` Stop capturing requirements after this pattern (regular expression).
 
-`-type` Type of the document, overriding the file extension.
+`-type` Type of the document, overriding the file extension. One of: `txt`, `docx`, `odt`, `xml`, `pdf`.
 
 
 

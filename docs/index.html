@@ -44,9 +44,9 @@
 <ul>
 <li>docx (Open Xml)</li>
 <li>odt (Open Document)</li>
-<li>text (extensions .txt, .ad, .adoc, .asc, .asciidoc, .md)</li>
 <li>HTML</li>
 <li>PDF</li>
+<li>text (default)</li>
 </ul>
 <h3 id="output-formats">Output formats</h3>
 <ul>
@@ -167,7 +167,7 @@ document X -path /path/to/x -req REQ_ALPHANUM</code></pre>
 <p><code>-sort</code> Sort method when listing requirements: <code>document</code> (same order as the are in the document) or <code>alphanum</code> (alphanumeric order).</p>
 <p><code>-start-after</code> Start capturing requirements after this pattern (regular expression).</p>
 <p><code>-stop-after</code> Stop capturing requirements after this pattern (regular expression).</p>
-<p><code>-type</code> Type of the document, overriding the file extension.</p>
+<p><code>-type</code> Type of the document, overriding the file extension. One of: <code>txt</code>, <code>docx</code>, <code>odt</code>, <code>xml</code>, <code>pdf</code>.</p>
 <h2 id="environment-variables">Environment Variables</h2>
 <p>Environment variables can be inserted in the configuration file, using a dollar sign ($) prefix.</p>
 <p>Example:</p>
@@ -191,7 +191,7 @@ document SPEC -path ${DOCUMENT} -req REQ_[-a-zA-Z0-9_]*</code></pre>
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on  3 Oct 2018
+            Page updated on 10 Mar 2019
         </div>
     </body>
 </html>
