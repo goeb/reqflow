@@ -317,6 +317,14 @@ int loadConfiguration(const char * file)
                     LOG_DEBUG("Add variable '%s'='%s'", key.c_str(), value.c_str());
                     defs.push_front(std::make_pair(key, value));
                 }
+
+                if (!line->empty()) {
+                    // tokens remaining on the line, but this is a syntax error
+                    PUSH_ERROR(file, "", "Invalid define: extra tokens on line %d", lineNum);
+                    return 1;
+                }
+                continue;
+
             } // else, parse arguments below...
         }
 
@@ -446,7 +454,7 @@ int loadConfiguration(const char * file)
                     return -1;
                 }
                 std::string t = pop(*line);
-                ReqFileType type = fileConfig->getFileType(t);
+                ReqFileType type = ReqFileConfig::getFileTypeByCode(t);
                 if (type == RF_UNKNOWN) {
                     PUSH_ERROR(file, "","Unknown file type '%s' for %s", t.c_str(), fileConfig->id.c_str());
                     return -1;

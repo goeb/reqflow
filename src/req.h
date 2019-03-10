@@ -57,7 +57,7 @@ struct ReqFileConfig {
 	regex_t *stopAfterRegex;
     std::map<std::string, regex_t *> endReq;
     std::map<std::string, regex_t *> endReqStyle;
-    ReqFileType type;
+    ReqFileType type; // this is the type as specified via option "-type"
     std::string prefixReq;
     enum SortMode { SORT_DOCUMENT_ORDER, SORT_ALPHANUMERIC_ORDER, SORT_UNKNOWN };
     SortMode sortMode;
@@ -81,7 +81,9 @@ struct ReqFileConfig {
 
     ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0), type(RF_UNKNOWN),
         nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false) {}
-    static ReqFileType getFileType(const std::string &extension);
+    static ReqFileType getFileTypeByExtension(const std::string &extension);
+    static ReqFileType getFileTypeByCode(const std::string &code);
+
     SortMode getSortMode(const std::string &text);
 
     ReqFileType getFileType();

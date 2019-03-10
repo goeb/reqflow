@@ -17,6 +17,7 @@
 #include <list>
 #include <string>
 #include <stdio.h>
+#include <algorithm>
 
 #include "req.h"
 #include "global.h"
@@ -104,33 +105,52 @@ ReqFileConfig::SortMode ReqFileConfig::getSortMode(const std::string &text)
 }
 
 
-ReqFileType ReqFileConfig::getFileType(const std::string &extension)
+ReqFileType ReqFileConfig::getFileTypeByExtension(const std::string &extension)
 {
-    if (0 == strcasecmp(extension.c_str(), "txt")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "ad")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "adoc")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "asc")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "asciidoc")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "md")) return RF_TEXT;
-    else if (0 == strcasecmp(extension.c_str(), "odt")) return RF_ODT;
-    else if (0 == strcasecmp(extension.c_str(), "docx")) return RF_DOCX;
-    else if (0 == strcasecmp(extension.c_str(), "xslx")) return RF_XSLX;
-    else if (0 == strcasecmp(extension.c_str(), "xml")) return RF_DOCX_XML;
-    else if (0 == strcasecmp(extension.c_str(), "htm")) return RF_HTML;
-    else if (0 == strcasecmp(extension.c_str(), "html")) return RF_HTML;
-    else if (0 == strcasecmp(extension.c_str(), "pdf")) return RF_PDF;
+    // Convert to lower case
+    std::string lcExtension = extension;
+    std::transform(lcExtension.begin(), lcExtension.end(), lcExtension.begin(), ::tolower);
+
+    ReqFileType type = ReqFileConfig::getFileTypeByCode(lcExtension);
+    if (type != RF_UNKNOWN) return type;
+
+    // search alternative known extensions
+    if (lcExtension == "xslx") return RF_XSLX;
+    else if (lcExtension == "htm") return RF_HTML;
+    // Users expect the following extensions be processed as text:
+    // txt, ad, adoc, asc, asciidoc, md, c, h
+    else return RF_TEXT;
+}
+
+ReqFileType ReqFileConfig::getFileTypeByCode(const std::string &code)
+{
+    if (code == "txt") return RF_TEXT;
+    else if (code == "odt") return RF_ODT;
+    else if (code == "docx") return RF_DOCX;
+    else if (code == "xml") return RF_DOCX_XML;
+    else if (code ==  "html") return RF_HTML;
+    else if (code ==  "pdf") return RF_PDF;
     else return RF_UNKNOWN;
 }
 
+/** Set the file type according to the extension of the filename
+ *
+ * If no known extension is recognised, then it defaults to text.
+ */
 ReqFileType ReqFileConfig::getFileType()
 {
     if (type != RF_UNKNOWN) return type;
 
+    // If the type has not been explicitely specified, then
+    // follow the filename extension.
+
     size_t i = path.find_last_of('.');
-    if (i == std::string::npos) return RF_UNKNOWN;
-    if (i == path.size()-1) return RF_UNKNOWN;
-    std::string extension = path.substr(i+1);
-    return getFileType(extension);
+    if (i == std::string::npos) return RF_TEXT; // no extension (no dot character)
+    else if (i == path.size()-1) return RF_TEXT; // empty extension
+    else {
+        std::string extension = path.substr(i+1);
+        return getFileTypeByExtension(extension);
+    }
 }
 
 void ReqDocument::init()
