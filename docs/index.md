@@ -5,7 +5,8 @@ Reqflow is a free and open-source tool for traceability of requirements across d
 
 ## News
 
-- 2 Oct 2018: Reqflow v1.5.3 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
+- 11 Mar 2019: Reqflow v1.6.0 (see [Changes](https://raw.githubusercontent.com/goeb/reqflow/master/NEWS))
+- 2 Oct 2018: Reqflow v1.5.3
 - 31 Oct 2017 Reqflow v1.5.2
 - 13 Feb 2017 Reqflow v1.5.1
 - 22 Nov 2016: Reqflow v1.5.0
@@ -47,13 +48,14 @@ Build From Source :
 
 Latest stable:
 
-* [reqflow-1.5.3-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.3/reqflow-1.5.3-setup.exe)
+* [reqflow-1.6.0-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.6.0/reqflow-1.6.0-setup.exe)
 
 
 Previous versions:
 
 * [reqflow-1.5.1-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.1/reqflow-1.5.1-setup.exe)
 * [reqflow-1.5.2-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.2/reqflow-1.5.2-setup.exe)
+* [reqflow-1.5.3-setup.exe](https://github.com/goeb/reqflow/releases/download/v1.5.3/reqflow-1.5.3-setup.exe)
 
 ## Usage
 
