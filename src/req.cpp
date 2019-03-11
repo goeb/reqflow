@@ -122,15 +122,43 @@ ReqFileType ReqFileConfig::getFileTypeByExtension(const std::string &extension)
     else return RF_TEXT;
 }
 
+struct FileTypeCodeAssociation {
+    const char *textCode;
+    ReqFileType filetype;
+};
+
+/** File type codes are the codes allowed for the -type option
+ */
+const FileTypeCodeAssociation FILE_TYPE_CODES[] {
+    { "txt", RF_TEXT },
+    { "odt", RF_ODT },
+    { "docx", RF_DOCX },
+    { "xml", RF_DOCX_XML },
+    { "html", RF_HTML },
+    { "pdf", RF_PDF },
+    { 0, RF_UNKNOWN }
+};
+
 ReqFileType ReqFileConfig::getFileTypeByCode(const std::string &code)
 {
-    if (code == "txt") return RF_TEXT;
-    else if (code == "odt") return RF_ODT;
-    else if (code == "docx") return RF_DOCX;
-    else if (code == "xml") return RF_DOCX_XML;
-    else if (code ==  "html") return RF_HTML;
-    else if (code ==  "pdf") return RF_PDF;
-    else return RF_UNKNOWN;
+    const FileTypeCodeAssociation *fta = FILE_TYPE_CODES;
+    while (fta->textCode) {
+        if (code == fta->textCode) return fta->filetype;
+        fta++;
+    }
+    return RF_UNKNOWN;
+}
+
+std::string ReqFileConfig::getFileTypeCodes()
+{
+    std::string result;
+    const FileTypeCodeAssociation *fta = FILE_TYPE_CODES;
+    while (fta->textCode) {
+        if (fta != FILE_TYPE_CODES) result += ", ";
+        result += fta->textCode;
+        fta++;
+    }
+    return result;
 }
 
 /** Set the file type according to the extension of the filename

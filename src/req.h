@@ -83,6 +83,7 @@ struct ReqFileConfig {
         nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false) {}
     static ReqFileType getFileTypeByExtension(const std::string &extension);
     static ReqFileType getFileTypeByCode(const std::string &code);
+    static std::string getFileTypeCodes();
 
     SortMode getSortMode(const std::string &text);
 

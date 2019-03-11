@@ -456,7 +456,9 @@ int loadConfiguration(const char * file)
                 std::string t = pop(*line);
                 ReqFileType type = ReqFileConfig::getFileTypeByCode(t);
                 if (type == RF_UNKNOWN) {
-                    PUSH_ERROR(file, "","Unknown file type '%s' for %s", t.c_str(), fileConfig->id.c_str());
+                    PUSH_ERROR(file, "","Invalid option -type '%s' for %s (valid types are: %s)",
+                               t.c_str(), fileConfig->id.c_str(), ReqFileConfig::getFileTypeCodes().c_str());
+
                     return -1;
                 }
                 fileConfig->type = type;
