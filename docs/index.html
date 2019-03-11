@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Reqflow</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    </head>
+
+    <body>
+        <div class="header">
+
+        </div>
+        <div class="page">
+<aside class='menu'>
+<ul>
+<li class='active'>Reqflow
+<ul class=menu_level2>
+<li><a href='#news'>News</a></li>
+<li><a href='#supported-formats'>Supported Formats</a></li>
+<li><a href='#example-of-report'>Example of Report</a></li>
+<li><a href='#download'>Download</a></li>
+<li><a href='#usage'>Usage</a></li>
+<li><a href='#sample-configuration-file'>Sample Configuration File</a></li>
+<li><a href='#configuration-reference'>Configuration Reference</a></li>
+<li><a href='#environment-variables'>Environment Variables</a></li>
+<li><a href='#external-dependencies'>External Dependencies</a></li>
+<li><a href='#license-gplv2'>License GPLv2+</a></li>
+</ul>
+</li>
+</ul>
+</aside>
+<div class='contents'>
+<h1 id="reqflow">Reqflow</h1>
+<p>Reqflow is a free and open-source tool for traceability of requirements across documents, designed to analyse documents with speed and efficiency.</p>
+<h2 id="news">News</h2>
+<ul>
+<li>2 Oct 2018: Reqflow v1.5.3 (see <a href="https://raw.githubusercontent.com/goeb/reqflow/master/NEWS">Changes</a>)</li>
+<li>31 Oct 2017 Reqflow v1.5.2</li>
+<li>13 Feb 2017 Reqflow v1.5.1</li>
+<li>22 Nov 2016: Reqflow v1.5.0</li>
+</ul>
+<h2 id="supported-formats">Supported Formats</h2>
+<h3 id="input-formats">Input formats</h3>
+<ul>
+<li>docx (Open Xml)</li>
+<li>odt (Open Document)</li>
+<li>text (extensions .txt, .ad, .adoc, .asc, .asciidoc, .md)</li>
+<li>HTML</li>
+<li>PDF</li>
+</ul>
+<h3 id="output-formats">Output formats</h3>
+<ul>
+<li>text</li>
+<li>CSV</li>
+<li>HTML</li>
+</ul>
+<h2 id="example-of-report">Example of Report</h2>
+<p>No screenshot, but an example: <a href="reqReport.html" class="uri">reqReport.html</a></p>
+<h2 id="download">Download</h2>
+<h3 id="linux">Linux</h3>
+<p>Build From Source :</p>
+<pre><code>git clone https://github.com/goeb/reqflow.git
+cd reqflow
+./configure
+make
+cd test &amp;&amp; ../reqflow stat -s</code></pre>
+<h3 id="windows">Windows</h3>
+<p>Latest stable:</p>
+<ul>
+<li><a href="https://github.com/goeb/reqflow/releases/download/v1.5.3/reqflow-1.5.3-setup.exe">reqflow-1.5.3-setup.exe</a></li>
+</ul>
+<p>Previous versions:</p>
+<ul>
+<li><a href="https://github.com/goeb/reqflow/releases/download/v1.5.1/reqflow-1.5.1-setup.exe">reqflow-1.5.1-setup.exe</a></li>
+<li><a href="https://github.com/goeb/reqflow/releases/download/v1.5.2/reqflow-1.5.2-setup.exe">reqflow-1.5.2-setup.exe</a></li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre><code>Usage: 1. reqflow &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
+       2. reqflow &lt;config-file&gt;
+
+
+1. reqflow &lt;command&gt; [&lt;options&gt;] [&lt;args&gt;]
+
+Commands:
+
+    stat [doc ...]  Print the status of requirements in all documents or the
+                    given documents. Without additionnal option, only
+                    unresolved coverage issues are reported.
+         -s         Print a one-line summary for each document.
+         -v         Print the status of all requirements.
+                    Status codes:
+
+                      &#39;U&#39;  Uncovered
+
+    trac [doc ...]  Print the traceability matrix of the requirements 
+                    (A covered by B).
+         [-r]       Print the reverse traceability matrix (A covers B).
+         [-x &lt;fmt&gt;] Select export format: text (default), csv, html.
+                    If format &#39;html&#39; is chosen, -r is ignored, as both foward
+                    and reverse traceability matrices are displayed.
+
+    review          Print the requirements with their text.
+         [-f | -r]  Print also traceability (forward or backward)
+         [-x &lt;fmt&gt;] Choose format: txt, csv.
+
+    config          Print the list of configured documents.
+
+    debug &lt;file&gt;    Dump text extracted from file (debug purpose).
+
+    regex &lt;pattern&gt; [&lt;text&gt;]
+                    Test regex given by &lt;pattern&gt; applied on &lt;text&gt;.
+                    If &lt;text&gt; is omitted, then the text is read from stdin.
+
+    version
+    help
+
+Options:
+    -c &lt;config&gt;  Select configuration file. Defaults to &#39;conf.req&#39;.
+    -o &lt;file&gt;    Output to file instead of stdout.
+                 Not supported for commands &#39;config&#39;, debug&#39; and &#39;regex&#39;.
+
+2. reqflow &lt;config&gt;
+This is equivalent to:
+    reqflow trac -c &lt;config&gt; -x html -o &lt;outfile&gt; &amp;&amp; start &lt;outfile&gt;
+
+Purpose: This usage is suitable for double-cliking on the config file.
+Note: &lt;config&gt; must be different from the commands of use case 1.</code></pre>
+<h2 id="sample-configuration-file">Sample Configuration File</h2>
+<p><code>conf.req</code></p>
+<pre><code># document &lt;document-id&gt; -path &lt;document-path&gt; -req &lt;pattern&gt; \
+#          [-stop-after &lt;pattern&gt;] [-ref &lt;pattern&gt;] [-start-after &lt;pattern&gt;] \
+#          [-nocov]
+#
+# &lt;pattern&gt; must be a Perl Compatible Regular Expression (PCRE)
+# -req indicates how the requirements must be captured
+# -ref indicates how the referenced requirements must be captured
+# 
+# Parameters containing spaces must be enclosed by quotes: &quot;The file.doxc&quot;
+# Escape character (for quotes, etc.): antislash (\).
+# Thus any \ must be written \\.
+# 
+# Keyword &#39;define&#39; may be used to define values:
+# 
+#   define PATH
+#   document x -path PATH/x.txt
+#   document y -path PATH/y.txt
+
+document SPEC -path SPEC.docx -req REQ_[-a-zA-Z0-9_]* -stop-after Annex
+document TEST -path TEST.txt \
+    -req T_[-a-zA-Z0-9_]* \
+    -ref &quot;Ref:  *(.*)&quot; \
+    -stop-after &quot;Annex&quot; \
+    -start-after &quot;Tests cases&quot; \
+    -nocov -sort alphanum
+</code></pre>
+<h2 id="configuration-reference">Configuration Reference</h2>
+<p><code>define</code> Define a variable. Example:</p>
+<pre><code>define ALPHANUM [-a-zA-Z0-9_]
+document X -path /path/to/x -req REQ_ALPHANUM</code></pre>
+<p><code>document</code> Start a document description.</p>
+<p><code>-end-req</code> Indicate the end of the text of a requirement. This is used when you run <code>reqflow review</code>. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.</p>
+<p><code>-nocov</code> Do not report uncovered requirements (useful for-top level documents).</p>
+<p><code>-path</code> Path to the file.</p>
+<p><code>-ref</code> Pattern for capturing references identifiers (regular expression).</p>
+<p><code>-prefix-req</code> Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)</p>
+<p><code>-req</code> Pattern for capturing requirements identifiers (regular expression).</p>
+<p><code>-sort</code> Sort method when listing requirements: <code>document</code> (same order as the are in the document) or <code>alphanum</code> (alphanumeric order).</p>
+<p><code>-start-after</code> Start capturing requirements after this pattern (regular expression).</p>
+<p><code>-stop-after</code> Stop capturing requirements after this pattern (regular expression).</p>
+<p><code>-type</code> Type of the document, overriding the file extension.</p>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>Environment variables can be inserted in the configuration file, using a dollar sign ($) prefix.</p>
+<p>Example:</p>
+<pre><code>document SPEC -path $DOCUMENT -req REQ_[-a-zA-Z0-9_]*
+# or
+document SPEC -path ${DOCUMENT} -req REQ_[-a-zA-Z0-9_]*</code></pre>
+<h2 id="external-dependencies">External Dependencies</h2>
+<ul>
+<li>libz, libzip</li>
+<li>libxml2</li>
+<li>libpoppler, libpoppler-cpp</li>
+<li>libpcreposix, libpcre</li>
+</ul>
+<p>The Windows release includes these as static libraries.</p>
+<h2 id="license-gplv2">License GPLv2+</h2>
+<p>Reqflow Copyright (C) 2014 Frederic Hoerni</p>
+<p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
+</div>
+        </div> <!-- div class page -->
+        <div class="footer">
+            Copyright &copy; 2014, Frédéric Hoerni<br>
+            Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
+            Page updated on  3 Oct 2018
+        </div>
+    </body>
+</html>
