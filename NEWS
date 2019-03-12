@@ -1,9 +1,9 @@
 Reqflow 1.6.0, 11 Mar 2019
-	- Option -type accepts only the following arguments: txt, odt, docx, xml, html, pdf
-	- When file type detection is based on the filename extension:
-		* the detection is case insensitive
-		* the known extensions are those accepted by -type, and "htm"
-		* text is the default (when the extension is unkown)
+    - Option -type accepts only the following arguments: txt, odt, docx, xml, html, pdf
+    - When file type detection is based on the filename extension:
+        * the detection is case insensitive
+        * the known extensions are those accepted by -type, and "htm"
+        * text is the default (when the extension is unkown)
 
 Reqflow 1.5.3, 2 Oct 2018
     - file extensions .ad, .adoc, .asc, .asciidoc, .md known as text documents
