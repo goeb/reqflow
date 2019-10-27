@@ -273,6 +273,17 @@ BlockStatus ReqDocument::processBlock(std::string &text)
         }
     }
 
+    // Check for endReq to know if text of current requirement is finished
+    std::map<std::string, regex_t *>::iterator endreq;
+    // There may be several ways to end a requirement: check each one in turn.
+    FOREACH(endreq, fileConfig->endReq) {
+
+        std::string reqEndPat = extractPattern(endreq->second, text, ERASE_ALL);
+        if (!reqEndPat.empty()) {
+            finalizeCurrentReq(); // finalize current req before starting a new one            
+        }
+    }
+
     // refs are stored after capturing a possible requirement
     // this is to deal with the case where the req and refs are on the same line
     if (!refs.empty()) {
@@ -283,17 +294,6 @@ BlockStatus ReqDocument::processBlock(std::string &text)
             } else {
                 Requirements[currentRequirement].covers.insert(*ref);
             }
-        }
-    }
-
-    // Check for endReq to know if text of current requirement is finished
-    std::map<std::string, regex_t *>::iterator endreq;
-    // There may be several ways to end a requirement: check each one in turn.
-    FOREACH(endreq, fileConfig->endReq) {
-
-        std::string reqEndPat = extractPattern(endreq->second, text, ERASE_ALL);
-        if (!reqEndPat.empty()) {
-            finalizeCurrentReq(); // finalize current req before starting a new one            
         }
     }
 
