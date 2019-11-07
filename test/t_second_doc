@@ -7,8 +7,10 @@
 
 T=$(basename $0)
 
-# copy input files locally so that their path does not depend on $srcdir
-cp -f $srcdir/SPEC.docx .
+if [ "." != "$srcdir" ]; then
+	# copy input files locally so that their path does not depend on $srcdir
+	cp -f $srcdir/SPEC.docx .
+fi
 
 # build .req file
 
