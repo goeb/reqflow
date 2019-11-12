@@ -1,6 +1,7 @@
 # Generate HTML pages with a menu
 
 SRCS += index.md
+SRCS += capture.md
 
 BUILD_DIR=.
 
