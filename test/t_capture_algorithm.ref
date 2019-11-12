@@ -1,0 +1,32 @@
+
+Requirements of SPEC1                              Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+SPEC1_PRINTF_01                                    SYS_155                                           
+SPEC1_PRINTF_02                                    SYS_158                                           
+SPEC1_PRINTF_02                                    SYS_159                                           
+SPEC1_PRINTF_03                                    SYS_721                                           
+SPEC1_PRINTF_03                                    SYS_722                                           
+
+Requirements of SPEC2                              Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+SPEC2_PRINTF_01                                    SYS_155                                           
+SPEC2_PRINTF_02                                    SYS_158                                           
+SPEC2_PRINTF_02                                    SYS_159                                           
+SPEC2_PRINTF_03                                    SYS_721                                           
+SPEC2_PRINTF_03                                    SYS_722                                           
+
+Requirements of SPEC3                              Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+SPEC3_PRINTF_01                                    SYS_155                                           
+SPEC3_PRINTF_02                                    SYS_158                                           
+SPEC3_PRINTF_02                                    SYS_159                                           
+SPEC3_PRINTF_03                                    SYS_721                                           
+SPEC3_PRINTF_03                                    SYS_722                                           
+
+Requirements of SYS                                Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+SYS_155                                           
+SYS_158                                           
+SYS_159                                           
+SYS_721                                           
+SYS_722                                           

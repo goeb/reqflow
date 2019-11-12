@@ -11,7 +11,8 @@ req-stat-sort.test \
 SPEC-with-table.test \
 t_second_doc \
 t_end_req \
-t_multi_doc
+t_multi_doc \
+t_capture_algorithm
 
 # include the tests on the distribution
 EXTRA_DIST = .

@@ -456,7 +456,8 @@ req-stat-sort.test \
 SPEC-with-table.test \
 t_second_doc \
 t_end_req \
-t_multi_doc
+t_multi_doc \
+t_capture_algorithm
 
 
 # include the tests on the distribution
@@ -661,6 +662,13 @@ t_end_req.log: t_end_req
 t_multi_doc.log: t_multi_doc
 	@p='t_multi_doc'; \
 	b='t_multi_doc'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+t_capture_algorithm.log: t_capture_algorithm
+	@p='t_capture_algorithm'; \
+	b='t_capture_algorithm'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# Test the capture algorithm
+. ./envtest
+. $srcdir/functions
+
+T=$(basename $0)
+
+# Create a etxt document for testing
+create_document() {
+	cat > $T.document << EOF
+# Title...
+
+## SYS requirements
+SYS_155
+SYS_158
+SYS_159
+SYS_721
+SYS_722
+
+## Requirements PART1
+REQ alone ont its line, REFS with "Ref:" marker, before or after the text.
+
+PRINTF_01
+printf –help shall display a help message and exit.
+Ref: SYS_155
+
+PRINTF_02
+Ref: SYS_158
+Ref: SYS_159
+The FORMAT parameter shall control the output as in C printf.
+
+PRINTF_03
+The exit code of printf shall be:
+- zero if no error occurs
+- 1 if the FORMAT has an invalid syntax
+Ref: SYS_721, SYS_722
+
+
+## Requirements PART2
+REQ and REFS on same line
+
+REQ: PRINTF_01, Ref: SYS_155
+printf –help shall display a help message and exit.
+
+REQ: PRINTF_02, Ref: SYS_158, SYS_159
+The FORMAT parameter shall control the output as in C printf.
+
+REQ: PRINTF_03, Ref: SYS_721, SYS_722
+The exit code of printf shall be:
+- zero if no error occurs
+- 1 if the FORMAT has an invalid syntax
+
+
+## Requirements PART3
+REFS on separate lines
+
+PRINTF_01
+printf –help shall display a help message and exit.
+SYS_155
+
+PRINTF_02
+SYS_158
+SYS_159
+The FORMAT parameter shall control the output as in C printf.
+
+PRINTF_03
+The exit code of printf shall be:
+- zero if no error occurs
+- 1 if the FORMAT has an invalid syntax
+SYS_721
+SYS_722
+
+EOF
+}
+
+create_document
+
+test_run $REQFLOW trac -r -c - << EOF
+
+document SYS -path $T.document -stop-after PART1 -req SYS_[0-9]+
+document SPEC1 -path $T.document -prefix-req SPEC1_ -start-after PART1 -stop-after PART2 -req PRINTF_[0-9]+ -ref "Ref:[, ]*(SYS_[0-9]+)"
+document SPEC2 -path $T.document -prefix-req SPEC2_ -start-after PART2 -stop-after PART3 -req PRINTF_[0-9]+ -ref "Ref:[, ]*(SYS_[0-9]+)"
+document SPEC3 -path $T.document -prefix-req SPEC3_ -start-after PART3 -req PRINTF_[0-9]+ -ref "SYS_[0-9]+"
+
+EOF
+
+diff -w $T.stdout $srcdir/$T.ref
