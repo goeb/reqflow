@@ -53,12 +53,12 @@ REF        := the unique identifier of a reference
 <ul>
 <li><code>-req</code> tells how to capture the REQ. Parentheses may be used to identify REQ inside a broader expression.
 <ul>
-<li>Eg: <code>&quot;&lt;(REQ_[-a-zA-Z_0-9]*)&gt;&quot;</code> for matching <code>&quot;&lt;REQ_123&gt;&quot;</code> and extracting <code>&quot;REQ_123&quot;</code></li>
+<li>Eg: <code>&lt;(REQ_[-a-zA-Z_0-9]*)&gt;</code> for matching <code>&lt;REQ_123&gt;</code> and extracting <code>REQ_123</code></li>
 </ul></li>
 <li><code>-ref</code> tells how to capture the REFS. Parentheses may be used to identify one or more REFS inside a broader expression.
 <ul>
-<li>Eg: <code>&quot;Ref:[, ]*(REF_[0-9]+)&quot;</code> for matching <code>&quot;Ref: REF_01, REF_02, REF_03&quot;</code> and extracting <code>&quot;REF_01&quot;</code>, <code>&quot;REF_02&quot;</code>, <code>&quot;REF_03&quot;</code></li>
-<li>Eg: <code>REF_[0-9]+</code> for mathing <code>&quot;REF_01&quot;</code>, and extracting the same.</li>
+<li>Eg: <code>Ref:[, ]*(REF_[0-9]+)</code> for matching <code>Ref: REF_01, REF_02, REF_03</code> and extracting <code>REF_01</code>, <code>REF_02</code>, <code>REF_03</code></li>
+<li>Eg: <code>REF_[0-9]+</code> for matching <code>REF_01</code>, and extracting the same.</li>
 </ul></li>
 <li><code>-end-req</code> tells where the capture of the text of the requirement shall end</li>
 </ul>
@@ -67,7 +67,7 @@ REF        := the unique identifier of a reference
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on 12 Nov 2019
+            Page updated on 13 Nov 2019
         </div>
     </body>
 </html>

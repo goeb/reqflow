@@ -37,10 +37,10 @@ As a result:
 The Reqflow parameters are as follows:
 
 * `-req` tells how to capture the REQ. Parentheses may be used to identify REQ inside a broader expression.
-	* Eg: `"<(REQ_[-a-zA-Z_0-9]*)>"` for matching `"<REQ_123>"` and extracting `"REQ_123"`
+	* Eg: `<(REQ_[-a-zA-Z_0-9]*)>` for matching `<REQ_123>` and extracting `REQ_123`
 * `-ref` tells how to capture the REFS. Parentheses may be used to identify one or more REFS inside a broader expression.
-	* Eg: `"Ref:[, ]*(REF_[0-9]+)"` for matching `"Ref: REF_01, REF_02, REF_03"` and extracting `"REF_01"`, `"REF_02"`, `"REF_03"`
-	* Eg: `REF_[0-9]+` for mathing `"REF_01"`, and extracting the same.
+	* Eg: `Ref:[, ]*(REF_[0-9]+)` for matching `Ref: REF_01, REF_02, REF_03` and extracting `REF_01`, `REF_02`, `REF_03`
+	* Eg: `REF_[0-9]+` for matching `REF_01`, and extracting the same.
 * `-end-req` tells where the capture of the text of the requirement shall end
 
 
