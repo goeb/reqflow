@@ -7,7 +7,7 @@ if [ "." != "$TEST_ORIGIN" ]; then
 	cp $TEST_ORIGIN/SPEC.docx .
 	cp $TEST_ORIGIN/TEST.txt .
 fi
-$REQFLOW stat -s -c - > $T.stdout.out 2> $T.stderr.out << EOF
+$(! $REQFLOW stat -s -c - > $T.stdout.out 2> $T.stderr.out << EOF
 define REQ_PATTERN PRINTF_[-a-zA-Z0-9_]*
 define ALPHANUM [-a-zA-Z0-9_]
 document SPEC 
@@ -24,6 +24,7 @@ document TEST -path TEST.txt
     -nocov
 
 EOF
+)
 cd $TEST_DIR
 diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref
 diff -w $T.stderr.out $TEST_ORIGIN/$T.stderr.ref

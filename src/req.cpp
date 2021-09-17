@@ -67,6 +67,7 @@ void printErrors()
                 fprintf(stderr, "%s:%s: %s\n", file->first.c_str(), e->first.c_str(), e->second.c_str());
             }
         }
+        exit (EXIT_FAILURE);
     }
 }
 

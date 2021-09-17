@@ -1,7 +1,7 @@
 #!/bin/sh
 . ./envtest
 T=req-trac
-$REQFLOW trac -c $TEST_ORIGIN/conf.req > $T.out 2> $T.err
+$(! $REQFLOW trac -c $TEST_ORIGIN/conf.req > $T.out 2> $T.err)
 diff -w $T.out $TEST_ORIGIN/$T.stdout.ref
 diff -w $T.err $TEST_ORIGIN/$T.stderr.ref
 

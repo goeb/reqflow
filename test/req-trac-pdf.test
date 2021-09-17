@@ -1,6 +1,6 @@
 #!/bin/sh
 . ./envtest
 T=req-trac-pdf
-$REQFLOW trac -c $TEST_ORIGIN/pdf.req > $T.out 2> $T.err
+$(! $REQFLOW trac -c $TEST_ORIGIN/pdf.req > $T.out 2> $T.err)
 diff -w $T.out $TEST_ORIGIN/$T.stdout.ref
 diff -w $T.err $TEST_ORIGIN/$T.stderr.ref
