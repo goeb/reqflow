@@ -1,5 +1,7 @@
 #!/bin/sh
 . ./envtest
+. $srcdir/functions
+
 T=req-stat-stdin
 TEST_DIR=$PWD
 if [ "." != "$TEST_ORIGIN" ]; then
@@ -7,7 +9,8 @@ if [ "." != "$TEST_ORIGIN" ]; then
 	cp $TEST_ORIGIN/SPEC.docx .
 	cp $TEST_ORIGIN/TEST.txt .
 fi
-$(! $REQFLOW stat -s -c - > $T.stdout.out 2> $T.stderr.out << EOF
+
+test_run ! $REQFLOW stat -s -c - << EOF
 define REQ_PATTERN PRINTF_[-a-zA-Z0-9_]*
 define ALPHANUM [-a-zA-Z0-9_]
 document SPEC 
@@ -24,7 +27,7 @@ document TEST -path TEST.txt
     -nocov
 
 EOF
-)
+
 cd $TEST_DIR
-diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref
-diff -w $T.stderr.out $TEST_ORIGIN/$T.stderr.ref
+diff -w $T.stdout $TEST_ORIGIN/$T.stdout.ref
+diff -w $T.stderr $TEST_ORIGIN/$T.stderr.ref

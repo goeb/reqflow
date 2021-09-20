@@ -1,6 +1,10 @@
 #!/bin/sh
 . ./envtest
+. $srcdir/functions
+
 T=req-stat
-$(! $REQFLOW stat -s -c $TEST_ORIGIN/conf.req > $T.stdout.out 2> $T.stderr.out)
-diff -w $T.stdout.out $TEST_ORIGIN/$T.stdout.ref
-diff -w $T.stderr.out $TEST_ORIGIN/$T.stderr.ref
+
+test_run ! $REQFLOW stat -s -c $TEST_ORIGIN/conf.req
+
+diff -w $T.stdout $TEST_ORIGIN/$T.stdout.ref
+diff -w $T.stderr $TEST_ORIGIN/$T.stderr.ref
