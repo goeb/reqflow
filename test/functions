@@ -3,7 +3,7 @@ test_run() {
     echo ">>>" $* | sed -e "s!$REQFLOW! REQFLOW!" >> $T.out
     # separate, then merge stdout and stderr, in order
     # to have a deterministic order of lines
-    $(eval "$* > $T.stdout 2>$T.stderr")
+    eval "$* > $T.stdout 2>$T.stderr"
     cat $T.stderr $T.stdout >> $T.out
     echo >> $T.out
 }
