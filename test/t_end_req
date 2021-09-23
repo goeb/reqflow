@@ -29,6 +29,6 @@ EOF
 
 echo -n > $T.out
 
-test_run $REQFLOW review -c $T.req
+test_run ! $REQFLOW review -c $T.req
 
 diff -w $T.out $srcdir/$T.ref

@@ -1,4 +1,4 @@
->>>REQFLOW review -c t_end_req.req
+>>> ! REQFLOW review -c t_end_req.req
 Error(s): 1
 SPEC_docx:SPEC_docx_PRINTF_15: Duplicate requirement: also defined in 'SPEC.docx'
 SPEC_docx_PRINTF_01
@@ -32,6 +32,8 @@ SPEC_docx_PRINTF_20
 SPEC_html_REQ_01
         Globulus shall have 3
         legs:
+        
+        
         
         one for walking
         

@@ -23,7 +23,7 @@ EOF
 
 set -x
 echo -n > $T.out
-test_run $REQFLOW stat -s -c $T.req
-test_run $REQFLOW trac -c $T.req
+test_run ! $REQFLOW stat -s -c $T.req
+test_run ! $REQFLOW trac -c $T.req
 
 diff -w $T.out $srcdir/$T.ref

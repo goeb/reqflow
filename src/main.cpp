@@ -1130,5 +1130,10 @@ int main(int argc, const char **argv)
 
     printErrors();
 
+    if ((rc == 0) and not Errors.empty()) {
+        // Errors detected during requirement analysis
+        return rc = 2;
+    }
+
     return rc;
 }
