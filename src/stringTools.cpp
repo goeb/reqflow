@@ -187,7 +187,7 @@ std::string replaceAll(const std::string &in, char c, const char *replaceBy)
   * REQ_3.17
   *
   */
-bool stringCompare::operator()(const std::string &s1, const std::string &s2)
+bool stringCompare::operator()(const std::string &s1, const std::string &s2) const
 {
 	enum mode_t { STRING, NUMBER } mode = STRING;
 	const char *l = s1.c_str();

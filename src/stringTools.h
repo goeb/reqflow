@@ -37,7 +37,7 @@ std::string replaceAll(const std::string &in, char c, const char *replaceBy);
 bool stringLessThan(std::string const &s1, std::string const &s2);
 struct stringCompare
 {
-    bool operator()(const std::string &s1, const std::string &s2);
+    bool operator()(const std::string &s1, const std::string &s2) const;
 };
 std::string escapeCsv(const std::string &input);
 

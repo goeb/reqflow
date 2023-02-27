@@ -70,7 +70,7 @@ void printErrors()
     }
 }
 
-bool ReqCompare::operator()(const Requirement *a, const Requirement *b)
+bool ReqCompare::operator()(const Requirement *a, const Requirement *b) const
 {
     if (!a) {
         LOG_ERROR("null a in ReqCompare");
