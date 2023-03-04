@@ -40,7 +40,7 @@ enum ReqFileType { RF_TEXT, RF_ODT, RF_DOCX, RF_XSLX, RF_DOCX_XML, RF_HTML, RF_P
   */
 struct ReqCompare
 {
-    bool operator()(const Requirement *a, const Requirement *b);
+    bool operator()(const Requirement *a, const Requirement *b) const;
 };
 
 struct ReqFileConfig {
