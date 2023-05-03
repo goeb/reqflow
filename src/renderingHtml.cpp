@@ -22,6 +22,8 @@
 #include "global.h"
 #include "stringTools.h"
 
+std::string htmlcss;
+
 /** Encode a string for HREF
   *
   */
@@ -58,8 +60,11 @@ void htmlPrintHeader()
     OUTPUT("<!DOCTYPE HTML><html>\n"
            "<head>\n"
            "<title>Requirements Traceability</title>\n"
-           "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n"
-           "<style>\n"
+           "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n");
+    if (!htmlcss.empty()) {
+        OUTPUT("<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n", htmlcss.c_str());
+    } else {
+        OUTPUT("<style>\n"
            "body { font-family: Verdana,sans-serif; }\n"
            "h1 { border-bottom: 1px #bbb solid; margin-top: 15px;}\n"
            "a[href], a[href]:link { color: blue; text-decoration: none; }\n"
@@ -82,8 +87,9 @@ void htmlPrintHeader()
            "td.r_upstream { border: 1px solid grey; padding: 1em;}\n"
            "td.r_downstream { border: 1px solid grey; padding: 1em; }\n"
            ".r_no_coverage { color: grey; }\n"
-           "</style>\n"
-           "</head>\n"
+           "</style>\n");
+    }
+    OUTPUT("</head>\n"
            "<body>\n"
            "<h1>Requirements Traceability</h1>\n"
            "<div class=\"r_main\">\n"
@@ -119,7 +125,7 @@ void htmlPrintErrors()
  */
 void htmlPrintSummaryRow(const char *docId, int ratio, int covered, int total, const char *path )
 {
-    const char *warning = "";
+    const char *warning = "r_normal";
     if (ratio != 100 && ratio != -1) warning = "r_warning";
     OUTPUT("<tr class=\"%s\"><td class=\"r_summary_l\">", warning);
     if (strlen(path)) OUTPUT("<a href=\"#%s\">", hrefEncode(docId).c_str()); // do not print href for the "total" line (no path)

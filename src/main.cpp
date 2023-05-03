@@ -36,6 +36,8 @@
 #include "ReqDocumentPdf.h"
 #include "renderingHtml.h"
 
+extern std::string htmlcss;
+
 std::string Cmdline;
 
 // Directory where the config file is
@@ -242,8 +244,10 @@ std::string consolidateToken(const std::list<std::pair<std::string, std::string>
   *     -end-req-style <regex> (not used)
   *     -sort <sort-mode>
   *
-  * A 'define' instanciates the definition of a variable, that will be used as replacement in the tokens.
-  * A 'document' starts a new definition os document.
+  * htmlcss <stylesheet.css>
+  *
+  * A 'define' instantiates the definition of a variable, that will be used as replacement in the tokens.
+  * A 'document' starts a new document definition.
   * The options of a document may be on the same line or on the following lines.
   * A 'define' interrupts the current document, if any.
   * Defined variables apply only on the <token> parts mentionned above, and in the order they appear.
@@ -324,7 +328,15 @@ int loadConfiguration(const char * file)
                     return 1;
                 }
                 continue;
-
+            } else if (verb == "htmlcss") {
+                pop(*line);
+                if (line->size() != 1) {
+                    PUSH_ERROR(file, "", "Invalid htmlcss: incorrect path to CSS file on line %d", lineNum);
+                } else {
+                    fileConfig = 0;
+                    htmlcss = pop(*line);
+                    LOG_DEBUG("HTML CSS file: '%s'", htmlcss.c_str());
+                }
             } // else, parse arguments below...
         }
 
