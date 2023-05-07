@@ -22,8 +22,6 @@
 #include "global.h"
 #include "stringTools.h"
 
-std::string htmlcss;
-
 /** Encode a string for HREF
   *
   */

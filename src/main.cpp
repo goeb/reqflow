@@ -36,8 +36,6 @@
 #include "ReqDocumentPdf.h"
 #include "renderingHtml.h"
 
-extern std::string htmlcss;
-
 std::string Cmdline;
 
 // Directory where the config file is

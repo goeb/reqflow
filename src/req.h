@@ -99,7 +99,8 @@ struct Requirement {
     std::string text;
 };
 
-
+/* Optional CSS file for html output */
+extern std::string htmlcss;
 
 extern std::map<std::string, ReqFileConfig*> ReqConfig;
 // storage for all requirements
