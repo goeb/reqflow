@@ -29,6 +29,7 @@ std::map<std::string, Requirement> Requirements;
 std::map<std::string, std::list<std::pair<std::string, std::string> > > Errors; // errors indexed by file
 int ReqTotal = 0;
 int ReqCovered = 0;
+std::string htmlcss;
 
 void dumpText(const char *text)
 {
