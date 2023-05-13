@@ -125,10 +125,6 @@ Note: <config> must be different from the commands of use case 1.
 # -req indicates how the requirements must be captured
 # -ref indicates how the referenced requirements must be captured
 # 
-# Parameters containing spaces must be enclosed by quotes: "The file.doxc"
-# Escape character (for quotes, etc.): antislash (\).
-# Thus any \ must be written \\.
-# 
 # Keyword 'define' may be used to define values:
 # 
 #   define PATH
@@ -143,38 +139,88 @@ document TEST -path TEST.txt \
     -start-after "Tests cases" \
     -nocov -sort alphanum
 
+# CSS for HTML output (optional)
+htmlcss style.css
 ```
 
 ## Configuration Reference
 
-`define` Define a variable. Example:
+A configuration file contains directives:
+
+- `document`: document to be analysed (at least 1)
+- `define`: expression that can be reused within the configuration file (zero or more)
+- `htmlcss`: CSS file to be used for HTML output (zero or one)
+
+General syntax:
+
+- Parameters with spaces must be enclosed by quotes. Eg: "Some file.docx"
+- Directives can be spanned on several lines ending with backslash (`\`)
+- Escape character (for quotes, etc.): backslash (`\`)
+
+### Directive `define`
+
+Define a variable.
+
+Syntax:
+```
+define NAME PATTERN
+```
+
+Example:
 
     define ALPHANUM [-a-zA-Z0-9_]
     document X -path /path/to/x -req REQ_ALPHANUM
 
-`document` Start a document description.
+### Directive `document`
 
-`-end-req` Indicate the end of the text of a requirement. This is used when you run `reqflow review`. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.
+Start a document description.
 
-`-nocov` Do not report uncovered requirements (useful for-top level documents).
+Syntax:
+```
+document NAME PARAMETERS ...
+```
 
-`-path` Path to the file.
+Parameters:
 
-`-ref` Pattern for capturing references identifiers (regular expression).
+- `-end-req` Indicate the end of the text of a requirement. This is used when you run `reqflow review`. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.
 
-`-prefix-req` Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)
+- `-nocov` Do not report uncovered requirements (useful for-top level documents).
 
-`-req` Pattern for capturing requirements identifiers (regular expression).
+- `-path` Path to the file.
 
-`-sort` Sort method when listing requirements: `document` (same order as the are in the document) or `alphanum` (alphanumeric order).
+- `-ref` Pattern for capturing references identifiers (regular expression).
 
-`-start-after` Start capturing requirements after this pattern (regular expression).
+- `-prefix-req` Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)
 
-`-stop-after` Stop capturing requirements after this pattern (regular expression).
+- `-req` Pattern for capturing requirements identifiers (regular expression).
 
-`-type` Type of the document, overriding the file extension. One of: `txt`, `docx`, `odt`, `xml`, `pdf`.
+- `-sort` Sort method when listing requirements: `document` (same order as the are in the document) or `alphanum` (alphanumeric order).
 
+- `-start-after` Start capturing requirements after this pattern (regular expression).
 
+- `-stop-after` Stop capturing requirements after this pattern (regular expression).
+
+- `-type` Type of the document, overriding the file extension. One of: `txt`, `docx`, `odt`, `xml`, `pdf`.
+
+### Directive `htmlcss`
+
+Indicate a CSS file for HTML output (generated with command-line option `-x html`).
+
+Example:
+
+```
+htmlcss style.css
+```
+
+Generated HTML:
+
+```
+<link href="style.css" rel="stylesheet" type="text/css"/>
+```
+
+[Example of CSS file](stylesheet.css)
+
+If no `htmlcss` is given, a default embedded CSS stylesheet is used.
 
 ## Environment Variables
 

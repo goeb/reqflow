@@ -138,10 +138,6 @@ Note: &lt;config&gt; must be different from the commands of use case 1.</code></
 # -req indicates how the requirements must be captured
 # -ref indicates how the referenced requirements must be captured
 # 
-# Parameters containing spaces must be enclosed by quotes: &quot;The file.doxc&quot;
-# Escape character (for quotes, etc.): antislash (\).
-# Thus any \ must be written \\.
-# 
 # Keyword &#39;define&#39; may be used to define values:
 # 
 #   define PATH
@@ -155,22 +151,54 @@ document TEST -path TEST.txt \
     -stop-after &quot;Annex&quot; \
     -start-after &quot;Tests cases&quot; \
     -nocov -sort alphanum
-</code></pre>
+
+# CSS for HTML output (optional)
+htmlcss style.css</code></pre>
 <h2 id="configuration-reference">Configuration Reference</h2>
-<p><code>define</code> Define a variable. Example:</p>
+<p>A configuration file contains directives:</p>
+<ul>
+<li><code>document</code>: document to be analysed (at least 1)</li>
+<li><code>define</code>: expression that can be reused within the configuration file (zero or more)</li>
+<li><code>htmlcss</code>: CSS file to be used for HTML output (zero or one)</li>
+</ul>
+<p>General syntax:</p>
+<ul>
+<li>Parameters with spaces must be enclosed by quotes. Eg: “Some file.docx”</li>
+<li>Directives can be spanned on several lines ending with backslash (<code>\</code>)</li>
+<li>Escape character (for quotes, etc.): backslash (<code>\</code>)</li>
+</ul>
+<h3 id="directive-define">Directive <code>define</code></h3>
+<p>Define a variable.</p>
+<p>Syntax:</p>
+<pre><code>define NAME PATTERN</code></pre>
+<p>Example:</p>
 <pre><code>define ALPHANUM [-a-zA-Z0-9_]
 document X -path /path/to/x -req REQ_ALPHANUM</code></pre>
-<p><code>document</code> Start a document description.</p>
-<p><code>-end-req</code> Indicate the end of the text of a requirement. This is used when you run <code>reqflow review</code>. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.</p>
-<p><code>-nocov</code> Do not report uncovered requirements (useful for-top level documents).</p>
-<p><code>-path</code> Path to the file.</p>
-<p><code>-ref</code> Pattern for capturing references identifiers (regular expression).</p>
-<p><code>-prefix-req</code> Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)</p>
-<p><code>-req</code> Pattern for capturing requirements identifiers (regular expression).</p>
-<p><code>-sort</code> Sort method when listing requirements: <code>document</code> (same order as the are in the document) or <code>alphanum</code> (alphanumeric order).</p>
-<p><code>-start-after</code> Start capturing requirements after this pattern (regular expression).</p>
-<p><code>-stop-after</code> Stop capturing requirements after this pattern (regular expression).</p>
-<p><code>-type</code> Type of the document, overriding the file extension. One of: <code>txt</code>, <code>docx</code>, <code>odt</code>, <code>xml</code>, <code>pdf</code>.</p>
+<h3 id="directive-document">Directive <code>document</code></h3>
+<p>Start a document description.</p>
+<p>Syntax:</p>
+<pre><code>document NAME PARAMETERS ...</code></pre>
+<p>Parameters:</p>
+<ul>
+<li><p><code>-end-req</code> Indicate the end of the text of a requirement. This is used when you run <code>reqflow review</code>. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.</p></li>
+<li><p><code>-nocov</code> Do not report uncovered requirements (useful for-top level documents).</p></li>
+<li><p><code>-path</code> Path to the file.</p></li>
+<li><p><code>-ref</code> Pattern for capturing references identifiers (regular expression).</p></li>
+<li><p><code>-prefix-req</code> Add this prefix to captured requirements to obtain the final requirements identifiers (useful to avoid conflicts when different documents use the same requirements identifiers)</p></li>
+<li><p><code>-req</code> Pattern for capturing requirements identifiers (regular expression).</p></li>
+<li><p><code>-sort</code> Sort method when listing requirements: <code>document</code> (same order as the are in the document) or <code>alphanum</code> (alphanumeric order).</p></li>
+<li><p><code>-start-after</code> Start capturing requirements after this pattern (regular expression).</p></li>
+<li><p><code>-stop-after</code> Stop capturing requirements after this pattern (regular expression).</p></li>
+<li><p><code>-type</code> Type of the document, overriding the file extension. One of: <code>txt</code>, <code>docx</code>, <code>odt</code>, <code>xml</code>, <code>pdf</code>.</p></li>
+</ul>
+<h3 id="directive-htmlcss">Directive <code>htmlcss</code></h3>
+<p>Indicate a CSS file for HTML output (generated with command-line option <code>-x html</code>).</p>
+<p>Example:</p>
+<pre><code>htmlcss style.css</code></pre>
+<p>Generated HTML:</p>
+<pre><code>&lt;link href=&quot;style.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;/&gt;</code></pre>
+<p><a href="stylesheet.css">Example of CSS file</a></p>
+<p>If no <code>htmlcss</code> is given, a default embedded CSS stylesheet is used.</p>
 <h2 id="environment-variables">Environment Variables</h2>
 <p>Environment variables can be inserted in the configuration file, using a dollar sign ($) prefix.</p>
 <p>Example:</p>
@@ -194,7 +222,7 @@ document SPEC -path ${DOCUMENT} -req REQ_[-a-zA-Z0-9_]*</code></pre>
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on 13 Nov 2019
+            Page updated on 13 May 2023
         </div>
     </body>
 </html>
