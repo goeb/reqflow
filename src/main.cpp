@@ -757,7 +757,7 @@ void printSummaryOfFile(const ReqFileConfig &f)
 
 }
 
-void printSummary(int argc, const char **argv)
+int printSummary(int argc, const char **argv)
 {
     // print statistics
     bool doPrintTotal = true;
@@ -781,6 +781,8 @@ void printSummary(int argc, const char **argv)
     }
 
     if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "", false);
+
+    return (ReqTotal == ReqCovered) ? 0 : 2;
 }
 
 void printRequirementsOfFile(StatusMode status, const ReqFileConfig &rfc)
@@ -853,8 +855,10 @@ int cmdStat(int argc, const char **argv)
     if (output) initOutputFd(output);
 
     if (REQ_SUMMARY == statusMode) {
-        printSummary(argc-i, argv+i);
-    } else printRequirements(statusMode, argc-i, argv+i);
+        return printSummary(argc-i, argv+i);
+    }
+
+    printRequirements(statusMode, argc-i, argv+i);
 
     return 0;
 }
