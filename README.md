@@ -1,0 +1,70 @@
+
+This is Reqflow, a requirement traceability tool.
+
+See the file NEWS for the user-visible changes from previous releases.
+
+For general building and installation instructions, see the file INSTALL.
+
+Reqflow is free software. See the file COPYING for copying conditions.
+
+
+Overview
+--------
+
+Reqflow is a free and open-source tool for tracing requirements across
+documents.
+
+To launch Reqflow:
+    - create a file with a .req extension, as follows,
+    - double-click it,
+    - this will generate an HTML report and open it.
+
+Sample file 'test.req'
+
+    define ALPHANUM [-a-zA-Z0-9_]
+    define REQ_PATTERN "REQ_ALPHANUM+"
+    define TST_PATTERN "TST_ALPHANUM+"
+    define REF_PATTERN "Ref: (ALPHANUM+)"
+
+    document SPEC -path SPEC.pdf -req REQ_PATTERN -stop-after Annex
+
+    document TEST -path TEST.docx
+        -req TST_PATTERN
+        -ref REF_PATTERN
+        -stop-after Annex
+        -nocov
+
+Installation
+------------
+
+Prerequisites:
+
+- autotools (autoconf, libtool, ...)
+- libzip
+- libxml-2.0
+- poppler-cpp
+- libpcreposix (libpcre3)
+
+Build and install:
+
+    ./bootstrap.sh
+    mkdir build
+    cd build
+    ../configure
+    make
+    make check
+    make install
+
+
+Documentation and Downloading
+-----------------------------
+
+See: http://goeb.github.io/reqflow
+
+
+System-specific Notes
+---------------------
+
+Reqflow can be cross-compiled using the Mingw GNU toolchain.
+See dev/README-cross-libs.txt for guidance.
+
