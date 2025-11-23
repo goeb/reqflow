@@ -757,7 +757,7 @@ void printSummaryOfFile(const ReqFileConfig &f)
 
 }
 
-void printSummary(int argc, const char **argv)
+bool printSummary(int argc, const char **argv)
 {
     // print statistics
     bool doPrintTotal = true;
@@ -781,6 +781,8 @@ void printSummary(int argc, const char **argv)
     }
 
     if (doPrintTotal) printPercent(ReqTotal, ReqCovered, "Total", "", false);
+
+    return (ReqTotal == ReqCovered);
 }
 
 void printRequirementsOfFile(StatusMode status, const ReqFileConfig &rfc)
@@ -825,6 +827,7 @@ int cmdStat(int argc, const char **argv)
     const char *configFile = DEFAULT_CONF;
     const char *output = 0;
     const char *arg = 0;
+    bool set_exit_status = false;
     StatusMode statusMode = REQ_UNRESOLVED;
     while (i<argc) {
         arg = argv[i]; i++;
@@ -838,6 +841,8 @@ int cmdStat(int argc, const char **argv)
             statusMode = REQ_SUMMARY;
         } else if (0 == strcmp(arg, "-v")) {
             statusMode = REQ_ALL;
+        } else if (0 == strcmp(arg, "-e")) {
+            set_exit_status = true;
         } else {
             i--; // push back arg into the list
             break; // leave remaining args for below
@@ -853,8 +858,10 @@ int cmdStat(int argc, const char **argv)
     if (output) initOutputFd(output);
 
     if (REQ_SUMMARY == statusMode) {
-        printSummary(argc-i, argv+i);
-    } else printRequirements(statusMode, argc-i, argv+i);
+        return (!printSummary(argc-i, argv+i) && set_exit_status) ? 2 : 0;
+    }
+
+    printRequirements(statusMode, argc-i, argv+i);
 
     return 0;
 }
