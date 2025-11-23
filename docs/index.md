@@ -40,9 +40,14 @@ Build From Source :
 
     git clone https://github.com/goeb/reqflow.git
     cd reqflow
-    ./configure
+    ./bootstrap.sh
+    mkdir build
+    cd build
+    ../configure
     make
-    cd test && ../reqflow stat -s
+    make check
+    ./reqflow stat -s -c ../test/conf.req
+
 
 ### Windows
 
@@ -71,6 +76,8 @@ Commands:
     stat [doc ...]  Print the status of requirements in all documents or the
                     given documents. Without additionnal option, only
                     unresolved coverage issues are reported.
+         -e         When combined with -s, exit with code 2 if the coverage
+                    ratio is not 100%.
          -s         Print a one-line summary for each document.
          -v         Print the status of all requirements.
                     Status codes:

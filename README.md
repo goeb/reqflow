@@ -53,7 +53,7 @@ Build and install:
     ../configure
     make
     make check
-    make install
+    ./reqflow stat -s -c ../test/conf.req
 
 
 Documentation and Downloading
