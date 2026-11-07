@@ -242,9 +242,9 @@ BlockStatus ReqDocument::processBlock(std::string &text)
     }
 
     // check if text covers a requirement
-    std::set<std::string> refs = extractAllPatterns(fileConfig->refRegex, text);
+    std::set<std::string> refs = extractAllPatterns(fileConfig->refRegex, text, fileConfig->keep_ids);
 
-    std::string reqId = extractPattern(fileConfig->reqRegex, text, ERASE_ALL);
+    std::string reqId = extractPattern(fileConfig->reqRegex, text, (fileConfig->keep_ids) ? ERASE_NONE : ERASE_ALL);
 
     if (!reqId.empty()) {
         // add the prefix, if any
@@ -409,16 +409,21 @@ std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtract
 
 /** Extract all matching patterns and remove them from the text
   */
-std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text)
+std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text, bool keep_ids)
 {
     std::set<std::string> result;
 
     std::string extracted;
-    do {
-        extracted = extractPattern(regex, text, ERASE_LAST);
+    if (keep_ids) {
+        extracted = extractPattern(regex, text, ERASE_NONE);
         if (!extracted.empty()) result.insert(extracted);
+    } else {
+        do {
+            extracted = extractPattern(regex, text, ERASE_LAST);
+            if (!extracted.empty()) result.insert(extracted);
 
-    } while (!extracted.empty());
+        } while (!extracted.empty());
+    }
 
     return result;
 }

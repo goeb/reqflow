@@ -191,6 +191,8 @@ Parameters:
 
 - `-end-req` Indicate the end of the text of a requirement. This is used when you run `reqflow review`. Note that the capture of requirements identifiers takes precedence over this option: a requirement id will automatically put an end to the text of the previous requirement.
 
+- `-keep-ids` Do not swallow requirements and references while parsing. This enable to, use parts of requirements as implicit references to upper requirements and have better review outputs. But prevent to use multiple refs on the same line which you anyway do not want when using implicit refs.
+
 - `-nocov` Do not report uncovered requirements (useful for-top level documents).
 
 - `-path` Path to the file.

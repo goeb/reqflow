@@ -234,6 +234,7 @@ std::string consolidateToken(const std::list<std::pair<std::string, std::string>
   *     -req <regex>
   *     -ref <regex>
   *     -nocov
+  *     -keep-ids
   *     -start-after <regex>
   *     -stop-after <regex>
   *     -type <type>
@@ -377,6 +378,9 @@ int loadConfiguration(const char * file)
 
             } else if (fileConfig && arg == "-nocov") {
                 fileConfig->nocov = true;
+
+            } else if (fileConfig && arg == "-keep-ids") {
+                fileConfig->keep_ids = true;
 
             } else if (fileConfig && arg == "-req") {
                 if (line->empty()) {
@@ -1034,6 +1038,7 @@ int cmdConfig(int argc, const char **argv)
         if (!f.startAfter.empty()) OUTPUT(" -start '%s'", f.startAfter.c_str());
         if (!f.stopAfter.empty()) OUTPUT(" -stop '%s'", f.stopAfter.c_str());
         if (f.nocov) OUTPUT(" -nocov");
+        if (f.keep_ids) OUTPUT(" -keep-ids");
         OUTPUT("\n");
     }
 
