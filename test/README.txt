@@ -6,4 +6,4 @@ Execution of a test must produce a T_ID ".out" (merging of stdout and stderr).
 
 The verdict is computed by comparing T_ID ".out" and T_ID ".ref"
 
-And tests scripts name must be reference in the 'TESTS' list of 'Makefile.am'.
+And tests scripts must be referenced in the 'TESTS' list of 'Makefile.am'.
