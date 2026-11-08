@@ -81,10 +81,10 @@ struct ReqFileConfig {
     // indicate we should not erase IDs of this document
     // this enable to implicitly use part of reqs as refs.
     // but also prevent multiple ref on same line but we anyway do not want it in this case.
-    bool keep_ids;
+    bool req_contains_ref;
 
     ReqFileConfig(): reqRegex(0), refRegex(0), startAfterRegex(0), stopAfterRegex(0), type(RF_UNKNOWN),
-        nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false), keep_ids(false) {}
+        nTotalRequirements(0), nCoveredRequirements(0), encoding(UTF8), nocov(false), req_contains_ref(false) {}
     static ReqFileType getFileTypeByExtension(const std::string &extension);
     static ReqFileType getFileTypeByCode(const std::string &code);
     static std::string getFileTypeCodes();
@@ -152,7 +152,7 @@ ReqFileConfig *getDocument(std::string docId);
 void consolidateCoverage();
 void checkUndefinedRequirements();
 std::string extractPattern(regex_t *regex, std::string &text, PolicyEraseExtracted erase = ERASE_NONE);
-std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text, bool keep_ids);
+std::set<std::string> extractAllPatterns(regex_t *regex, std::string &text, bool req_contains_ref);
 
 void computeGlobalStatistics();
 

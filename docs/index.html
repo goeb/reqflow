@@ -203,11 +203,11 @@ requirement. This is used when you run <code>reqflow review</code>. Note
 that the capture of requirements identifiers takes precedence over this
 option: a requirement id will automatically put an end to the text of
 the previous requirement.</p></li>
-<li><p><code>-keep-ids</code> Do not swallow requirements and references
-while parsing. This enable to, use parts of requirements as implicit
-references to upper requirements and have better review outputs. But
-prevent to use multiple refs on the same line which you anyway do not
-want when using implicit refs.</p></li>
+<li><p><code>-req-contains-ref</code> This enables to use parts of
+requirements as implicit references to upper requirements
+(i.e. requirements identifiers contain their reference identifier).
+Limitation: you cannot have multiple refs on a single requirement in
+this document.</p></li>
 <li><p><code>-nocov</code> Do not report uncovered requirements (useful
 for-top level documents).</p></li>
 <li><p><code>-path</code> Path to the file.</p></li>
@@ -269,7 +269,7 @@ Public License for more details.</p>
         <div class="footer">
             Copyright &copy; 2014, Frédéric Hoerni<br>
             Contact: &#x66;&#x68;&#x6f;&#x65;&#x72;&#x6e;&#x69;&#x40;free.fr<br>
-            Page updated on  7 nov. 2026
+            Page updated on  8 nov. 2026
         </div>
     </body>
 </html>

@@ -13,7 +13,7 @@ t_second_doc \
 t_end_req \
 t_multi_doc \
 t_capture_algorithm \
-t_keep_ids
+t_req_contains_ref
 
 # include the tests on the distribution
 EXTRA_DIST = .

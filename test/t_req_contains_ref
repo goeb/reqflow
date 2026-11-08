@@ -89,10 +89,10 @@ define RESULT_END   "^1[.][.]"
 document SPECS   -path $T.txt  -type txt  -req SPEC_REQ
 
 document TESTS   -path $T.bats -type txt  -req TEST_REQ   -ref TEST_REF
-                 -keep-ids
+                 -req-contains-ref
 
 document RESULTS -path $T.tap  -type txt  -req RESULT_REQ -ref RESULT_REF
-                 -keep-ids     -nocov -end-req RESULT_END
+                 -req-contains-ref        -nocov -end-req RESULT_END
                  -start-after RESULT_START
                  -stop-after  RESULT_STOP
 EOF
