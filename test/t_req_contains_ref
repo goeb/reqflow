@@ -1,0 +1,106 @@
+#!/bin/sh
+
+. ./envtest
+. "$srcdir/functions"
+
+T=$(basename "$0")
+
+#########
+# SPECS #
+#########
+
+cat << 'EOF' > "$T.txt"
+== REQ_1 Echo command behaviour output
+
+The `echo` command should place its arguments on stdout and nothing else.
+
+== REQ_2 Echo command status
+
+The `echo` command should exit with success
+EOF
+
+#########
+# TESTS #
+#########
+
+cat << 'EOF' > "$T.bats"
+setup() {
+    load '/usr/lib/bats/bats-assert/load'
+}
+
+@test "T-REQ_1-1 it can write 'foo bar'" {
+    run echo foo bar
+    assert_output "foo bar"
+}
+
+@test "T-REQ_1-2 it does not allways just write 'foo bar'" {
+    run echo baz
+    assert_output "baz"
+}
+
+@test "T-REQ_2-1 it return 0 # TODO correct this test" {
+    run echo foo
+    refute_success # Oups !!! should be 'assert_success'.
+}
+EOF
+
+###########
+# RESULTS #
+###########
+
+cat << 'EOF' > "$T.tap"
+TAP version 13
+1..3                                                                           
+ok     1 - T-REQ_1-1 it can write 'foo bar'                                    
+ok     2 - T-REQ_1-2 it does not allways just write 'foo bar'
+not ok 3 - T-REQ_2-1 it return 0 # TODO correct this test
+  ---
+  message: |
+    (in test file toto.bats, line 20)
+      `assert_failure # Oups !!! should be 'assert_success'.' failed
+
+    -- command succeeded, but it was expected to fail --
+    output : foo
+    --
+
+  ...
+EOF
+
+################
+# reqflow conf #
+################
+
+cat << EOF > "$T.req"
+define NUM          "[1-9][0-9]*"
+define REQ_ID       "REQ_NUM"
+define TEST_ID      "T-REQ_ID-NUM"
+define RESULT_ID    "(?:not )?ok\\\\s+\\\\d+"
+
+define SPEC_REQ     "== (REQ_ID)"
+define TEST_REQ     "^@test\\\\s+\\"(TEST_ID)"
+define TEST_REF     "^@test\\\\s+\\"T-(REQ_ID)-NUM"
+
+define RESULT_START "^TAP version NUM$"
+define RESULT_REQ   "^(RESULT_ID\\\\s+-\\\\s+TEST_ID)"
+define RESULT_REF   "^RESULT_ID\\\\s+-\\\\s+(TEST_ID)"
+define RESULT_STOP  "^Bail out!"
+define RESULT_END   "^1[.][.]"
+
+document SPECS   -path $T.txt  -type txt  -req SPEC_REQ
+
+document TESTS   -path $T.bats -type txt  -req TEST_REQ   -ref TEST_REF
+                 -req-contains-ref
+
+document RESULTS -path $T.tap  -type txt  -req RESULT_REQ -ref RESULT_REF
+                 -req-contains-ref        -nocov -end-req RESULT_END
+                 -start-after RESULT_START
+                 -stop-after  RESULT_STOP
+EOF
+
+set -x
+echo -n > "$T.out"
+test_run "$REQFLOW" stat -s -c "$T.req"
+test_run "$REQFLOW" trac -r -c "$T.req"
+test_run "$REQFLOW" review  -c "$T.req"
+
+diff -w "$T.out" "$srcdir/$T.ref"

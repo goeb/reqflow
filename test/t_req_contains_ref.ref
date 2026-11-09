@@ -1,0 +1,76 @@
+>>> REQFLOW stat -s -c t_req_contains_ref.req
+Document                          % covered / total
+----------------------------------------------------------------------
+RESULTS                        nocov  nocov /     3 t_req_contains_ref.tap
+SPECS                          100%       2 /     2 t_req_contains_ref.txt
+TESTS                          100%       3 /     3 t_req_contains_ref.bats
+Total                          100%       5 /     5 
+
+>>> REQFLOW trac -r -c t_req_contains_ref.req
+
+Requirements of RESULTS                            Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+ok     1 - T-REQ_1-1                               T-REQ_1-1                                         
+ok     2 - T-REQ_1-2                               T-REQ_1-2                                         
+not ok 3 - T-REQ_2-1                               T-REQ_2-1                                         
+
+Requirements of SPECS                              Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+REQ_1                                             
+REQ_2                                             
+
+Requirements of TESTS                              Requirements Upstream                             
+--------------------------------------------------------------------------------------------------------------------
+T-REQ_1-1                                          REQ_1                                             
+T-REQ_1-2                                          REQ_1                                             
+T-REQ_2-1                                          REQ_2                                             
+
+>>> REQFLOW review -c t_req_contains_ref.req
+ok     1 - T-REQ_1-1
+        ok     1 - T-REQ_1-1 it can write 'foo bar'
+
+ok     2 - T-REQ_1-2
+        ok     2 - T-REQ_1-2 it does not allways just write 'foo bar'
+
+not ok 3 - T-REQ_2-1
+        not ok 3 - T-REQ_2-1 it return 0 # TODO correct this test
+        ---
+        message: |
+        (in test file toto.bats, line 20)
+        `assert_failure # Oups !!! should be 'assert_success'.' failed
+        
+        -- command succeeded, but it was expected to fail --
+        output : foo
+        --
+        
+        ...
+
+REQ_1
+        Echo command behaviour output
+        
+        The `echo` command should place its arguments on stdout and nothing else.
+
+REQ_2
+        Echo command status
+        
+        The `echo` command should exit with success
+
+T-REQ_1-1
+        @test "T-REQ_1-1 it can write 'foo bar'" {
+        run echo foo bar
+        assert_output "foo bar"
+        }
+
+T-REQ_1-2
+        @test "T-REQ_1-2 it does not allways just write 'foo bar'" {
+        run echo baz
+        assert_output "baz"
+        }
+
+T-REQ_2-1
+        @test "T-REQ_2-1 it return 0 # TODO correct this test" {
+        run echo foo
+        refute_success # Oups !!! should be 'assert_success'.
+        }
+
+
